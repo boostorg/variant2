@@ -15,3 +15,4 @@ run variant_size.cpp : : : $(REQ) ;
 run variant_alternative.cpp : : : $(REQ) ;
 run holds_alternative.cpp : : : $(REQ) ;
 run holds_alternative_cx.cpp : : : $(REQ) ;
+run get_by_index.cpp : : : $(REQ) ;
