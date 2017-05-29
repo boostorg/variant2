@@ -13,3 +13,5 @@ REQ = ; #[ requires cxx11_variadic_templates cxx11_template_aliases cxx11_declty
 
 run variant_size.cpp : : : $(REQ) ;
 run variant_alternative.cpp : : : $(REQ) ;
+run holds_alternative.cpp : : : $(REQ) ;
+run holds_alternative_cx.cpp : : : $(REQ) ;

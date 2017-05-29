@@ -20,7 +20,6 @@ template<class T> using var_size_t = mp_size_t<variant_size<T>::value>;
 
 int main()
 {
-
     BOOST_TEST_EQ( (variant_size<variant<>>::value), 0 );
     BOOST_TEST_EQ( (variant_size<variant<> const>::value), 0 );
     BOOST_TEST_EQ( (variant_size<variant<> volatile>::value), 0 );

@@ -20,7 +20,6 @@ template<class I, class T> using var_alt_t = variant_alternative_t<I::value, T>;
 
 int main()
 {
-
     BOOST_TEST_TRAIT_TRUE((std::is_same<variant_alternative_t<0, variant<void>>, void>));
     BOOST_TEST_TRAIT_TRUE((std::is_same<variant_alternative_t<0, variant<void> const>, void const>));
     BOOST_TEST_TRAIT_TRUE((std::is_same<variant_alternative_t<0, variant<void> volatile>, void volatile>));
