@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <exception>
 #include <cassert>
+#include <initializer_list>
 
 //
 
