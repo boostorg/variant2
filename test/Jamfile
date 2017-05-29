@@ -19,3 +19,5 @@ run get_by_index.cpp : : : $(REQ) ;
 compile get_by_index_cx.cpp : : : $(REQ) ;
 run get_by_type.cpp : : : $(REQ) ;
 compile get_by_type_cx.cpp : : : $(REQ) ;
+run variant_default_construct.cpp : : : $(REQ) ;
+compile variant_default_construct_cx.cpp : : : $(REQ) ;
