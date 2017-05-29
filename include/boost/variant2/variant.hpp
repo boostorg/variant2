@@ -142,7 +142,7 @@ template<class U, class... T> constexpr U& get(variant<T...>& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return v.index() == I? v._get_impl( mp_size_t<I>() ): throw bad_variant_access();
+    return ( v.index() == I? (void)0: throw bad_variant_access() ), v._get_impl( mp_size_t<I>() );
 }
 
 template<class U, class... T> constexpr U&& get(variant<T...>&& v)
@@ -150,7 +150,7 @@ template<class U, class... T> constexpr U&& get(variant<T...>&& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return v.index() == I? std::move( v._get_impl( mp_size_t<I>() ) ): throw bad_variant_access();
+    return ( v.index() == I? (void)0: throw bad_variant_access() ), std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
 template<class U, class... T> constexpr U const& get(variant<T...> const& v)
@@ -158,7 +158,7 @@ template<class U, class... T> constexpr U const& get(variant<T...> const& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return v.index() == I? v._get_impl( mp_size_t<I>() ): throw bad_variant_access();
+    return ( v.index() == I? (void)0: throw bad_variant_access() ), v._get_impl( mp_size_t<I>() );
 }
 
 template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
@@ -166,7 +166,7 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return v.index() == I? std::move( v._get_impl( mp_size_t<I>() ) ): throw bad_variant_access();
+    return ( v.index() == I? (void)0: throw bad_variant_access() ), std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
 // get_if
