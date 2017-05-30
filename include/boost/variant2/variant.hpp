@@ -592,11 +592,31 @@ template<class T> struct in_place_type_t
 {
 };
 
+template<class T> constexpr in_place_type_t<T> in_place_type{};
+
+namespace detail
+{
+
+template<class T> struct is_in_place_type: std::false_type {};
+template<class T> struct is_in_place_type<in_place_type_t<T>>: std::true_type {};
+
+} // namespace detail
+
 // in_place_index_t
 
 template<std::size_t I> struct in_place_index_t
 {
 };
+
+template<std::size_t I> constexpr in_place_index_t<I> in_place_index{};
+
+namespace detail
+{
+
+template<class T> struct is_in_place_index: std::false_type {};
+template<std::size_t I> struct is_in_place_index<in_place_index_t<I>>: std::true_type {};
+
+} // namespace detail
 
 // variant
 
@@ -643,7 +663,8 @@ public:
     }
 
     template<class U,
-        class E1 = std::enable_if_t<!std::is_same<std::decay_t<U>, variant>::value>,
+        class Ud = std::decay_t<U>,
+        class E1 = std::enable_if_t< !std::is_same<Ud, variant>::value && !variant2::detail::is_in_place_index<Ud>::value && !variant2::detail::is_in_place_type<Ud>::value >,
         class V = variant2::detail::resolve_overload_type<U&&, T...>,
         class E2 = std::enable_if_t<std::is_constructible<V, U>::value>
         >
