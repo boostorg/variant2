@@ -54,6 +54,8 @@ int main()
 
         BOOST_TEST_EQ( get<0>(v), 0 );
         BOOST_TEST_EQ( get_if<0>(&v), &get<0>(v) );
+
+        BOOST_TEST_EQ( get<0>(std::move(v)), 0 );
     }
 
     {
@@ -61,6 +63,8 @@ int main()
 
         BOOST_TEST_EQ( get<0>(v), 1 );
         BOOST_TEST_EQ( get_if<0>(&v), &get<0>(v) );
+
+        BOOST_TEST_EQ( get<0>(std::move(v)), 1 );
     }
 
     {
@@ -119,6 +123,8 @@ int main()
 
         BOOST_TEST_THROWS( get<1>(v), bad_variant_access );
         BOOST_TEST_EQ( get_if<1>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<0>(std::move(v)), 0 );
     }
 
     {
@@ -129,6 +135,8 @@ int main()
 
         BOOST_TEST_THROWS( get<1>(v), bad_variant_access );
         BOOST_TEST_EQ( get_if<1>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<0>(std::move(v)), 1 );
     }
 
     {
@@ -139,6 +147,8 @@ int main()
 
         BOOST_TEST_EQ( get<1>(v), 3.14f );
         BOOST_TEST_EQ( get_if<1>(&v), &get<1>(v) );
+
+        BOOST_TEST_EQ( get<1>(std::move(v)), 3.14f );
     }
 
     {
@@ -152,6 +162,8 @@ int main()
 
         BOOST_TEST_THROWS( get<2>(v), bad_variant_access );
         BOOST_TEST_EQ( get_if<2>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<0>(std::move(v)), 0 );
     }
 
     {
@@ -165,6 +177,8 @@ int main()
 
         BOOST_TEST_THROWS( get<2>(v), bad_variant_access );
         BOOST_TEST_EQ( get_if<2>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<0>(std::move(v)), 1 );
     }
 
     {
@@ -178,6 +192,8 @@ int main()
 
         BOOST_TEST_EQ( get<2>(v), 3.14f );
         BOOST_TEST_EQ( get_if<2>(&v), &get<2>(v) );
+
+        BOOST_TEST_EQ( get<2>(std::move(v)), 3.14f );
     }
 
     return boost::report_errors();

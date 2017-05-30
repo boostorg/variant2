@@ -114,25 +114,37 @@ template<class U, class... T> constexpr bool holds_alternative( variant<T...> co
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>& get(variant<T...>& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), v._get_impl( mp_size_t<I>() );
+
+    if( v.index() != I ) throw bad_variant_access();
+
+    return v._get_impl( mp_size_t<I>() );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>&& get(variant<T...>&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), std::move( v._get_impl( mp_size_t<I>() ) );
+
+    if( v.index() != I ) throw bad_variant_access();
+
+    return std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...> const>& get(variant<T...> const& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), v._get_impl( mp_size_t<I>() );
+
+    if( v.index() != I ) throw bad_variant_access();
+
+    return v._get_impl( mp_size_t<I>() );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...> const>&& get(variant<T...> const&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), std::move( v._get_impl( mp_size_t<I>() ) );
+
+    if( v.index() != I ) throw bad_variant_access();
+
+    return std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
 // get
@@ -142,7 +154,9 @@ template<class U, class... T> constexpr U& get(variant<T...>& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), v._get_impl( mp_size_t<I>() );
+    if( v.index() != I ) throw bad_variant_access();
+
+    return v._get_impl( mp_size_t<I>() );
 }
 
 template<class U, class... T> constexpr U&& get(variant<T...>&& v)
@@ -150,7 +164,9 @@ template<class U, class... T> constexpr U&& get(variant<T...>&& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), std::move( v._get_impl( mp_size_t<I>() ) );
+    if( v.index() != I ) throw bad_variant_access();
+
+    return std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
 template<class U, class... T> constexpr U const& get(variant<T...> const& v)
@@ -158,7 +174,9 @@ template<class U, class... T> constexpr U const& get(variant<T...> const& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), v._get_impl( mp_size_t<I>() );
+    if( v.index() != I ) throw bad_variant_access();
+
+    return v._get_impl( mp_size_t<I>() );
 }
 
 template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
@@ -166,7 +184,9 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return ( v.index() == I? (void)0: throw bad_variant_access() ), std::move( v._get_impl( mp_size_t<I>() ) );
+    if( v.index() != I ) throw bad_variant_access();
+
+    return std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
 // get_if
@@ -699,13 +719,13 @@ public:
 
             if( J == r.index() )
             {
-                if( index() == J )
+                if( this->index() == J )
                 {
                     get<J>(*this) = get<J>(r);
                 }
                 else
                 {
-                    variant_base::template emplace<J>( get<J>(r) );
+                    this->variant_base::template emplace<J>( get<J>(r) );
                 }
             }
 
@@ -722,13 +742,13 @@ public:
 
             if( J == r.index() )
             {
-                if( index() == J )
+                if( this->index() == J )
                 {
                     get<J>(*this) = get<J>(std::move(r));
                 }
                 else
                 {
-                    variant_base::template emplace<J>( get<J>(std::move(r)) );
+                    this->variant_base::template emplace<J>( get<J>(std::move(r)) );
                 }
             }
 
