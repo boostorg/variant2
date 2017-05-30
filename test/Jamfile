@@ -21,3 +21,5 @@ run get_by_type.cpp : : : $(REQ) ;
 compile get_by_type_cx.cpp : : : $(REQ) ;
 run variant_default_construct.cpp : : : $(REQ) ;
 compile variant_default_construct_cx.cpp : : : $(REQ) ;
+run variant_copy_construct.cpp : : : $(REQ) ;
+run variant_move_construct.cpp : : : $(REQ) ;

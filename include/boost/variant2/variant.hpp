@@ -642,8 +642,13 @@ public:
         });
     }
 
-    template<class U> constexpr variant( U&& u )
-        noexcept( std::is_nothrow_constructible< variant2::detail::resolve_overload_type<U&&, T...>, U >::value )
+    template<class U,
+        class E1 = std::enable_if_t<!std::is_same<std::decay_t<U>, variant>::value>,
+        class V = variant2::detail::resolve_overload_type<U&&, T...>,
+        class E2 = std::enable_if_t<std::is_constructible<V, U>::value>
+        >
+    constexpr variant( U&& u )
+        noexcept( std::is_nothrow_constructible<V, U>::value )
         : variant_base( variant2::detail::resolve_overload_index<U&&, T...>(), std::forward<U>(u) )
     {
     }
@@ -714,9 +719,9 @@ public:
     template<class U,
         class E1 = std::enable_if_t<!std::is_same<std::decay_t<U>, variant>::value>,
         class V = variant2::detail::resolve_overload_type<U, T...>,
-        class E2 = std::enable_if_t<std::is_assignable<V&, U>::value && std::is_constructible<V&, U>::value>
+        class E2 = std::enable_if_t<std::is_assignable<V&, U>::value && std::is_constructible<V, U>::value>
         >
-        variant& operator=( U&& u ) // noexcept(see below );
+        variant& operator=( U&& u ) noexcept( std::is_nothrow_assignable<V&, U>::value && std::is_nothrow_constructible<V, U>::value )
     {
         std::size_t const I = variant2::detail::resolve_overload_index<U, T...>::value;
 
@@ -733,7 +738,6 @@ public:
     }
 
     // modifiers
-    // using variant_base::emplace;
 
     template<class U, class... A, class I = mp_find<variant<T...>, U>> U& emplace( A&&... a )
     {
@@ -777,28 +781,30 @@ template<class... T> constexpr bool operator==( variant<T...> const & v, variant
 {
     if( v.index() != w.index() ) return false;
 
+    bool r = false;
+
     mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-        if( I == v.index() ) return get<I>(v) == get<I>(w);
+        if( I == v.index() ) r = get<I>(v) == get<I>(w);
 
     });
 
-    assert( false );
-    return false;
+    return r;
 }
 
 template<class... T> constexpr bool operator!=( variant<T...> const & v, variant<T...> const & w )
 {
     if( v.index() != w.index() ) return true;
 
+    bool r = true;
+
     mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-        if( I == v.index() ) return get<I>(v) != get<I>(w);
+        if( I == v.index() ) r = get<I>(v) != get<I>(w);
 
     });
 
-    assert( false );
-    return true;
+    return r;
 }
 
 template<class... T> constexpr bool operator<( variant<T...> const & v, variant<T...> const & w )
@@ -806,14 +812,15 @@ template<class... T> constexpr bool operator<( variant<T...> const & v, variant<
     if( v.index() < w.index() ) return true;
     if( v.index() > w.index() ) return false;
 
+    bool r = false;
+
     mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-        if( I == v.index() ) return get<I>(v) < get<I>(w);
+        if( I == v.index() ) r = get<I>(v) < get<I>(w);
 
     });
 
-    assert( false );
-    return false;
+    return r;
 }
 
 template<class... T> constexpr bool operator>(  variant<T...> const & v, variant<T...> const & w )
@@ -821,14 +828,15 @@ template<class... T> constexpr bool operator>(  variant<T...> const & v, variant
     if( v.index() > w.index() ) return true;
     if( v.index() < w.index() ) return false;
 
+    bool r = false;
+
     mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-        if( I == v.index() ) return get<I>(v) > get<I>(w);
+        if( I == v.index() ) r = get<I>(v) > get<I>(w);
 
     });
 
-    assert( false );
-    return false;
+    return r;
 }
 
 template<class... T> constexpr bool operator<=( variant<T...> const & v, variant<T...> const & w )
@@ -836,14 +844,15 @@ template<class... T> constexpr bool operator<=( variant<T...> const & v, variant
     if( v.index() < w.index() ) return true;
     if( v.index() > w.index() ) return false;
 
+    bool r = false;
+
     mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-        if( I == v.index() ) return get<I>(v) <= get<I>(w);
+        if( I == v.index() ) r = get<I>(v) <= get<I>(w);
 
     });
 
-    assert( false );
-    return false;
+    return r;
 }
 
 template<class... T> constexpr bool operator>=( variant<T...> const & v, variant<T...> const & w )
@@ -851,14 +860,15 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
     if( v.index() > w.index() ) return true;
     if( v.index() < w.index() ) return false;
 
+    bool r = false;
+
     mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-        if( I == v.index() ) return get<I>(v) >= get<I>(w);
+        if( I == v.index() ) r = get<I>(v) >= get<I>(w);
 
     });
 
-    assert( false );
-    return false;
+    return r;
 }
 
 // visitation
