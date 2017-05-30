@@ -31,3 +31,4 @@ run variant_in_place_type_construct.cpp : : : $(REQ) ;
 compile variant_in_place_type_construct_cx.cpp : : : $(REQ) ;
 run variant_copy_assign.cpp : : : $(REQ) ;
 run variant_move_assign.cpp : : : $(REQ) ;
+run variant_value_assign.cpp : : : $(REQ) ;
