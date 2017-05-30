@@ -27,3 +27,5 @@ run variant_value_construct.cpp : : : $(REQ) ;
 compile variant_value_construct_cx.cpp : : : $(REQ) ;
 run variant_in_place_index_construct.cpp : : : $(REQ) ;
 compile variant_in_place_index_construct_cx.cpp : : : $(REQ) ;
+run variant_in_place_type_construct.cpp : : : $(REQ) ;
+compile variant_in_place_type_construct_cx.cpp : : : $(REQ) ;
