@@ -23,3 +23,5 @@ run variant_default_construct.cpp : : : $(REQ) ;
 compile variant_default_construct_cx.cpp : : : $(REQ) ;
 run variant_copy_construct.cpp : : : $(REQ) ;
 run variant_move_construct.cpp : : : $(REQ) ;
+run variant_value_construct.cpp : : : $(REQ) ;
+compile variant_value_construct_cx.cpp : : : $(REQ) ;
