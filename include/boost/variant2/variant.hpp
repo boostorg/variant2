@@ -749,8 +749,10 @@ public:
     {
     }
 
-    template<class U, class V, class... A>
-    constexpr explicit variant( in_place_type_t<U>, std::initializer_list<V>, A&&... a );
+    template<class U, class V, class... A, class I = mp_find<variant<T...>, U>>
+    constexpr explicit variant( in_place_type_t<U>, std::initializer_list<V> il, A&&... a ): variant_base( I(), il, std::forward<A>(a)... )
+    {
+    }
 
     template<std::size_t I, class... A>
     constexpr explicit variant( in_place_index_t<I>, A&&... a ): variant_base( mp_size_t<I>(), std::forward<A>(a)... )
@@ -758,7 +760,9 @@ public:
     }
 
     template<std::size_t I, class V, class... A>
-    constexpr explicit variant( in_place_index_t<I>, std::initializer_list<V>, A&&... );
+    constexpr explicit variant( in_place_index_t<I>, std::initializer_list<V> il, A&&... a ): variant_base( mp_size_t<I>(), il, std::forward<A>(a)... )
+    {
+    }
 
     // assignment
     variant& operator=( variant const & r )
@@ -836,7 +840,11 @@ public:
         return _get_impl( I() );
     }
 
-    template<class U, class V, class... A> U& emplace( std::initializer_list<V> il, A&&... a );
+    template<class U, class V, class... A, class I = mp_find<variant<T...>, U>> U& emplace( std::initializer_list<V> il, A&&... a )
+    {
+        variant_base::template emplace<I::value>( il, std::forward<A>(a)... );
+        return _get_impl( I() );
+    }
 
     template<std::size_t I, class... A> variant_alternative_t<I, variant<T...>>& emplace( A&&... a )
     {
@@ -844,7 +852,11 @@ public:
         return _get_impl( mp_size_t<I>() );
     }
 
-    template<std::size_t I, class V, class... A> variant_alternative_t<I, variant<T...>>& emplace( std::initializer_list<V> il, A&&... a );
+    template<std::size_t I, class V, class... A> variant_alternative_t<I, variant<T...>>& emplace( std::initializer_list<V> il, A&&... a )
+    {
+        variant_base::template emplace<I>( il, std::forward<A>(a)... );
+        return _get_impl( mp_size_t<I>() );
+    }
 
     // value status
 

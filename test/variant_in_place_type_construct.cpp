@@ -112,5 +112,23 @@ int main()
         BOOST_TEST( holds_alternative<std::string>(v) );
     }
 
+    {
+        variant<int, int, float, float, std::string> v( in_place_type<std::string>, { 'a', 'b', 'c' } );
+
+        BOOST_TEST_EQ( v.index(), 4 );
+        BOOST_TEST_EQ( get<4>(v), (std::string{ 'a', 'b', 'c' }) );
+
+        BOOST_TEST( holds_alternative<std::string>(v) );
+    }
+
+    {
+        variant<int, int, float, float, std::string> v( in_place_type<std::string>, { 'a', 'b', 'c' }, std::allocator<char>() );
+
+        BOOST_TEST_EQ( v.index(), 4 );
+        BOOST_TEST_EQ( get<4>(v), (std::string{ 'a', 'b', 'c' }) );
+
+        BOOST_TEST( holds_alternative<std::string>(v) );
+    }
+
     return boost::report_errors();
 }

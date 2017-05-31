@@ -128,6 +128,14 @@ int main()
         v.emplace<3>();
         BOOST_TEST_EQ( v.index(), 3 );
         BOOST_TEST_EQ( get<3>(v), std::string() );
+
+        v.emplace<3>( { 'a', 'b' } );
+        BOOST_TEST_EQ( v.index(), 3 );
+        BOOST_TEST_EQ( get<3>(v), (std::string{ 'a', 'b'}) );
+
+        v.emplace<3>( { 'c', 'd' }, std::allocator<char>() );
+        BOOST_TEST_EQ( v.index(), 3 );
+        BOOST_TEST_EQ( get<3>(v), (std::string{ 'c', 'd'}) );
     }
 
     {

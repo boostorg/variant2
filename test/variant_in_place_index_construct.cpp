@@ -17,8 +17,8 @@ using namespace boost::variant2;
 
 struct X
 {
-	X() = default;
-	X( in_place_index_t<0> ) = delete;
+    X() = default;
+    X( in_place_index_t<0> ) = delete;
 };
 
 int main()
@@ -118,6 +118,20 @@ int main()
 
         BOOST_TEST_EQ( v.index(), 5 );
         BOOST_TEST_EQ( get<5>(v), std::string( 4, 'a' ) );
+    }
+
+    {
+        variant<int, int, float, float, std::string, std::string> v( in_place_index<4>, { 'a', 'b', 'c' } );
+
+        BOOST_TEST_EQ( v.index(), 4 );
+        BOOST_TEST_EQ( get<4>(v), (std::string{ 'a', 'b', 'c' }) );
+    }
+
+    {
+        variant<int, int, float, float, std::string, std::string> v( in_place_index<5>, { 'a', 'b', 'c' }, std::allocator<char>() );
+
+        BOOST_TEST_EQ( v.index(), 5 );
+        BOOST_TEST_EQ( get<5>(v), (std::string{ 'a', 'b', 'c' }) );
     }
 
     return boost::report_errors();
