@@ -335,13 +335,13 @@ template<class U, class... T> using resolve_overload_index = mp_find<mp_list<T..
 
 // variant_base
 
-template<class D1, class D2, class... T> struct variant_base_impl; // trivially destructible, single buffered
-template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>, mp_all<std::is_nothrow_move_constructible<T>...>, T...>;
+template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl; // trivially destructible, single buffered
+template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>::value, mp_all<std::is_nothrow_move_constructible<T>...>::value || mp_any<std::is_nothrow_default_constructible<T>...>::value, T...>;
 
 struct none {};
 
 // trivially destructible, single buffered
-template<class... T> struct variant_base_impl<mp_true, mp_true, T...>
+template<class... T> struct variant_base_impl<true, true, T...>
 {
     int ix_;
     variant_storage<none, T...> st1_;
@@ -374,7 +374,9 @@ template<class... T> struct variant_base_impl<mp_true, mp_true, T...>
 
     template<std::size_t I, class... A> void emplace( A&&... a )
     {
-        size_t const J = I+1;
+        std::size_t const J = I+1;
+
+        std::size_t const K = mp_find_if<mp_list<T...>, std::is_nothrow_constructible>::value;
 
         using U = mp_at_c<variant<T...>, I>;
 
@@ -383,8 +385,25 @@ template<class... T> struct variant_base_impl<mp_true, mp_true, T...>
             st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
             ix_ = J;
         }
+        else if( K < sizeof...(T) ) // have nothrow destructible
+        {
+            try
+            {
+                st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
+                ix_ = J;
+            }
+            catch( ... )
+            {
+                st1_.emplace( mp_size_t<K>() );
+                ix_ = K;
+
+                throw;
+            }
+        }
         else
         {
+            assert( std::is_nothrow_move_constructible<U>::value );
+
             U tmp( std::forward<A>(a)... );
 
             st1_.emplace( mp_size_t<J>(), std::move(tmp) );
@@ -394,7 +413,7 @@ template<class... T> struct variant_base_impl<mp_true, mp_true, T...>
 };
 
 // trivially destructible, double buffered
-template<class... T> struct variant_base_impl<mp_true, mp_false, T...>
+template<class... T> struct variant_base_impl<true, false, T...>
 {
     int ix_;
     variant_storage<none, T...> st1_;
@@ -446,7 +465,7 @@ template<class... T> struct variant_base_impl<mp_true, mp_false, T...>
 };
 
 // not trivially destructible, single buffered
-template<class... T> struct variant_base_impl<mp_false, mp_true, T...>
+template<class... T> struct variant_base_impl<false, true, T...>
 {
     int ix_;
     variant_storage<none, T...> st1_;
@@ -501,14 +520,33 @@ template<class... T> struct variant_base_impl<mp_false, mp_true, T...>
     {
         size_t const J = I+1;
 
+        std::size_t const K = mp_find_if<mp_list<T...>, std::is_nothrow_constructible>::value;
+
         using U = mp_at_c<variant<T...>, I>;
 
         if( std::is_nothrow_constructible<U, A...>::value )
         {
             _destroy();
-            st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
 
+            st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
             ix_ = J;
+        }
+        else if( K < sizeof...(T) ) // have nothrow destructible
+        {
+            _destroy();
+
+            try
+            {
+                st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
+                ix_ = J;
+            }
+            catch( ... )
+            {
+                st1_.emplace( mp_size_t<K>() );
+                ix_ = K;
+
+                throw;
+            }
         }
         else
         {
@@ -517,15 +555,15 @@ template<class... T> struct variant_base_impl<mp_false, mp_true, T...>
             U tmp( std::forward<A>(a)... );
 
             _destroy();
-            st1_.emplace( mp_size_t<J>(), std::move(tmp) );
 
+            st1_.emplace( mp_size_t<J>(), std::move(tmp) );
             ix_ = J;
         }
     }
 };
 
 // not trivially destructible, double buffered
-template<class... T> struct variant_base_impl<mp_false, mp_false, T...>
+template<class... T> struct variant_base_impl<false, false, T...>
 {
     int ix_;
     variant_storage<none, T...> st1_;
