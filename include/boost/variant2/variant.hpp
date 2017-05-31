@@ -116,9 +116,16 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-    if( v.index() != I ) throw bad_variant_access();
+#if BOOST_WORKAROUND( BOOST_GCC, < 60000 )
 
+    return (void)( v.index() != I? throw bad_variant_access(): 0), v._get_impl( mp_size_t<I>() );
+
+#else
+
+	if( v.index() != I ) throw bad_variant_access();
     return v._get_impl( mp_size_t<I>() );
+
+#endif
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>&& get(variant<T...>&& v)
@@ -134,9 +141,16 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-    if( v.index() != I ) throw bad_variant_access();
+#if BOOST_WORKAROUND( BOOST_GCC, < 60000 )
 
+    return (void)( v.index() != I? throw bad_variant_access(): 0), v._get_impl( mp_size_t<I>() );
+
+#else
+
+    if( v.index() != I ) throw bad_variant_access();
     return v._get_impl( mp_size_t<I>() );
+
+#endif
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const&& get(variant<T...> const&& v)
@@ -155,9 +169,16 @@ template<class U, class... T> constexpr U& get(variant<T...>& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    if( v.index() != I ) throw bad_variant_access();
+#if BOOST_WORKAROUND( BOOST_GCC, < 60000 )
 
+    return (void)( v.index() != I? throw bad_variant_access(): 0), v._get_impl( mp_size_t<I>() );
+
+#else
+
+    if( v.index() != I ) throw bad_variant_access();
     return v._get_impl( mp_size_t<I>() );
+
+#endif
 }
 
 template<class U, class... T> constexpr U&& get(variant<T...>&& v)
@@ -175,9 +196,16 @@ template<class U, class... T> constexpr U const& get(variant<T...> const& v)
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    if( v.index() != I ) throw bad_variant_access();
+#if BOOST_WORKAROUND( BOOST_GCC, < 60000 )
 
+    return (void)( v.index() != I? throw bad_variant_access(): 0), v._get_impl( mp_size_t<I>() );
+
+#else
+
+    if( v.index() != I ) throw bad_variant_access();
     return v._get_impl( mp_size_t<I>() );
+
+#endif
 }
 
 template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
