@@ -1,0 +1,40 @@
+#  Boost.Variant2 Library Test Jamfile
+#
+#  Copyright 2015-2017 Peter Dimov
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt
+
+import testing ;
+import ../../config/checks/config : requires ;
+
+REQ = ; #[ requires cxx11_variadic_templates cxx11_template_aliases cxx11_decltype cxx11_hdr_type_traits ] ;
+
+run variant_size.cpp : : : $(REQ) ;
+run variant_alternative.cpp : : : $(REQ) ;
+run variant_holds_alternative.cpp : : : $(REQ) ;
+compile variant_holds_alternative_cx.cpp : : : $(REQ) ;
+run variant_get_by_index.cpp : : : $(REQ) ;
+compile variant_get_by_index_cx.cpp : : : $(REQ) ;
+run variant_get_by_type.cpp : : : $(REQ) ;
+compile variant_get_by_type_cx.cpp : : : $(REQ) ;
+run variant_default_construct.cpp : : : $(REQ) ;
+compile variant_default_construct_cx.cpp : : : $(REQ) ;
+run variant_copy_construct.cpp : : : $(REQ) ;
+run variant_move_construct.cpp : : : $(REQ) ;
+run variant_value_construct.cpp : : : $(REQ) ;
+compile variant_value_construct_cx.cpp : : : $(REQ) ;
+run variant_in_place_index_construct.cpp : : : $(REQ) ;
+compile variant_in_place_index_construct_cx.cpp : : : $(REQ) ;
+run variant_in_place_type_construct.cpp : : : $(REQ) ;
+compile variant_in_place_type_construct_cx.cpp : : : $(REQ) ;
+run variant_copy_assign.cpp : : : $(REQ) ;
+run variant_move_assign.cpp : : : $(REQ) ;
+run variant_value_assign.cpp : : : $(REQ) ;
+run variant_emplace_index.cpp : : : $(REQ) ;
+run variant_emplace_type.cpp : : : $(REQ) ;
+run variant_swap.cpp : : : $(REQ) ;
+run variant_eq_ne.cpp : : : $(REQ) ;
+run variant_destroy.cpp : : : $(REQ) ;
+run variant_visit.cpp : : : $(REQ) ;
