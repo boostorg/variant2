@@ -43,6 +43,11 @@ STATIC_ASSERT( !std::is_nothrow_default_constructible<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_copy_constructible<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_move_constructible<X2>::value );
 
+struct Y
+{
+    Y( Y&& ) = delete;
+};
+
 template<class V> static void test( V&& v )
 {
     V v2( v );
@@ -115,6 +120,9 @@ int main()
 
         BOOST_TEST_TRAIT_FALSE((std::is_nothrow_move_constructible<variant<X1, X2>>));
         BOOST_TEST_TRAIT_FALSE((std::is_nothrow_move_constructible<variant<X1, X2, int, int>>));
+
+        BOOST_TEST_TRAIT_TRUE((std::is_move_constructible<variant<X1, X2>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_move_constructible<variant<int, float, Y>>));
     }
 
     return boost::report_errors();

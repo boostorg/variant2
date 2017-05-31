@@ -57,6 +57,11 @@ STATIC_ASSERT( !std::is_nothrow_move_constructible<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_copy_assignable<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_move_assignable<X2>::value );
 
+struct Y
+{
+    Y& operator=( Y const& ) = delete;
+};
+
 int main()
 {
     {
@@ -162,6 +167,27 @@ int main()
         v = v5;
         BOOST_TEST_EQ( v.index(), 0 );
         BOOST_TEST_EQ( get<0>(v).v, 4 );
+    }
+
+    {
+        BOOST_TEST_TRAIT_TRUE((std::is_nothrow_copy_assignable<variant<int>>));
+        BOOST_TEST_TRAIT_TRUE((std::is_nothrow_copy_assignable<variant<int, int>>));
+        BOOST_TEST_TRAIT_TRUE((std::is_nothrow_copy_assignable<variant<int, float>>));
+        BOOST_TEST_TRAIT_TRUE((std::is_nothrow_copy_assignable<variant<int, int, float, float>>));
+
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<X1>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<X1, int>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<X1, int, float>>));
+
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<int, X1>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<int, int, X1>>));
+
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<X1, X2>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_nothrow_copy_assignable<variant<X1, X2, int, int>>));
+
+        BOOST_TEST_TRAIT_TRUE((std::is_copy_assignable<variant<X1, X2>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_copy_assignable<variant<int const>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_copy_assignable<variant<int, float, Y>>));
     }
 
     return boost::report_errors();

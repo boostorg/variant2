@@ -20,6 +20,11 @@ struct X
     X();
 };
 
+struct Y
+{
+    Y() = delete;
+};
+
 int main()
 {
     {
@@ -89,6 +94,9 @@ int main()
         BOOST_TEST_TRAIT_FALSE((std::is_nothrow_default_constructible<variant<X>>));
         BOOST_TEST_TRAIT_FALSE((std::is_nothrow_default_constructible<variant<X, int>>));
         BOOST_TEST_TRAIT_FALSE((std::is_nothrow_default_constructible<variant<X, int, float>>));
+
+        BOOST_TEST_TRAIT_TRUE((std::is_default_constructible<variant<int, Y>>));
+        BOOST_TEST_TRAIT_FALSE((std::is_default_constructible<variant<Y, int>>));
     }
 
     return boost::report_errors();
