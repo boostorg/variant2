@@ -208,7 +208,7 @@ install:
   - git submodule update --init tools/build
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
-  - git clone https://github.com/pdimov/mp11 libs/mp11
+  - git clone -b $TRAVIS_BRANCH https://github.com/pdimov/mp11 libs/mp11
   - mkdir libs/variant2
   - cp -r $TRAVIS_BUILD_DIR/* libs/variant2
   - python tools/boostdep/depinst/depinst.py variant2
