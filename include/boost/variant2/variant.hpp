@@ -130,7 +130,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
     return std::move( v._get_impl( mp_size_t<I>() ) );
 }
 
-template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...> const>& get(variant<T...> const& v)
+template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const& get(variant<T...> const& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
@@ -139,7 +139,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
     return v._get_impl( mp_size_t<I>() );
 }
 
-template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...> const>&& get(variant<T...> const&& v)
+template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const&& get(variant<T...> const&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
