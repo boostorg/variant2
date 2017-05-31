@@ -35,3 +35,4 @@ run variant_value_assign.cpp : : : $(REQ) ;
 run variant_emplace_index.cpp : : : $(REQ) ;
 run variant_emplace_type.cpp : : : $(REQ) ;
 run variant_swap.cpp : : : $(REQ) ;
+run variant_eq_ne.cpp : : : $(REQ) ;
