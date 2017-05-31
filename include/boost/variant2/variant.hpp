@@ -16,6 +16,7 @@
 #include <exception>
 #include <cassert>
 #include <initializer_list>
+#include <utility>
 
 //
 
@@ -353,7 +354,7 @@ template<class... T> struct variant_base_impl<mp_true, mp_true, T...>
     {
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> i ) noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
 
@@ -362,7 +363,7 @@ template<class... T> struct variant_base_impl<mp_true, mp_true, T...>
         return st1_.get( mp_size_t<J>() );
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> i ) const noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> ) const noexcept
     {
         size_t const J = I+1;
 
@@ -407,7 +408,7 @@ template<class... T> struct variant_base_impl<mp_true, mp_false, T...>
     {
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> i ) noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
 
@@ -417,7 +418,7 @@ template<class... T> struct variant_base_impl<mp_true, mp_false, T...>
         return ix_ >= 0? st1_.get( j ): st2_.get( j );
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> i ) const noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> ) const noexcept
     {
         size_t const J = I+1;
 
@@ -478,7 +479,7 @@ template<class... T> struct variant_base_impl<mp_false, mp_true, T...>
         _destroy();
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> i ) noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
 
@@ -487,7 +488,7 @@ template<class... T> struct variant_base_impl<mp_false, mp_true, T...>
         return st1_.get( mp_size_t<J>() );
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> i ) const noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> ) const noexcept
     {
         size_t const J = I+1;
 
@@ -563,7 +564,7 @@ template<class... T> struct variant_base_impl<mp_false, mp_false, T...>
         _destroy();
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> i ) noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
 
@@ -573,7 +574,7 @@ template<class... T> struct variant_base_impl<mp_false, mp_false, T...>
         return ix_ >= 0? st1_.get( j ): st2_.get( j );
     }
 
-    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> i ) const noexcept
+    template<std::size_t I> constexpr mp_at_c<variant<T...>, I> const& _get_impl( mp_size_t<I> ) const noexcept
     {
         size_t const J = I+1;
 
@@ -635,6 +636,55 @@ namespace detail
 
 template<class T> struct is_in_place_index: std::false_type {};
 template<std::size_t I> struct is_in_place_index<in_place_index_t<I>>: std::true_type {};
+
+} // namespace detail
+
+// is_nothrow_swappable
+
+namespace detail
+{
+
+namespace det2
+{
+
+using std::swap;
+
+template<class T> using is_swappable_impl = decltype(swap(std::declval<T&>(), std::declval<T&>()));
+
+#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+
+template<class T> struct is_nothrow_swappable_impl_
+{
+    static constexpr bool value = noexcept(swap(std::declval<T&>(), std::declval<T&>()));
+};
+
+template<class T> using is_nothrow_swappable_impl = mp_bool< is_nothrow_swappable_impl_<T>::value >;
+
+#else
+
+template<class T> using is_nothrow_swappable_impl = std::enable_if_t<noexcept(swap(std::declval<T&>(), std::declval<T&>()))>;
+
+#endif
+
+} // namespace det2
+
+template<class T> struct is_swappable: mp_valid<det2::is_swappable_impl, T>
+{
+};
+
+#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+
+template<class T> struct is_nothrow_swappable: mp_eval_if<mp_not<is_swappable<T>>, mp_false, det2::is_nothrow_swappable_impl, T>
+{
+};
+
+#else
+
+template<class T> struct is_nothrow_swappable: mp_valid<det2::is_nothrow_swappable_impl, T>
+{
+};
+
+#endif
 
 } // namespace detail
 
@@ -715,7 +765,7 @@ public:
     {
         mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-            constexpr auto J = decltype(I)::value;
+            constexpr auto J = I.value;
 
             if( J == r.index() )
             {
@@ -738,7 +788,7 @@ public:
     {
         mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
 
-            constexpr auto J = decltype(I)::type::value;
+            constexpr auto J = I.value;
 
             if( J == r.index() )
             {
@@ -805,7 +855,29 @@ public:
 
     // swap
 
-    void swap( variant& r ); // noexcept( ... )
+    void swap( variant& r ) noexcept( mp_all<std::is_nothrow_move_constructible<T>..., variant2::detail::is_nothrow_swappable<T>...>::value )
+    {
+        if( index() == r.index() )
+        {
+            mp_for_each<mp_iota_c<sizeof...(T)>>([&]( auto I ){
+
+                constexpr auto J = I.value;
+
+                if( J == this->index() )
+                {
+                    using std::swap;
+                    swap( get<J>(*this), get<J>(r) );
+                }
+
+            });
+        }
+        else
+        {
+            variant tmp( std::move(*this) );
+            *this = std::move( r );
+            r = std::move( tmp );
+        }
+    }
 
     // private accessors
 
@@ -916,7 +988,10 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 template<class Visitor, class... Variants> constexpr void visit( Visitor&&, Variants&&... );
 
 // specialized algorithms
-template<class... T> void swap( variant<T...> & v, variant<T...> & w ); // noexcept(see below );
+template<class... T> void swap( variant<T...> & v, variant<T...> & w ) noexcept( noexcept(v.swap(w)) )
+{
+    v.swap( w );
+}
 
 } // namespace variant2
 } // namespace boost
