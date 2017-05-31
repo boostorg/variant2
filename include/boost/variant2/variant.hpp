@@ -1063,11 +1063,87 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 }
 
 // visitation
-template<class Visitor, class... Variants> constexpr void visit( Visitor&&, Variants&&... );
+template<class F> constexpr auto visit( F&& f ) -> decltype(std::forward<F>(f)())
+{
+    return std::forward<F>(f)();
+}
+
+namespace detail
+{
+
+template<class T> using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
+
+template<class F> struct Qret
+{
+    template<class... T> using fn = decltype( std::declval<F>()( std::declval<T>()... ) );
+};
+
+template<class L> using front_if_same = mp_if<mp_apply<mp_same, L>, mp_front<L>>;
+
+template<class F, class... V> using Vret = front_if_same<mp_product_q<Qret<F>, remove_cv_ref<V>...>>;
+
+} // namespace detail
+
+template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::detail::Vret<F, V1>
+{
+    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+
+        return std::forward<F>(f)( get<I>( std::forward<V1>(v1) ) );
+
+    });
+}
+
+#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+
+template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> variant2::detail::Vret<F, V1, V2>
+{
+    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+
+        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
+        return visit( f2, std::forward<V2>(v2) );
+
+    });
+}
+
+template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3 ) -> variant2::detail::Vret<F, V1, V2, V3>
+{
+    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+
+        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
+        return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3) );
+
+    });
+}
+
+template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3, V4&& v4 ) -> variant2::detail::Vret<F, V1, V2, V3, V4>
+{
+    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+
+        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
+        return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) );
+
+    });
+}
+
+#else
+
+template<class F, class V1, class V2, class... V> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V&&... v ) -> variant2::detail::Vret<F, V1, V2, V...>
+{
+    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+
+        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
+        return visit( f2, std::forward<V2>(v2), std::forward<V>(v)... );
+
+    });
+}
+
+#endif
 
 // specialized algorithms
-template<class... T, class E = std::enable_if_t<mp_all<std::is_move_constructible<T>..., variant2::detail::is_swappable<T>...>::value>>
-void swap( variant<T...> & v, variant<T...> & w ) noexcept( noexcept(v.swap(w)) )
+template<class... T,
+    class E = std::enable_if_t<mp_all<std::is_move_constructible<T>..., variant2::detail::is_swappable<T>...>::value>>
+void swap( variant<T...> & v, variant<T...> & w )
+    noexcept( noexcept(v.swap(w)) )
 {
     v.swap( w );
 }
