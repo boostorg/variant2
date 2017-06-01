@@ -38,3 +38,4 @@ run variant_swap.cpp : : : $(REQ) ;
 run variant_eq_ne.cpp : : : $(REQ) ;
 run variant_destroy.cpp : : : $(REQ) ;
 run variant_visit.cpp : : : $(REQ) ;
+run variant_lt_gt.cpp : : : $(REQ) ;
