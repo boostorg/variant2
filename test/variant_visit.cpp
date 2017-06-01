@@ -7,6 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/variant2/variant.hpp>
+#include <boost/mp11.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
 #include <type_traits>
@@ -15,6 +16,19 @@
 #include <cstdio>
 
 using namespace boost::variant2;
+using boost::mp11::mp_size_t;
+
+struct X
+{
+};
+
+struct F
+{
+    mp_size_t<1> operator()( X& ) const;
+    mp_size_t<2> operator()( X const& ) const;
+    mp_size_t<3> operator()( X&& ) const;
+    mp_size_t<4> operator()( X const&& ) const;
+};
 
 int main()
 {
@@ -84,7 +98,17 @@ int main()
         BOOST_TEST_EQ( (visit( []( auto x1, auto x2, auto x3, auto x4 ){ return (long long)(x1 * 100) * 100000000 + (long long)(x2 * 100) * 100000 + (long long)(x3 * 10000) + (int)x4; }, v1, v2, v3, v4 )), 10031462800 + 'A' );
 
         visit( []( auto x1, auto x2, auto x3, auto x4 ){ BOOST_TEST_EQ( x1, 1 ); BOOST_TEST_EQ( x2, 3.14f ); BOOST_TEST_EQ( x3, 6.28 ); BOOST_TEST_EQ( x4, 'A' ); }, v1, v2, v3, v4 );
-		visit( []( auto x1, auto x2, auto x3, auto x4 ){ BOOST_TEST_EQ( x1, 1 ); BOOST_TEST_EQ( x2, 3.14f ); BOOST_TEST_EQ( x3, 6.28 ); BOOST_TEST_EQ( x4, 'A' ); }, std::move(v1), std::move(v2), std::move(v3), std::move(v4) );
+        visit( []( auto x1, auto x2, auto x3, auto x4 ){ BOOST_TEST_EQ( x1, 1 ); BOOST_TEST_EQ( x2, 3.14f ); BOOST_TEST_EQ( x3, 6.28 ); BOOST_TEST_EQ( x4, 'A' ); }, std::move(v1), std::move(v2), std::move(v3), std::move(v4) );
+    }
+
+    {
+        variant<X> v;
+        variant<X> const cv;
+
+        BOOST_TEST_EQ( decltype(visit(F{}, v))::value, 1 );
+        BOOST_TEST_EQ( decltype(visit(F{}, cv))::value, 2 );
+        BOOST_TEST_EQ( decltype(visit(F{}, std::move(v)))::value, 3 );
+        BOOST_TEST_EQ( decltype(visit(F{}, std::move(cv)))::value, 4 );
     }
 
     return boost::report_errors();

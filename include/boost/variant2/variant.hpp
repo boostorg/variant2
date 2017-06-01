@@ -81,22 +81,22 @@ template<std::size_t I, class T> using variant_alternative_t = typename variant_
 
 namespace detail
 {
-    template<class I, class T, class Q> using var_alt_t = mp_invoke<Q, variant_alternative_t<I::value, T>>;
+    template<class I, class T, class Q> using var_alt_impl = mp_invoke<Q, variant_alternative_t<I::value, T>>;
 } // namespace detail
 
 template<std::size_t I, class T> struct variant_alternative
 {
 };
 
-template<std::size_t I, class T> struct variant_alternative<I, T const>: mp_defer< variant2::detail::var_alt_t, mp_size_t<I>, T, mp_quote<std::add_const_t>>
+template<std::size_t I, class T> struct variant_alternative<I, T const>: mp_defer< variant2::detail::var_alt_impl, mp_size_t<I>, T, mp_quote<std::add_const_t>>
 {
 };
 
-template<std::size_t I, class T> struct variant_alternative<I, T volatile>: mp_defer< variant2::detail::var_alt_t, mp_size_t<I>, T, mp_quote<std::add_volatile_t>>
+template<std::size_t I, class T> struct variant_alternative<I, T volatile>: mp_defer< variant2::detail::var_alt_impl, mp_size_t<I>, T, mp_quote<std::add_volatile_t>>
 {
 };
 
-template<std::size_t I, class T> struct variant_alternative<I, T const volatile>: mp_defer< variant2::detail::var_alt_t, mp_size_t<I>, T, mp_quote<std::add_cv_t>>
+template<std::size_t I, class T> struct variant_alternative<I, T const volatile>: mp_defer< variant2::detail::var_alt_impl, mp_size_t<I>, T, mp_quote<std::add_cv_t>>
 {
 };
 
@@ -1065,15 +1065,8 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 }
 
 // visitation
-template<class F> constexpr auto visit( F&& f ) -> decltype(std::forward<F>(f)())
-{
-    return std::forward<F>(f)();
-}
-
 namespace detail
 {
-
-template<class T> using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
 
 template<class F> struct Qret
 {
@@ -1082,13 +1075,41 @@ template<class F> struct Qret
 
 template<class L> using front_if_same = mp_if<mp_apply<mp_same, L>, mp_front<L>>;
 
-template<class F, class... V> using Vret = front_if_same<mp_product_q<Qret<F>, remove_cv_ref<V>...>>;
+template<class V> using var_size = variant_size<std::remove_reference_t<V>>;
+
+template<class V, class N, class T = variant_alternative_t<N::value, std::remove_reference_t<V>>> using apply_cv_ref_ = mp_if<std::is_reference<V>, T&, T>;
+
+#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+
+template<class V> struct apply_cv_ref_impl
+{
+    template<class T> using _f = apply_cv_ref_<V, T>;
+
+    using L = mp_iota<var_size<V>>;
+
+    using type = mp_transform<_f, L>;
+};
+
+template<class V> using apply_cv_ref = typename apply_cv_ref_impl<V>::type;
+
+#else
+
+template<class V> using apply_cv_ref = mp_transform_q<mp_bind_front<apply_cv_ref_, V>, mp_iota<var_size<V>>>;
+
+#endif
+
+template<class F, class... V> using Vret = front_if_same<mp_product_q<Qret<F>, apply_cv_ref<V>...>>;
 
 } // namespace detail
 
+template<class F> constexpr auto visit( F&& f ) -> decltype(std::forward<F>(f)())
+{
+    return std::forward<F>(f)();
+}
+
 template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::detail::Vret<F, V1>
 {
-    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         return std::forward<F>(f)( get<I>( std::forward<V1>(v1) ) );
 
@@ -1099,7 +1120,7 @@ template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::
 
 template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> variant2::detail::Vret<F, V1, V2>
 {
-    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2) );
@@ -1109,7 +1130,7 @@ template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&&
 
 template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3 ) -> variant2::detail::Vret<F, V1, V2, V3>
 {
-    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3) );
@@ -1119,7 +1140,7 @@ template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&
 
 template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3, V4&& v4 ) -> variant2::detail::Vret<F, V1, V2, V3, V4>
 {
-    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) );
@@ -1131,7 +1152,7 @@ template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( 
 
 template<class F, class V1, class V2, class... V> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V&&... v ) -> variant2::detail::Vret<F, V1, V2, V...>
 {
-    return mp_for_index<mp_size<variant2::detail::remove_cv_ref<V1>>>( v1.index(), [&]( auto I ){
+    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V>(v)... );
