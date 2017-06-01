@@ -1,5 +1,5 @@
-#ifndef BOOST_VARIANT2_RESULT_HPP_INCLUDED
-#define BOOST_VARIANT2_RESULT_HPP_INCLUDED
+#ifndef BOOST_VARIANT2_OUTCOME_HPP_INCLUDED
+#define BOOST_VARIANT2_OUTCOME_HPP_INCLUDED
 
 //  Copyright 2017 Peter Dimov.
 //
@@ -12,6 +12,7 @@
 #include <boost/variant2/variant.hpp>
 #endif
 #include <system_error>
+#include <exception>
 #include <type_traits>
 #include <cassert>
 
@@ -22,69 +23,73 @@ namespace boost
 namespace variant2
 {
 
-enum class result_errc
+enum class outcome_errc
 {
     not_initialized
 };
 
-class result_error_category: public std::error_category
+class outcome_error_category: public std::error_category
 {
 public:
 
     virtual const char * name() const noexcept
     {
-        return "boost::variant2::result";
+        return "boost::variant2::outcome";
     }
 
     virtual std::string message( int e ) const
     {
         switch( e )
         {
-        case (int)result_errc::not_initialized:
+        case (int)outcome_errc::not_initialized:
 
-            return "result<> not initialized";
+            return "outcome<> not initialized";
 
         default:
 
-            return "unknown result<> error";
+            return "unknown outcome<> error";
         }
     }
 
-    static result_error_category const & instance()
+    static outcome_error_category const & instance()
     {
-        static result_error_category cat;
+        static outcome_error_category cat;
         return cat;
     }
 };
 
-std::error_code make_error_code( result_errc e )
+std::error_code make_error_code( outcome_errc e )
 {
-    return std::error_code( static_cast<int>( e ), result_error_category::instance() );
+    return std::error_code( static_cast<int>( e ), outcome_error_category::instance() );
 }
 
-template<class T> class result
+template<class T> class outcome
 {
 private:
 
-    variant<T, std::error_code> v_;
+    variant<T, std::error_code, std::exception_ptr> v_;
 
 public:
 
     // constructors
 
-    constexpr result() noexcept: v_( make_error_code( result_errc::not_initialized ) )
+    constexpr outcome() noexcept: v_( make_error_code( outcome_errc::not_initialized ) )
     {
     }
 
-    constexpr result( T const& t ): v_( t )
+    constexpr outcome( T const& t ): v_( t )
     {
     }
 
-    constexpr result( T&& t ): v_( std::move(t) )
+    constexpr outcome( T&& t ): v_( std::move(t) )
     {
     }
 
-    constexpr result( std::error_code const & ec ) noexcept: v_( ec )
+    constexpr outcome( std::error_code const & ec ) noexcept: v_( ec )
+    {
+    }
+
+    constexpr outcome( std::exception_ptr const & ep ) noexcept: v_( ep )
     {
     }
 
@@ -98,6 +103,11 @@ public:
     constexpr bool has_error() const noexcept
     {
         return v_.index() == 1;
+    }
+
+    constexpr bool has_exception() const noexcept
+    {
+        return v_.index() == 2;
     }
 
     constexpr explicit operator bool() const noexcept
@@ -195,6 +205,24 @@ public:
         }
     }
 
+    // exception access
+
+    std::exception_ptr exception() const noexcept
+    {
+        if( has_exception() )
+        {
+            return *get_if<2>(&v_);
+        }
+        else if( has_value() )
+        {
+            return std::exception_ptr();
+        }
+        else
+        {
+            return std::make_exception_ptr( std::system_error( *get_if<1>(&v_) ) );
+        }
+    }
+
     // setters
 
     void set_value( T const& t ) noexcept( std::is_nothrow_copy_constructible<T>::value )
@@ -212,9 +240,14 @@ public:
         v_.emplace<1>( e );
     }
 
+    void set_exception( std::exception_ptr const & x ) noexcept
+    {
+        v_.emplace<2>( x );
+    }
+
     // swap
 
-    void swap( result& r ) noexcept( noexcept( v_.swap( r.v_ ) ) )
+    void swap( outcome& r ) noexcept( noexcept( v_.swap( r.v_ ) ) )
     {
         v_.swap( r.v_ );
     }
@@ -223,4 +256,4 @@ public:
 } // namespace variant2
 } // namespace boost
 
-#endif // #ifndef BOOST_VARIANT2_RESULT_HPP_INCLUDED
+#endif // #ifndef BOOST_VARIANT2_OUTCOME_HPP_INCLUDED
