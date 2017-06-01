@@ -1,7 +1,7 @@
 #ifndef BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 #define BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 
-//  Copyright 2015-2017 Peter Dimov.
+//  Copyright 2017 Peter Dimov.
 //
 //  Distributed under the Boost Software License, Version 1.0.
 //
