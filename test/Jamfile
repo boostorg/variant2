@@ -40,3 +40,4 @@ run variant_destroy.cpp : : : $(REQ) ;
 run variant_visit.cpp : : : $(REQ) ;
 run variant_lt_gt.cpp : : : $(REQ) ;
 run variant_convert_construct.cpp : : : $(REQ) ;
+run variant_subset.cpp : : : $(REQ) ;

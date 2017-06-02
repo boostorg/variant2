@@ -370,7 +370,7 @@ public:
 
         return mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
 
-            return _remap_error<R>( I, f, get<I>(v_) );
+            return this->_remap_error<R>( I, f, get<I>(v_) );
 
         });
     }
@@ -383,7 +383,7 @@ public:
 
         return mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
 
-            return _remap_error<R>( I, f, get<I>(v_) );
+            return this->_remap_error<R>( I, f, get<I>(v_) );
 
         });
     }
