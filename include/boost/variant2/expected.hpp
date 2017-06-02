@@ -78,14 +78,7 @@ private:
 public:
 
     explicit bad_expected_access( E const& e )
-        noexcept( std::is_nothrow_copy_constructible<E>::value )
         : bad_expected_access<void>( "bad_expected_access<" + boost::core::demangle( typeid(E).name() ) + ">" + variant2::detail::add_value( e ) ), e_( e )
-    {
-    }
-
-    explicit bad_expected_access( E&& e )
-        noexcept( std::is_nothrow_move_constructible<E>::value )
-        : bad_expected_access<void>( "bad_expected_access<" + boost::core::demangle( typeid(E).name() ) + ">" + variant2::detail::add_value( e ) ), e_( std::move(e) )
     {
     }
 
@@ -377,7 +370,7 @@ public:
 
         return mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
 
-            return _remap_error<R>( I, f, get<I>(v_) );
+            return this->_remap_error<R>( I, f, get<I>(v_) );
 
         });
     }
@@ -390,7 +383,7 @@ public:
 
         return mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
 
-            return _remap_error<R>( I, f, get<I>(v_) );
+            return this->_remap_error<R>( I, f, get<I>(v_) );
 
         });
     }
@@ -406,6 +399,18 @@ private:
 public:
 
     template<class F> then_result<F, T const&> then( F && f ) const
+    {
+        if( has_value() )
+        {
+            return std::forward<F>(f)( **this );
+        }
+        else
+        {
+            return unexpected();
+        }
+    }
+
+    template<class F> then_result<F, T const&> operator>>( F && f ) const
     {
         if( has_value() )
         {

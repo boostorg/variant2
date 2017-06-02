@@ -162,5 +162,49 @@ int main()
         BOOST_TEST_EQ( get_if<float>(&v), &get<float>(v) );
     }
 
+    {
+        variant<int> * p = 0;
+        BOOST_TEST_EQ( get_if<int>(p), nullptr );
+    }
+
+    {
+        variant<int const> * p = 0;
+        BOOST_TEST_EQ( get_if<int const>(p), nullptr );
+    }
+
+    {
+        variant<int> const * p = 0;
+        BOOST_TEST_EQ( get_if<int>(p), nullptr );
+    }
+
+    {
+        variant<int const> const * p = 0;
+        BOOST_TEST_EQ( get_if<int const>(p), nullptr );
+    }
+
+    {
+        variant<int, float> * p = 0;
+
+        BOOST_TEST_EQ( get_if<int>(p), nullptr );
+        BOOST_TEST_EQ( get_if<float>(p), nullptr );
+    }
+
+    {
+        variant<int, float> const * p = 0;
+
+        BOOST_TEST_EQ( get_if<int>(p), nullptr );
+        BOOST_TEST_EQ( get_if<float>(p), nullptr );
+    }
+
+    {
+        variant<int, int, float> * p = 0;
+        BOOST_TEST_EQ( get_if<float>(p), nullptr );
+    }
+
+    {
+        variant<int, int, float> const * p = 0;
+        BOOST_TEST_EQ( get_if<float>(p), nullptr );
+    }
+
     return boost::report_errors();
 }

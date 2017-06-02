@@ -112,7 +112,7 @@ template<class U, class... T> constexpr bool holds_alternative( variant<T...> co
     return v.index() == mp_find<variant<T...>, U>::value;
 }
 
-// get
+// get (index)
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>& get(variant<T...>& v)
 {
@@ -178,7 +178,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 #endif
 }
 
-// get
+// get (type)
 
 template<class U, class... T> constexpr U& get(variant<T...>& v)
 {
@@ -253,13 +253,13 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
 template<std::size_t I, class... T> constexpr std::add_pointer_t<variant_alternative_t<I, variant<T...>>> get_if(variant<T...>* v) noexcept
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
+    return v && v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
 }
 
 template<std::size_t I, class... T> constexpr std::add_pointer_t<const variant_alternative_t<I, variant<T...>>> get_if(variant<T...> const * v) noexcept
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
+    return v && v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
 }
 
 template<class U, class... T> constexpr std::add_pointer_t<U> get_if(variant<T...>* v) noexcept
@@ -267,7 +267,7 @@ template<class U, class... T> constexpr std::add_pointer_t<U> get_if(variant<T..
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
+    return v && v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
 }
 
 template<class U, class... T> constexpr std::add_pointer_t<U const> get_if(variant<T...> const * v) noexcept
@@ -275,7 +275,7 @@ template<class U, class... T> constexpr std::add_pointer_t<U const> get_if(varia
     static_assert( mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
     constexpr auto I = mp_find<variant<T...>, U>::value;
 
-    return v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
+    return v && v->index() == I? &v->_get_impl( mp_size_t<I>() ): 0;
 }
 
 //
@@ -1064,7 +1064,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, this->_get_impl( I ) );
+            return this->_subset_impl<U...>( J{}, this->_get_impl( I ) );
 
         });
     }
@@ -1077,7 +1077,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, this->_get_impl( I ) );
+            return this->_subset_impl<U...>( J{}, this->_get_impl( I ) );
 
         });
     }
@@ -1090,7 +1090,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
+            return this->_subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
 
         });
     }
@@ -1103,7 +1103,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
+            return this->_subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
 
         });
     }

@@ -196,5 +196,55 @@ int main()
         BOOST_TEST_EQ( get<2>(std::move(v)), 3.14f );
     }
 
+    {
+        variant<int> * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int const> * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int> const * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int const> const * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int, float> * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int, float> const * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int const, float volatile> * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int const, float volatile> const * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int, int, float, float> * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
+    {
+        variant<int, int, float, float> const * p = 0;
+        BOOST_TEST_EQ( get_if<0>(p), nullptr );
+    }
+
     return boost::report_errors();
 }
