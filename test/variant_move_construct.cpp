@@ -122,7 +122,12 @@ int main()
         BOOST_TEST_TRAIT_FALSE((std::is_nothrow_move_constructible<variant<X1, X2, int, int>>));
 
         BOOST_TEST_TRAIT_TRUE((std::is_move_constructible<variant<X1, X2>>));
+
+#if !BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+
         BOOST_TEST_TRAIT_FALSE((std::is_move_constructible<variant<int, float, Y>>));
+
+#endif
     }
 
     return boost::report_errors();
