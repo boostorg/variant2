@@ -78,14 +78,7 @@ private:
 public:
 
     explicit bad_expected_access( E const& e )
-        noexcept( std::is_nothrow_copy_constructible<E>::value )
         : bad_expected_access<void>( "bad_expected_access<" + boost::core::demangle( typeid(E).name() ) + ">" + variant2::detail::add_value( e ) ), e_( e )
-    {
-    }
-
-    explicit bad_expected_access( E&& e )
-        noexcept( std::is_nothrow_move_constructible<E>::value )
-        : bad_expected_access<void>( "bad_expected_access<" + boost::core::demangle( typeid(E).name() ) + ">" + variant2::detail::add_value( e ) ), e_( std::move(e) )
     {
     }
 
