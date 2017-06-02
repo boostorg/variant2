@@ -376,9 +376,10 @@ template<class T1, class... T> struct overload<T1, T...>: overload<T...>
 
 #if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
 
-template<class U, class... T> struct resolve_overload_type_impl
+template<class U, class... T> using resolve_overload_type_ = decltype( overload<T...>()(std::declval<U>()) );
+
+template<class U, class... T> struct resolve_overload_type_impl: mp_defer< resolve_overload_type_, U, T... >
 {
-    using type = decltype( overload<T...>()(std::declval<U>()) );
 };
 
 template<class U, class... T> using resolve_overload_type = typename resolve_overload_type_impl<U, T...>::type::type;
@@ -410,6 +411,11 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<class I, class... A> constexpr explicit variant_base_impl( I, A&&... a ): ix_( I::value + 1 ), st1_( mp_size_t<I::value + 1>(), std::forward<A>(a)... )
     {
+    }
+
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ - 1;
     }
 
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
@@ -485,6 +491,11 @@ template<class... T> struct variant_base_impl<true, false, T...>
     {
     }
 
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ >= 0? ix_ - 1: -ix_ - 1;
+    }
+
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
@@ -552,6 +563,11 @@ template<class... T> struct variant_base_impl<false, true, T...>
     ~variant_base_impl() noexcept
     {
         _destroy();
+    }
+
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ - 1;
     }
 
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
@@ -658,6 +674,11 @@ template<class... T> struct variant_base_impl<false, false, T...>
     ~variant_base_impl() noexcept
     {
         _destroy();
+    }
+
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ >= 0? ix_ - 1: -ix_ - 1;
     }
 
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
@@ -871,11 +892,11 @@ public:
 
             if( this->index() == I )
             {
-                get<I>(*this) = get<I>(r);
+                this->_get_impl( I ) = r._get_impl( I );
             }
             else
             {
-                this->variant_base::template emplace<I>( get<I>(r) );
+                this->variant_base::template emplace<I>( r._get_impl( I ) );
             }
 
         });
@@ -891,11 +912,11 @@ public:
 
             if( this->index() == I )
             {
-                get<I>(*this) = get<I>(std::move(r));
+                this->_get_impl( I ) = std::move( r._get_impl( I ) );
             }
             else
             {
-                this->variant_base::template emplace<I>( get<I>(std::move(r)) );
+                this->variant_base::template emplace<I>( std::move( r._get_impl( I ) ) );
             }
 
         });
@@ -957,10 +978,7 @@ public:
 
     // value status
 
-    constexpr size_t index() const noexcept
-    {
-        return this->ix_ >= 0? this->ix_ - 1 : -this->ix_ - 1;
-    }
+    using variant_base::index;
 
     // swap
 
@@ -971,7 +989,7 @@ public:
             mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
 
                 using std::swap;
-                swap( get<I>(*this), get<I>(r) );
+                swap( this->_get_impl( I ), r._get_impl( I ) );
 
             });
         }
@@ -991,6 +1009,104 @@ public:
     }
 
     using variant_base::_get_impl;
+
+    // converting constructors (extension)
+
+    template<class... U,
+        class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
+    variant( variant<U...> const& r )
+        noexcept( mp_all<std::is_nothrow_copy_constructible<U>...>::value )
+    {
+        mp_for_index<sizeof...(U)>( r.index(), [&]( auto I ){
+
+            using J = mp_find<mp_list<T...>, mp_at_c<mp_list<U...>, I>>;
+
+            ::new( static_cast<variant_base*>(this) ) variant_base( J{}, r._get_impl( I ) );
+
+        });
+    }
+
+    template<class... U,
+        class E2 = mp_if<mp_all<std::is_move_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
+    variant( variant<U...> && r )
+        noexcept( mp_all<std::is_nothrow_move_constructible<U>...>::value )
+    {
+        mp_for_index<sizeof...(U)>( r.index(), [&]( auto I ){
+
+            using J = mp_find<mp_list<T...>, mp_at_c<mp_list<U...>, I>>;
+
+            ::new( static_cast<variant_base*>(this) ) variant_base( J{}, std::move( r._get_impl( I ) ) );
+
+        });
+    }
+
+    // subset (extension)
+
+private:
+
+    template<class... U, class V, std::size_t J, class E = std::enable_if_t<J != sizeof...(U)>> static variant<U...> _subset_impl( mp_size_t<J>, V && v )
+    {
+        return variant<U...>( in_place_index<J>, std::forward<V>(v) );
+    }
+
+    template<class... U, class V> static variant<U...> _subset_impl( mp_size_t<sizeof...(U)>, V && /*v*/ )
+    {
+        throw bad_variant_access();
+    }
+
+public:
+
+    template<class... U,
+        class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
+    constexpr variant<U...> subset() &
+    {
+        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+
+            using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
+
+            return _subset_impl<U...>( J{}, this->_get_impl( I ) );
+
+        });
+    }
+
+    template<class... U,
+        class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
+    constexpr variant<U...> subset() const&
+    {
+        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+
+            using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
+
+            return _subset_impl<U...>( J{}, this->_get_impl( I ) );
+
+        });
+    }
+
+    template<class... U,
+        class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
+    constexpr variant<U...> subset() &&
+    {
+        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+
+            using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
+
+            return _subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
+
+        });
+    }
+
+    template<class... U,
+        class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
+    constexpr variant<U...> subset() const&&
+    {
+        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+
+            using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
+
+            return _subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
+
+        });
+    }
 };
 
 // relational operators
@@ -1000,7 +1116,7 @@ template<class... T> constexpr bool operator==( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) == get<I>(w);
+        return v._get_impl( I ) == w._get_impl( I );
 
     });
 }
@@ -1011,7 +1127,7 @@ template<class... T> constexpr bool operator!=( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) != get<I>(w);
+        return v._get_impl( I ) != w._get_impl( I );
 
     });
 }
@@ -1023,7 +1139,7 @@ template<class... T> constexpr bool operator<( variant<T...> const & v, variant<
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) < get<I>(w);
+        return v._get_impl( I ) < w._get_impl( I );
 
     });
 }
@@ -1035,7 +1151,7 @@ template<class... T> constexpr bool operator>(  variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) > get<I>(w);
+        return v._get_impl( I ) > w._get_impl( I );
 
     });
 }
@@ -1047,7 +1163,7 @@ template<class... T> constexpr bool operator<=( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) <= get<I>(w);
+        return v._get_impl( I ) <= w._get_impl( I );
 
     });
 }
@@ -1059,7 +1175,7 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) >= get<I>(w);
+        return v._get_impl( I ) >= w._get_impl( I );
 
     });
 }
