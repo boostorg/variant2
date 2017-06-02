@@ -136,7 +136,7 @@ private:
 
     void _bad_access() const
     {
-        mp_for_index<mp_size<expected>>( v_.index(), [&]( auto I )
+        mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I )
         {
             if( I == 0 )
             {
@@ -375,7 +375,7 @@ public:
     {
         using R = remapped<F>;
 
-        return mp_for_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
+        return mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
 
             return _remap_error<R>( I, f, get<I>(v_) );
 
@@ -388,7 +388,7 @@ public:
 
         auto f = []( auto const& e ){ return make_error_code(e); };
 
-        return mp_for_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
+        return mp_with_index<mp_size<expected>>( v_.index(), [&]( auto I ) {
 
             return _remap_error<R>( I, f, get<I>(v_) );
 
