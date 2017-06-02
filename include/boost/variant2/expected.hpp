@@ -409,6 +409,18 @@ public:
             return unexpected();
         }
     }
+
+    template<class F> then_result<F, T const&> operator>>( F && f ) const
+    {
+        if( has_value() )
+        {
+            return std::forward<F>(f)( **this );
+        }
+        else
+        {
+            return unexpected();
+        }
+    }
 };
 
 template<class T, class... E> inline constexpr bool operator==( expected<T, E...> const & x1, expected<T, E...> const & x2 )
