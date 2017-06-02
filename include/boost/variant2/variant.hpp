@@ -892,11 +892,11 @@ public:
 
             if( this->index() == I )
             {
-                get<I>(*this) = get<I>(r);
+                this->_get_impl( I ) = r._get_impl( I );
             }
             else
             {
-                this->variant_base::template emplace<I>( get<I>(r) );
+                this->variant_base::template emplace<I>( r._get_impl( I ) );
             }
 
         });
@@ -912,11 +912,11 @@ public:
 
             if( this->index() == I )
             {
-                get<I>(*this) = get<I>(std::move(r));
+                this->_get_impl( I ) = std::move( r._get_impl( I ) );
             }
             else
             {
-                this->variant_base::template emplace<I>( get<I>(std::move(r)) );
+                this->variant_base::template emplace<I>( std::move( r._get_impl( I ) ) );
             }
 
         });
@@ -989,7 +989,7 @@ public:
             mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
 
                 using std::swap;
-                swap( get<I>(*this), get<I>(r) );
+                swap( this->_get_impl( I ), r._get_impl( I ) );
 
             });
         }
@@ -1064,7 +1064,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, get<I>( *this ) );
+            return _subset_impl<U...>( J{}, this->_get_impl( I ) );
 
         });
     }
@@ -1077,7 +1077,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, get<I>( *this ) );
+            return _subset_impl<U...>( J{}, this->_get_impl( I ) );
 
         });
     }
@@ -1090,7 +1090,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, get<I>( std::move(*this) ) );
+            return _subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
 
         });
     }
@@ -1103,7 +1103,7 @@ public:
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
-            return _subset_impl<U...>( J{}, get<I>( std::move(*this) ) );
+            return _subset_impl<U...>( J{}, std::move( this->_get_impl( I ) ) );
 
         });
     }
@@ -1116,7 +1116,7 @@ template<class... T> constexpr bool operator==( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) == get<I>(w);
+        return v._get_impl( I ) == w._get_impl( I );
 
     });
 }
@@ -1127,7 +1127,7 @@ template<class... T> constexpr bool operator!=( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) != get<I>(w);
+        return v._get_impl( I ) != w._get_impl( I );
 
     });
 }
@@ -1139,7 +1139,7 @@ template<class... T> constexpr bool operator<( variant<T...> const & v, variant<
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) < get<I>(w);
+        return v._get_impl( I ) < w._get_impl( I );
 
     });
 }
@@ -1151,7 +1151,7 @@ template<class... T> constexpr bool operator>(  variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) > get<I>(w);
+        return v._get_impl( I ) > w._get_impl( I );
 
     });
 }
@@ -1163,7 +1163,7 @@ template<class... T> constexpr bool operator<=( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) <= get<I>(w);
+        return v._get_impl( I ) <= w._get_impl( I );
 
     });
 }
@@ -1175,7 +1175,7 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 
     return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
-        return get<I>(v) >= get<I>(w);
+        return v._get_impl( I ) >= w._get_impl( I );
 
     });
 }
