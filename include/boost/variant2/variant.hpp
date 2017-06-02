@@ -413,6 +413,11 @@ template<class... T> struct variant_base_impl<true, true, T...>
     {
     }
 
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ - 1;
+    }
+
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
@@ -486,6 +491,11 @@ template<class... T> struct variant_base_impl<true, false, T...>
     {
     }
 
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ >= 0? ix_ - 1: -ix_ - 1;
+    }
+
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
     {
         size_t const J = I+1;
@@ -553,6 +563,11 @@ template<class... T> struct variant_base_impl<false, true, T...>
     ~variant_base_impl() noexcept
     {
         _destroy();
+    }
+
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ - 1;
     }
 
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
@@ -659,6 +674,11 @@ template<class... T> struct variant_base_impl<false, false, T...>
     ~variant_base_impl() noexcept
     {
         _destroy();
+    }
+
+    constexpr std::size_t index() const noexcept
+    {
+        return ix_ >= 0? ix_ - 1: -ix_ - 1;
     }
 
     template<std::size_t I> constexpr mp_at_c<variant<T...>, I>& _get_impl( mp_size_t<I> ) noexcept
@@ -958,10 +978,7 @@ public:
 
     // value status
 
-    constexpr size_t index() const noexcept
-    {
-        return this->ix_ >= 0? this->ix_ - 1 : -this->ix_ - 1;
-    }
+    using variant_base::index;
 
     // swap
 
