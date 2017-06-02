@@ -95,7 +95,7 @@ public:
     }
 };
 
-// expected
+// throw_on_unexpected
 
 template<class E> void throw_on_unexpected( E const& e )
 {
@@ -118,6 +118,13 @@ void throw_on_unexpected( std::exception_ptr const & e )
         throw bad_expected_access<>( "bad_expected_access<>: null exception_ptr" );
     }
 }
+
+// expected
+
+template<class T, class... E> class expected;
+
+template<class T> struct is_expected: std::false_type {};
+template<class T, class... E> struct is_expected<expected<T, E...>>: std::true_type {};
 
 template<class T, class... E> class expected
 {
@@ -386,6 +393,28 @@ public:
             return _remap_error<R>( I, f, get<I>(v_) );
 
         });
+    }
+
+    // then
+
+private:
+
+    template<class F, class U> using then_result_ = decltype( std::declval<F>()( std::declval<U>() ) );
+
+    template<class F, class U, class R = then_result_<F, U>> using then_result = mp_if<is_expected<R>, R, expected<R, E...>>;
+
+public:
+
+    template<class F> then_result<F, T const&> then( F && f ) const
+    {
+        if( has_value() )
+        {
+            return std::forward<F>(f)( **this );
+        }
+        else
+        {
+            return unexpected();
+        }
     }
 };
 
