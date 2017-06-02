@@ -551,7 +551,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
     {
         if( ix_ > 0 )
         {
-            mp_for_index<1 + sizeof...(T)>( ix_, [&]( auto I ){
+            mp_with_index<1 + sizeof...(T)>( ix_, [&]( auto I ){
 
                 using U = mp_at_c<mp_list<none, T...>, I>;
                 st1_.get( I ).~U();
@@ -653,7 +653,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
     {
         if( ix_ > 0 )
         {
-            mp_for_index<1 + sizeof...(T)>( ix_, [&]( auto I ){
+            mp_with_index<1 + sizeof...(T)>( ix_, [&]( auto I ){
 
                 using U = mp_at_c<mp_list<none, T...>, I>;
                 st1_.get( I ).~U();
@@ -662,7 +662,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
         }
         else if( ix_ < 0 )
         {
-            mp_for_index<1 + sizeof...(T)>( -ix_, [&]( auto I ){
+            mp_with_index<1 + sizeof...(T)>( -ix_, [&]( auto I ){
 
                 using U = mp_at_c<mp_list<none, T...>, I>;
                 st2_.get( I ).~U();
@@ -833,7 +833,7 @@ public:
     variant( variant const& r )
         noexcept( mp_all<std::is_nothrow_copy_constructible<T>...>::value )
     {
-        mp_for_index<sizeof...(T)>( r.index(), [&]( auto I ){
+        mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
 
             ::new( static_cast<variant_base*>(this) ) variant_base( I, r._get_impl( I ) );
 
@@ -844,7 +844,7 @@ public:
     variant( variant && r )
         noexcept( mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
-        mp_for_index<sizeof...(T)>( r.index(), [&]( auto I ){
+        mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
 
             ::new( static_cast<variant_base*>(this) ) variant_base( I, std::move( r._get_impl( I ) ) );
 
@@ -888,7 +888,7 @@ public:
     variant& operator=( variant const & r )
         noexcept( mp_all<std::is_nothrow_copy_constructible<T>..., std::is_nothrow_copy_assignable<T>...>::value )
     {
-        mp_for_index<sizeof...(T)>( r.index(), [&]( auto I ){
+        mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
 
             if( this->index() == I )
             {
@@ -908,7 +908,7 @@ public:
     variant& operator=( variant && r )
         noexcept( mp_all<std::is_nothrow_move_constructible<T>..., std::is_nothrow_move_assignable<T>...>::value )
     {
-        mp_for_index<sizeof...(T)>( r.index(), [&]( auto I ){
+        mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
 
             if( this->index() == I )
             {
@@ -986,7 +986,7 @@ public:
     {
         if( index() == r.index() )
         {
-            mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+            mp_with_index<sizeof...(T)>( index(), [&]( auto I ){
 
                 using std::swap;
                 swap( this->_get_impl( I ), r._get_impl( I ) );
@@ -1017,7 +1017,7 @@ public:
     variant( variant<U...> const& r )
         noexcept( mp_all<std::is_nothrow_copy_constructible<U>...>::value )
     {
-        mp_for_index<sizeof...(U)>( r.index(), [&]( auto I ){
+        mp_with_index<sizeof...(U)>( r.index(), [&]( auto I ){
 
             using J = mp_find<mp_list<T...>, mp_at_c<mp_list<U...>, I>>;
 
@@ -1031,7 +1031,7 @@ public:
     variant( variant<U...> && r )
         noexcept( mp_all<std::is_nothrow_move_constructible<U>...>::value )
     {
-        mp_for_index<sizeof...(U)>( r.index(), [&]( auto I ){
+        mp_with_index<sizeof...(U)>( r.index(), [&]( auto I ){
 
             using J = mp_find<mp_list<T...>, mp_at_c<mp_list<U...>, I>>;
 
@@ -1060,7 +1060,7 @@ public:
         class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
     constexpr variant<U...> subset() &
     {
-        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+        return mp_with_index<sizeof...(T)>( index(), [&]( auto I ){
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
@@ -1073,7 +1073,7 @@ public:
         class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
     constexpr variant<U...> subset() const&
     {
-        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+        return mp_with_index<sizeof...(T)>( index(), [&]( auto I ){
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
@@ -1086,7 +1086,7 @@ public:
         class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
     constexpr variant<U...> subset() &&
     {
-        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+        return mp_with_index<sizeof...(T)>( index(), [&]( auto I ){
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
@@ -1099,7 +1099,7 @@ public:
         class E2 = mp_if<mp_all<std::is_copy_constructible<U>..., mp_contains<mp_list<T...>, U>...>, void> >
     constexpr variant<U...> subset() const&&
     {
-        return mp_for_index<sizeof...(T)>( index(), [&]( auto I ){
+        return mp_with_index<sizeof...(T)>( index(), [&]( auto I ){
 
             using J = mp_find<mp_list<U...>, mp_at_c<mp_list<T...>, I>>;
 
@@ -1114,7 +1114,7 @@ template<class... T> constexpr bool operator==( variant<T...> const & v, variant
 {
     if( v.index() != w.index() ) return false;
 
-    return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
+    return mp_with_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
         return v._get_impl( I ) == w._get_impl( I );
 
@@ -1125,7 +1125,7 @@ template<class... T> constexpr bool operator!=( variant<T...> const & v, variant
 {
     if( v.index() != w.index() ) return true;
 
-    return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
+    return mp_with_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
         return v._get_impl( I ) != w._get_impl( I );
 
@@ -1137,7 +1137,7 @@ template<class... T> constexpr bool operator<( variant<T...> const & v, variant<
     if( v.index() < w.index() ) return true;
     if( v.index() > w.index() ) return false;
 
-    return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
+    return mp_with_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
         return v._get_impl( I ) < w._get_impl( I );
 
@@ -1149,7 +1149,7 @@ template<class... T> constexpr bool operator>(  variant<T...> const & v, variant
     if( v.index() > w.index() ) return true;
     if( v.index() < w.index() ) return false;
 
-    return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
+    return mp_with_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
         return v._get_impl( I ) > w._get_impl( I );
 
@@ -1161,7 +1161,7 @@ template<class... T> constexpr bool operator<=( variant<T...> const & v, variant
     if( v.index() < w.index() ) return true;
     if( v.index() > w.index() ) return false;
 
-    return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
+    return mp_with_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
         return v._get_impl( I ) <= w._get_impl( I );
 
@@ -1173,7 +1173,7 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
     if( v.index() > w.index() ) return true;
     if( v.index() < w.index() ) return false;
 
-    return mp_for_index<sizeof...(T)>( v.index(), [&]( auto I ){
+    return mp_with_index<sizeof...(T)>( v.index(), [&]( auto I ){
 
         return v._get_impl( I ) >= w._get_impl( I );
 
@@ -1225,7 +1225,7 @@ template<class F> constexpr auto visit( F&& f ) -> decltype(std::forward<F>(f)()
 
 template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::detail::Vret<F, V1>
 {
-    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         return std::forward<F>(f)( get<I>( std::forward<V1>(v1) ) );
 
@@ -1236,7 +1236,7 @@ template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::
 
 template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> variant2::detail::Vret<F, V1, V2>
 {
-    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2) );
@@ -1246,7 +1246,7 @@ template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&&
 
 template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3 ) -> variant2::detail::Vret<F, V1, V2, V3>
 {
-    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3) );
@@ -1256,7 +1256,7 @@ template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&
 
 template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3, V4&& v4 ) -> variant2::detail::Vret<F, V1, V2, V3, V4>
 {
-    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) );
@@ -1268,7 +1268,7 @@ template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( 
 
 template<class F, class V1, class V2, class... V> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V&&... v ) -> variant2::detail::Vret<F, V1, V2, V...>
 {
-    return mp_for_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V>(v)... );
