@@ -30,7 +30,9 @@ template<class... E> using unexpected_ = variant<E...>;
 
 // bad_expected_access
 
-class bad_expected_access: public std::exception
+template<class E = void> class bad_expected_access;
+
+template<> class bad_expected_access<void>: public std::exception
 {
 private:
 
@@ -42,21 +44,62 @@ public:
     {
     }
 
-    template<class E> explicit bad_expected_access( mp_identity<E> ) noexcept: msg_( "bad_expected_access: " + boost::core::demangle( typeid(E).name() ) )
+    explicit bad_expected_access( std::string&& msg ) noexcept: msg_( std::move(msg) ) // extension
     {
     }
 
     char const * what() const noexcept
     {
-        return msg_.empty()? "bad_expected_access": msg_.c_str();
+        return msg_.empty()? "bad_expected_access<>": msg_.c_str();
+    }
+};
+
+namespace detail
+{
+
+template<class E, class En = std::enable_if_t<!std::is_enum<E>::value>> std::string add_value( E const& /*e*/ )
+{
+    return std::string();
+}
+
+template<class E, class E1 = void, class E2 = std::enable_if_t<std::is_enum<E>::value>> std::string add_value( E const& e )
+{
+    return ": " + std::to_string( static_cast<int>(e) );
+}
+
+} // namespace detail
+
+template<class E> class bad_expected_access: public bad_expected_access<void>
+{
+private:
+
+    E e_;
+
+public:
+
+    explicit bad_expected_access( E const& e )
+        noexcept( std::is_nothrow_copy_constructible<E>::value )
+        : bad_expected_access<void>( "bad_expected_access<" + boost::core::demangle( typeid(E).name() ) + ">" + variant2::detail::add_value( e ) ), e_( e )
+    {
+    }
+
+    explicit bad_expected_access( E&& e )
+        noexcept( std::is_nothrow_move_constructible<E>::value )
+        : bad_expected_access<void>( "bad_expected_access<" + boost::core::demangle( typeid(E).name() ) + ">" + variant2::detail::add_value( e ) ), e_( std::move(e) )
+    {
+    }
+
+    E error() const
+    {
+        return e_;
     }
 };
 
 // expected
 
-template<class E> void throw_on_unexpected( E const & /*e*/ )
+template<class E> void throw_on_unexpected( E const& e )
 {
-    throw bad_expected_access( mp_identity<E>() );
+    throw bad_expected_access<E>( e );
 }
 
 void throw_on_unexpected( std::error_code const & e )
@@ -72,7 +115,7 @@ void throw_on_unexpected( std::exception_ptr const & e )
     }
     else
     {
-        throw bad_expected_access( mp_identity<std::exception_ptr>() );
+        throw bad_expected_access<>( "bad_expected_access<>: null exception_ptr" );
     }
 }
 
@@ -90,7 +133,7 @@ private:
         {
             if( I == 0 )
             {
-                throw bad_expected_access( mp_identity<T>() );
+                throw bad_expected_access<>( "bad_expected_access<>: value present on error request" );
             }
             else
             {
