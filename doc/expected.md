@@ -29,8 +29,8 @@
     // throw_on_unexpected
 
     template<class E> void throw_on_unexpected( E const& e );
-    void throw_on_unexpected( std::error_code const & e );
-    void throw_on_unexpected( std::exception_ptr const & e );
+    void throw_on_unexpected( std::error_code const& e );
+    void throw_on_unexpected( std::exception_ptr const& e );
 
     // expected
 
@@ -43,23 +43,23 @@
         constexpr expected() noexcept( /*see below*/ );
 
         constexpr expected( T const& t ) noexcept( /*see below*/ );
-        constexpr expected( T && t ) noexcept( /*see below*/ );
+        constexpr expected( T&& t ) noexcept( /*see below*/ );
 
         // unexpected constructor
 
         template<class... E2>
-        constexpr expected( unexpected_<E2...> const & x );
+        constexpr expected( unexpected_<E2...> const& x );
 
         template<class... E2>
-        constexpr expected( unexpected_<E2...> && x );
+        constexpr expected( unexpected_<E2...>&& x );
 
         // conversion constructor
 
         template<class... E2>
-        constexpr expected( expected<T, E2...> const & x );
+        constexpr expected( expected<T, E2...> const& x );
 
         template<class... E2>
-        constexpr expected( expected<T, E2...> && x );
+        constexpr expected( expected<T, E2...>&& x );
 
         // emplace
 
@@ -68,7 +68,7 @@
 
         // swap
 
-        void swap( expected & r ) noexcept( /*see below*/ );
+        void swap( expected& r ) noexcept( /*see below*/ );
 
         // value queries
 
@@ -102,33 +102,33 @@
         unexpected_<E...> unexpected() const;
 
         template<class E2> constexpr E2 error() const noexcept;
-        constexpr mp_first<expected> error() const noexcept;
+        constexpr /*see below*/ error() const noexcept;
 
         // error mapping
 
-        template<class F> /*see below*/ remap_errors( F && f ) const;
-        expected<T, std::error_code> remap_errors();
+        template<class F> /*see below*/ remap_errors( F&& f ) const;
+        expected<T, std::error_code> remap_errors() const;
 
         // then
 
-        template<class F> /*see below*/ operator>>( F && f ) const;
+        template<class F> /*see below*/ operator>>( F&& f ) const;
     };
 
     template<class T, class... E>
-    inline constexpr bool operator==( expected<T, E...> const & x1, expected<T, E...> const & x2 );
+    inline constexpr bool operator==( expected<T, E...> const& x1, expected<T, E...> const& x2 );
     
     template<class T, class... E>
-    inline constexpr bool operator!=( expected<T, E...> const & x1, expected<T, E...> const & x2 );
+    inline constexpr bool operator!=( expected<T, E...> const& x1, expected<T, E...> const& x2 );
 
     template<class T, class... E>
-    inline void swap( expected<T, E...> & x1, expected<T, E...> & x2 ) noexcept( /*see below*/ );
-
-    } // namespace variant2
-    } // namespace boost
+    inline void swap( expected<T, E...>& x1, expected<T, E...>& x2 ) noexcept( /*see below*/ );
 
     // is_expected
 
     template<class T> struct is_expected;
+
+    } // namespace variant2
+    } // namespace boost
 
 ## Reference
 
