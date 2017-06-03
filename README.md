@@ -1,6 +1,6 @@
 # variant2
 
-This repository contains a never-valueless C++14 implementation of [std::variant](http://en.cppreference.com/w/cpp/utility/variant) in [variant.hpp](include/boost/variant2/variant.hpp) and an implementation of `expected<T, E...>` in [expected.hpp](include/boost/variant2/variant.hpp) that is an extended version of `extended<T, E>` as proposed in [P0323R1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf).
+This repository contains a never-valueless C++14 implementation of [std::variant](http://en.cppreference.com/w/cpp/utility/variant) in [variant.hpp](include/boost/variant2/variant.hpp) and an implementation of `expected<T, E...>` in [expected.hpp](include/boost/variant2/variant.hpp) that is an extended version of `extended<T, E>` as proposed in [P0323R1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0323r1.pdf) and the subsequent [D0323R2](https://github.com/viboes/std-make/blob/master/doc/proposal/expected/d0323r2.md).
 
 The code requires [mp11](https://github.com/pdimov/mp11) and Boost.Config. The repository is intended to be placed into the `libs/variant2` directory of a Boost clone or release, with mp11 in `libs/mp11`, but the headers will also work standalone if [mp11.hpp](https://github.com/pdimov/mp11/blob/master/include/boost/mp11.hpp) or [mp11_single.hpp](https://github.com/pdimov/mp11/blob/master/include/boost/mp11_single.hpp) is included beforehand.
 
