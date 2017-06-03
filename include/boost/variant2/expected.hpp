@@ -90,9 +90,8 @@ public:
 
 // throw_on_unexpected
 
-template<class E> void throw_on_unexpected( E const& e )
+template<class E> void throw_on_unexpected( E const& /*e*/ )
 {
-    throw bad_expected_access<E>( e );
 }
 
 void throw_on_unexpected( std::error_code const & e )
@@ -137,7 +136,10 @@ private:
             }
             else
             {
-                throw_on_unexpected( get<I>(v_) );
+                auto const & e = get<I>(v_);
+
+                throw_on_unexpected( e );
+                throw bad_expected_access<std::decay_t<decltype(e)>>( e );
             }
         });
     }
