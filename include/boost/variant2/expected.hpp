@@ -375,7 +375,7 @@ public:
         });
     }
 
-    expected<T, std::error_code> remap_errors()
+    expected<T, std::error_code> remap_errors() const
     {
         using R = expected<T, std::error_code>;
 
