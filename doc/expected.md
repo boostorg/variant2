@@ -114,10 +114,14 @@
         template<class F> /*see below*/ operator>>( F && f ) const;
     };
 
-    template<class T, class... E> inline constexpr bool operator==( expected<T, E...> const & x1, expected<T, E...> const & x2 );
-    template<class T, class... E> inline constexpr bool operator!=( expected<T, E...> const & x1, expected<T, E...> const & x2 );
+    template<class T, class... E>
+    inline constexpr bool operator==( expected<T, E...> const & x1, expected<T, E...> const & x2 );
+    
+    template<class T, class... E>
+    inline constexpr bool operator!=( expected<T, E...> const & x1, expected<T, E...> const & x2 );
 
-    template<class T, class... E> inline void swap( expected<T, E...> & x1, expected<T, E...> & x2 ) noexcept( /*see below*/ );
+    template<class T, class... E>
+    inline void swap( expected<T, E...> & x1, expected<T, E...> & x2 ) noexcept( /*see below*/ );
 
     } // namespace variant2
     } // namespace boost
