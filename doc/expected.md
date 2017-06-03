@@ -7,15 +7,13 @@ proposed in [P0323R1](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0
 and the subsequent [D0323R2](https://github.com/viboes/std-make/blob/master/doc/proposal/expected/d0323r2.md).
 
 The main difference is that this class takes more than one error type, which makes it more
-flexible. One example of a type of the `expected` family, [outcome<T>](https://ned14.github.io/boost.outcome/),
-can store either an error of type `std::error_code`, or an exception in the form of `std::exception_ptr`.
+flexible. One example of a type of the `expected` family, [`outcome<T>`](https://ned14.github.io/boost.outcome/),
+on failure can store either an error of type `std::error_code`, or an exception in the form of `std::exception_ptr`.
 This can be represented naturally in this implementation via `expected<T, std::error_code, std::exception_ptr>`.
 
 In addition, libraries would generally differ in their choice of error types. It would be a
 common need in practice of having to combine the results of calling two different libraries,
-each with its own error type, such as the two examples below:
-
-    // Library 1
+each with its own error type. Library 1 may use `lib1::error`:
 
     namespace lib1
     {
@@ -30,7 +28,7 @@ each with its own error type, such as the two examples below:
 
     } // namespace lib1
 
-    // Library 2
+while Library 2 might define its own `lib2::error`:
 
     namespace lib2
     {
@@ -84,6 +82,10 @@ An alternative approach that requires more effort is also supported:
 
         return m * r2.value();
     }
+
+`std::error_code` is a very good choice for a common error type, and it's supported
+natively by the overload of `.remap_errors()` that takes no arguments, which uses
+calls to `make_error_code` to translate the errors.
 
 When an attempt to access the value via `r.value()` is made and an error is present,
 an exception is thrown. By default, this exception is of type `bad_expected_access<E>`,
