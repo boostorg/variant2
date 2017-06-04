@@ -173,7 +173,7 @@ public:
     }
 
     template<class... E2,
-        class En = mp_if<mp_all<std::is_copy_constructible<E2>..., mp_contains<mp_list<E...>, E2>...>, void>>
+        class En = mp_if<mp_all<std::is_move_constructible<E2>..., mp_contains<mp_list<E...>, E2>...>, void>>
     constexpr expected( unexpected_<E2...> && x ): v_( std::move(x) )
     {
     }
