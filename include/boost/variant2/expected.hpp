@@ -90,9 +90,8 @@ public:
 
 // throw_on_unexpected
 
-template<class E> void throw_on_unexpected( E const& e )
+template<class E> void throw_on_unexpected( E const& /*e*/ )
 {
-    throw bad_expected_access<E>( e );
 }
 
 void throw_on_unexpected( std::error_code const & e )
@@ -137,7 +136,10 @@ private:
             }
             else
             {
-                throw_on_unexpected( get<I>(v_) );
+                auto const & e = get<I>(v_);
+
+                throw_on_unexpected( e );
+                throw bad_expected_access<std::decay_t<decltype(e)>>( e );
             }
         });
     }
@@ -171,7 +173,7 @@ public:
     }
 
     template<class... E2,
-        class En = mp_if<mp_all<std::is_copy_constructible<E2>..., mp_contains<mp_list<E...>, E2>...>, void>>
+        class En = mp_if<mp_all<std::is_move_constructible<E2>..., mp_contains<mp_list<E...>, E2>...>, void>>
     constexpr expected( unexpected_<E2...> && x ): v_( std::move(x) )
     {
     }
@@ -375,7 +377,7 @@ public:
         });
     }
 
-    expected<T, std::error_code> remap_errors()
+    expected<T, std::error_code> remap_errors() const
     {
         using R = expected<T, std::error_code>;
 
