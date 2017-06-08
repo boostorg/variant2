@@ -311,12 +311,12 @@ template<class T1, class... T> union variant_storage_impl<mp_false, T1, T...>
     {
     }
 
-    template<class... A> void emplace( mp_size_t<0>, A&&... a ) noexcept
+    template<class... A> void emplace( mp_size_t<0>, A&&... a )
     {
         ::new( &first_ ) T1( std::forward<A>(a)... );
     }
 
-    template<std::size_t I, class... A> void emplace( mp_size_t<I>, A&&... a ) noexcept
+    template<std::size_t I, class... A> void emplace( mp_size_t<I>, A&&... a )
     {
         rest_.emplace( mp_size_t<I-1>(), std::forward<A>(a)... );
     }
@@ -342,24 +342,24 @@ template<class T1, class... T> union variant_storage_impl<mp_true, T1, T...>
     {
     }
 
-    template<class... A> void emplace_impl( mp_false, A&&... a ) noexcept
+    template<class... A> void emplace_impl( mp_false, mp_size_t<0>, A&&... a )
     {
         ::new( &first_ ) T1( std::forward<A>(a)... );
     }
 
-    template<class... A> constexpr void emplace_impl( mp_true, A&&... a ) noexcept
-    {
-        *this = variant_storage_impl( mp_size_t<0>(), std::forward<A>(a)... );
-    }
-
-    template<class... A> constexpr void emplace( mp_size_t<0>, A&&... a ) noexcept
-    {
-        this->emplace_impl( mp_all<std::is_trivially_move_assignable<T1>, std::is_trivially_move_assignable<T>...>(), std::forward<A>(a)... );
-    }
-
-    template<std::size_t I, class... A> constexpr void emplace( mp_size_t<I>, A&&... a ) noexcept
+    template<std::size_t I, class... A> constexpr void emplace_impl( mp_false, mp_size_t<I>, A&&... a )
     {
         rest_.emplace( mp_size_t<I-1>(), std::forward<A>(a)... );
+    }
+
+    template<std::size_t I, class... A> constexpr void emplace_impl( mp_true, mp_size_t<I>, A&&... a ) noexcept
+    {
+        *this = variant_storage_impl( mp_size_t<I>(), std::forward<A>(a)... );
+    }
+
+    template<std::size_t I, class... A> constexpr void emplace( mp_size_t<I>, A&&... a )
+    {
+        this->emplace_impl( mp_all<std::is_trivially_move_assignable<T1>, std::is_trivially_move_assignable<T>...>(), mp_size_t<I>(), std::forward<A>(a)... );
     }
 
     constexpr T1& get( mp_size_t<0> ) noexcept { return first_; }
