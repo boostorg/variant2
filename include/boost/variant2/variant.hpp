@@ -283,6 +283,35 @@ template<class U, class... T> constexpr std::add_pointer_t<U const> get_if(varia
 namespace detail
 {
 
+// trivially_*
+
+#if defined( BOOST_LIBSTDCXX_VERSION ) && BOOST_LIBSTDCXX_VERSION < 50000
+
+template<class T> struct is_trivially_copy_constructible: mp_bool<std::is_copy_constructible<T>::value && std::has_trivial_copy_constructor<T>::value>
+{
+};
+
+template<class T> struct is_trivially_copy_assignable: mp_bool<std::is_copy_assignable<T>::value && std::has_trivial_copy_assign<T>::value>
+{
+};
+
+template<class T> struct is_trivially_move_constructible: mp_bool<std::is_move_constructible<T>::value && std::is_trivial<T>::value>
+{
+};
+
+template<class T> struct is_trivially_move_assignable: mp_bool<std::is_move_assignable<T>::value && std::is_trivial<T>::value>
+{
+};
+
+#else
+
+using std::is_trivially_copy_constructible;
+using std::is_trivially_copy_assignable;
+using std::is_trivially_move_constructible;
+using std::is_trivially_move_assignable;
+
+#endif
+
 // variant_storage
 
 template<class D, class... T> union variant_storage_impl;
@@ -359,15 +388,7 @@ template<class T1, class... T> union variant_storage_impl<mp_true, T1, T...>
 
     template<std::size_t I, class... A> constexpr void emplace( mp_size_t<I>, A&&... a )
     {
-#if defined( BOOST_LIBSTDCXX_VERSION ) && BOOST_LIBSTDCXX_VERSION < 50000
-
-        this->emplace_impl( mp_all<std::is_move_assignable<T1>, std::is_trivial<T1>, std::is_move_assignable<T>..., std::is_trivial<T>...>(), mp_size_t<I>(), std::forward<A>(a)... );
-
-#else
-
-        this->emplace_impl( mp_all<std::is_trivially_move_assignable<T1>, std::is_trivially_move_assignable<T>...>(), mp_size_t<I>(), std::forward<A>(a)... );
-
-#endif
+        this->emplace_impl( mp_all<variant2::detail::is_trivially_move_assignable<T1>, variant2::detail::is_trivially_move_assignable<T>...>(), mp_size_t<I>(), std::forward<A>(a)... );
     }
 
     constexpr T1& get( mp_size_t<0> ) noexcept { return first_; }
@@ -503,15 +524,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
         std::size_t const J = I+1;
         using U = mp_at_c<variant<T...>, I>;
 
-#if defined( BOOST_LIBSTDCXX_VERSION ) && BOOST_LIBSTDCXX_VERSION < 50000
-
-        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A...>(), mp_all<std::is_move_constructible<U>, std::is_move_assignable<T>..., std::is_trivial<T>...>(), std::forward<A>(a)... );
-
-#else
-
-        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A...>(), mp_all<std::is_trivially_move_constructible<U>, std::is_trivially_move_assignable<T>...>(), std::forward<A>(a)... );
-
-#endif
+        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A...>(), mp_all<variant2::detail::is_trivially_move_constructible<U>, variant2::detail::is_trivially_move_assignable<T>...>(), std::forward<A>(a)... );
     }
 };
 
@@ -869,7 +882,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_all<std::is_trivially_copy_constructible<T>...>, E1>
+        class E2 = mp_if<mp_all<variant2::detail::is_trivially_copy_constructible<T>...>, E1>
     >
     constexpr variant( variant const& r ) noexcept
         : variant_base( static_cast<variant_base const&>(r) )
@@ -877,7 +890,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_not<mp_all<std::is_trivially_copy_constructible<T>...>>, E1>,
+        class E2 = mp_if<mp_not<mp_all<variant2::detail::is_trivially_copy_constructible<T>...>>, E1>,
         class E3 = mp_if<mp_all<std::is_copy_constructible<T>...>, E1>
     >
     variant( variant const& r )
@@ -891,7 +904,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_all<std::is_trivially_move_constructible<T>...>, E1>
+        class E2 = mp_if<mp_all<variant2::detail::is_trivially_move_constructible<T>...>, E1>
     >
     constexpr variant( variant && r ) noexcept
         : variant_base( static_cast<variant_base&&>(r) )
@@ -899,7 +912,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_not<mp_all<std::is_trivially_move_constructible<T>...>>, E1>,
+        class E2 = mp_if<mp_not<mp_all<variant2::detail::is_trivially_move_constructible<T>...>>, E1>,
         class E3 = mp_if<mp_all<std::is_move_constructible<T>...>, E1>
     >
     variant( variant && r )
@@ -946,7 +959,7 @@ public:
 
     // assignment
     template<class E1 = void,
-        class E2 = mp_if<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_copy_assignable<T>...>, E1>
+        class E2 = mp_if<mp_all<std::is_trivially_destructible<T>..., variant2::detail::is_trivially_copy_assignable<T>...>, E1>
     >
     constexpr variant& operator=( variant const & r ) noexcept
     {
@@ -955,7 +968,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_not<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_copy_assignable<T>...>>, E1>,
+        class E2 = mp_if<mp_not<mp_all<std::is_trivially_destructible<T>..., variant2::detail::is_trivially_copy_assignable<T>...>>, E1>,
         class E3 = mp_if<mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
     >
     constexpr variant& operator=( variant const & r )
@@ -978,7 +991,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_move_assignable<T>...>, E1>
+        class E2 = mp_if<mp_all<std::is_trivially_destructible<T>..., variant2::detail::is_trivially_move_assignable<T>...>, E1>
     >
     constexpr variant& operator=( variant && r ) noexcept
     {
@@ -987,7 +1000,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp_if<mp_not<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_move_assignable<T>...>>, E1>,
+        class E2 = mp_if<mp_not<mp_all<std::is_trivially_destructible<T>..., variant2::detail::is_trivially_move_assignable<T>...>>, E1>,
         class E3 = mp_if<mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
     >
     variant& operator=( variant && r )
