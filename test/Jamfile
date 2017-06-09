@@ -42,6 +42,7 @@ run variant_copy_assign.cpp : : : $(REQ) ;
 compile variant_copy_assign_cx.cpp : : : $(REQ) ;
 
 run variant_move_assign.cpp : : : $(REQ) ;
+compile variant_move_assign_cx.cpp : : : $(REQ) ;
 
 run variant_value_assign.cpp : : : $(REQ) ;
 compile variant_value_assign_cx.cpp : : : $(REQ) ;
