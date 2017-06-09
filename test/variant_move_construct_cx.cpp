@@ -6,7 +6,15 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
+#if !defined( __cpp_constexpr ) || __cpp_constexpr < 201603
+
+// no constexpr lambda support
+int main() {}
+
+#else
+
 #include <boost/variant2/variant.hpp>
+#include <utility>
 
 using namespace boost::variant2;
 
@@ -33,26 +41,21 @@ enum E
 
 #define STATIC_ASSERT(...) static_assert(__VA_ARGS__, #__VA_ARGS__)
 
-template<class V, class T, class A> constexpr T test( A const& a )
+template<class T, class V> constexpr T test( V&& v )
 {
-    V v;
-
-    v = a;
-
+    V v2( std::forward<V>(v) );
     return get<T>(v);
 }
 
 int main()
 {
     {
-        constexpr variant<int> v( 1 );
-        constexpr auto w = test<variant<int>, int>( v );
+        constexpr auto w = test<int>( variant<int>( 1 ) );
         STATIC_ASSERT( w == 1 );
     }
 
     {
-        constexpr variant<X> v( 1 );
-        constexpr auto w = test<variant<X>, X>( v );
+        constexpr auto w = test<X>( variant<X>( 1 ) );
         STATIC_ASSERT( w == 1 );
     }
 
@@ -60,40 +63,34 @@ int main()
 #else
 
     {
-        constexpr variant<Y> v( 1 );
-        constexpr auto w = test<variant<Y>, Y>( v );
+        constexpr auto w = test<Y>( variant<Y>( 1 ) );
         STATIC_ASSERT( w == 1 );
     }
 
 #endif
 
     {
-        constexpr variant<int, float> v( 1 );
-        constexpr auto w = test<variant<int, float>, int>( v );
+        constexpr auto w = test<int>( variant<int, float>( 1 ) );
         STATIC_ASSERT( w == 1 );
     }
 
     {
-        constexpr variant<int, float> v( 3.0f );
-        constexpr auto w = test<variant<int, float>, float>( v );
+        constexpr auto w = test<float>( variant<int, float>( 3.0f ) );
         STATIC_ASSERT( w == 3.0f );
     }
 
     {
-        constexpr variant<int, int, float> v( 3.0f );
-        constexpr auto w = test<variant<int, int, float>, float>( v );
+        constexpr auto w = test<float>( variant<int, int, float>( 3.0f ) );
         STATIC_ASSERT( w == 3.0f );
     }
 
     {
-        constexpr variant<E, E, X> v( 1 );
-        constexpr auto w = test<variant<E, E, X>, X>( v );
+        constexpr auto w = test<X>( variant<E, E, X>( 1 ) );
         STATIC_ASSERT( w == 1 );
     }
 
     {
-        constexpr variant<int, int, float, float, X> v( X(1) );
-        constexpr auto w = test<variant<int, int, float, float, X>, X>( v );
+        constexpr auto w = test<X>( variant<int, int, float, float, X>( X(1) ) );
         STATIC_ASSERT( w == 1 );
     }
 
@@ -101,16 +98,16 @@ int main()
 #else
 
     {
-        constexpr variant<E, E, Y> v( 1 );
-        constexpr auto w = test<variant<E, E, Y>, Y>( v );
+        constexpr auto w = test<Y>( variant<E, E, Y>( 1 ) );
         STATIC_ASSERT( w == 1 );
     }
 
     {
-        constexpr variant<int, int, float, float, Y> v( Y(1) );
-        constexpr auto w = test<variant<int, int, float, float, Y>, Y>( v );
+        constexpr auto w = test<Y>( variant<int, int, float, float, Y>( Y(1) ) );
         STATIC_ASSERT( w == 1 );
     }
 
 #endif
 }
+
+#endif // constexpr lambda support

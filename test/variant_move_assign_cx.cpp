@@ -6,13 +6,6 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
-#if !defined( __cpp_constexpr ) || __cpp_constexpr < 201603
-
-// no constexpr lambda support
-int main() {}
-
-#else
-
 #include <boost/variant2/variant.hpp>
 #include <utility>
 
@@ -112,5 +105,3 @@ int main()
 
 #endif
 }
-
-#endif // constexpr lambda support

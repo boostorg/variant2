@@ -868,8 +868,19 @@ public:
     {
     }
 
-    template<class E1 = void, class E2 = mp_if<mp_all<std::is_copy_constructible<T>...>, E1>>
-    constexpr variant( variant const& r )
+    template<class E1 = void,
+        class E2 = mp_if<mp_all<std::is_trivially_copy_constructible<T>...>, E1>
+    >
+    constexpr variant( variant const& r ) noexcept
+        : variant_base( static_cast<variant_base const&>(r) )
+    {
+    }
+
+    template<class E1 = void,
+        class E2 = mp_if<mp_not<mp_all<std::is_trivially_copy_constructible<T>...>>, E1>,
+        class E3 = mp_if<mp_all<std::is_copy_constructible<T>...>, E1>
+    >
+    variant( variant const& r )
         noexcept( mp_all<std::is_nothrow_copy_constructible<T>...>::value )
     {
         mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
@@ -879,8 +890,19 @@ public:
         });
     }
 
-    template<class E1 = void, class E2 = mp_if<mp_all<std::is_move_constructible<T>...>, E1>>
-    constexpr variant( variant && r )
+    template<class E1 = void,
+        class E2 = mp_if<mp_all<std::is_trivially_move_constructible<T>...>, E1>
+    >
+    constexpr variant( variant && r ) noexcept
+        : variant_base( static_cast<variant_base&&>(r) )
+    {
+    }
+
+    template<class E1 = void,
+        class E2 = mp_if<mp_not<mp_all<std::is_trivially_move_constructible<T>...>>, E1>,
+        class E3 = mp_if<mp_all<std::is_move_constructible<T>...>, E1>
+    >
+    variant( variant && r )
         noexcept( mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
         mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
@@ -923,7 +945,19 @@ public:
     }
 
     // assignment
-    template<class E1 = void, class E2 = mp_if<mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>>
+    template<class E1 = void,
+        class E2 = mp_if<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_copy_assignable<T>...>, E1>
+    >
+    constexpr variant& operator=( variant const & r ) noexcept
+    {
+        static_cast<variant_base&>( *this ) = static_cast<variant_base const&>( r );
+        return *this;
+    }
+
+    template<class E1 = void,
+        class E2 = mp_if<mp_not<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_copy_assignable<T>...>>, E1>,
+        class E3 = mp_if<mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
+    >
     constexpr variant& operator=( variant const & r )
         noexcept( mp_all<std::is_nothrow_copy_constructible<T>..., std::is_nothrow_copy_assignable<T>...>::value )
     {
@@ -943,8 +977,20 @@ public:
         return *this;
     }
 
-    template<class E1 = void, class E2 = mp_if<mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>>
-    constexpr variant& operator=( variant && r )
+    template<class E1 = void,
+        class E2 = mp_if<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_move_assignable<T>...>, E1>
+    >
+    constexpr variant& operator=( variant && r ) noexcept
+    {
+        static_cast<variant_base&>( *this ) = static_cast<variant_base&&>( r );
+        return *this;
+    }
+
+    template<class E1 = void,
+        class E2 = mp_if<mp_not<mp_all<std::is_trivially_destructible<T>..., std::is_trivially_move_assignable<T>...>>, E1>,
+        class E3 = mp_if<mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
+    >
+    variant& operator=( variant && r )
         noexcept( mp_all<std::is_nothrow_move_constructible<T>..., std::is_nothrow_move_assignable<T>...>::value )
     {
         mp_with_index<sizeof...(T)>( r.index(), [&]( auto I ){
