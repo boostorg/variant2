@@ -361,7 +361,7 @@ template<class T1, class... T> union variant_storage_impl<mp_true, T1, T...>
     {
 #if defined( BOOST_LIBSTDCXX_VERSION ) && BOOST_LIBSTDCXX_VERSION < 50000
 
-        this->emplace_impl( mp_all<std::has_trivial_copy_assign<T1>, std::is_move_assignable<T1>, std::has_trivial_copy_assign<T>..., std::is_move_assignable<T>...>(), mp_size_t<I>(), std::forward<A>(a)... );
+        this->emplace_impl( mp_all<std::is_move_assignable<T1>, std::is_trivially_copyable<T1>, std::is_move_assignable<T>..., std::is_trivially_copyable<T>...>(), mp_size_t<I>(), std::forward<A>(a)... );
 
 #else
 
@@ -505,7 +505,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
 #if defined( BOOST_LIBSTDCXX_VERSION ) && BOOST_LIBSTDCXX_VERSION < 50000
 
-        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A...>(), mp_all<std::has_trivial_copy_constructor<U>, std::is_move_constructible<U>, std::has_trivial_copy_assign<T>..., std::is_move_assignable<T>...>(), std::forward<A>(a)... );
+        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A...>(), mp_all<std::is_move_constructible<U>, std::is_move_assignable<T>..., std::is_trivially_copyable<T>...>(), std::forward<A>(a)... );
 
 #else
 
