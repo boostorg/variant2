@@ -45,7 +45,33 @@ public:
     }
 };
 
-//
+// monostate
+
+struct monostate
+{
+};
+
+constexpr bool operator<(monostate, monostate) noexcept { return false; }
+constexpr bool operator>(monostate, monostate) noexcept { return false; }
+constexpr bool operator<=(monostate, monostate) noexcept { return true; }
+constexpr bool operator>=(monostate, monostate) noexcept { return true; }
+constexpr bool operator==(monostate, monostate) noexcept { return true; }
+constexpr bool operator!=(monostate, monostate) noexcept { return false; }
+
+// valueless
+
+struct valueless
+{
+};
+
+constexpr bool operator<(valueless, valueless) noexcept { return false; }
+constexpr bool operator>(valueless, valueless) noexcept { return false; }
+constexpr bool operator<=(valueless, valueless) noexcept { return true; }
+constexpr bool operator>=(valueless, valueless) noexcept { return true; }
+constexpr bool operator==(valueless, valueless) noexcept { return true; }
+constexpr bool operator!=(valueless, valueless) noexcept { return false; }
+
+// variant forward declaration
 
 template<class... T> class variant;
 
@@ -434,7 +460,7 @@ template<class U, class... T> using resolve_overload_index = mp_find<mp_list<T..
 // variant_base
 
 template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl; // trivially destructible, single buffered
-template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>::value, mp_any<mp_all<std::is_nothrow_move_constructible<T>...>, std::is_nothrow_default_constructible<T>...>::value, T...>;
+template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>::value, mp_any<mp_all<std::is_nothrow_move_constructible<T>...>, std::is_same<T, valueless>...>::value, T...>;
 
 struct none {};
 
@@ -491,9 +517,9 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t J, class U, class... A> void emplace_impl( mp_false, mp_false, A&&... a )
     {
-        std::size_t const K = mp_find_if<mp_list<T...>, std::is_nothrow_constructible>::value;
+        std::size_t const K = mp_find<mp_list<T...>, valueless>::value;
 
-        if( K < sizeof...(T) ) // have nothrow destructible
+        if( K < sizeof...(T) ) // have valueless
         {
             try
             {
@@ -644,7 +670,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
     {
         size_t const J = I+1;
 
-        std::size_t const K = mp_find_if<mp_list<T...>, std::is_nothrow_constructible>::value;
+        std::size_t const K = mp_find<mp_list<T...>, valueless>::value;
 
         using U = mp_at_c<variant<T...>, I>;
 
@@ -655,7 +681,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
             st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
             ix_ = J;
         }
-        else if( K < sizeof...(T) ) // have nothrow destructible
+        else if( K < sizeof...(T) ) // have valueless
         {
             _destroy();
 
