@@ -22,9 +22,9 @@ The class `boost::variant2::variant<T...>` is an almost conforming implementatio
 To avoid going into a valueless-by-exception state, this implementation falls back to using double storage unless
 
 * all the contained types are nothrow move constructible, or
-* the list of alternatives contains the type `valueless`.
+* the first alternative is the type `valueless`.
 
-If the second bullet doesn't hold, but the first does, the variant uses single storage, but `emplace` constructs a temporary and moves it into place if the construction of the object can throw. In case this is undesirable, one can force `emplace` into always constructing in-place by adding `valueless` to the list of alternatives.
+If the second bullet doesn't hold, but the first does, the variant uses single storage, but `emplace` constructs a temporary and moves it into place if the construction of the object can throw. In case this is undesirable, one can force `emplace` into always constructing in-place by adding `valueless` as a first alternative.
 
 ## expected.hpp
 
