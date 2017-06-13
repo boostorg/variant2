@@ -407,7 +407,7 @@ template<class T1, class... T> union variant_storage_impl<mp_true, T1, T...>
         rest_.emplace( mp_size_t<I-1>(), std::forward<A>(a)... );
     }
 
-    template<std::size_t I, class... A> constexpr void emplace_impl( mp_true, mp_size_t<I>, A&&... a ) noexcept
+    template<std::size_t I, class... A> constexpr void emplace_impl( mp_true, mp_size_t<I>, A&&... a )
     {
         *this = variant_storage_impl( mp_size_t<I>(), std::forward<A>(a)... );
     }
@@ -459,8 +459,10 @@ template<class U, class... T> using resolve_overload_index = mp_find<mp_list<T..
 
 // variant_base
 
+template<class... T> using can_be_valueless = std::is_same<mp_first<mp_list<T...>>, valueless>;
+
 template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl; // trivially destructible, single buffered
-template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>::value, mp_any<mp_all<std::is_nothrow_move_constructible<T>...>, std::is_same<T, valueless>...>::value, T...>;
+template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>::value, mp_any<mp_all<std::is_nothrow_move_constructible<T>...>, can_be_valueless<T...>>::value, T...>;
 
 struct none {};
 
@@ -517,10 +519,10 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t J, class U, class... A> void emplace_impl( mp_false, mp_false, A&&... a )
     {
-        std::size_t const K = mp_find<mp_list<T...>, valueless>::value;
-
-        if( K < sizeof...(T) ) // have valueless
+        if( can_be_valueless<T...>::value ) // T0 == valueless
         {
+            std::size_t const K = 0;
+
             try
             {
                 st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
@@ -550,7 +552,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
         std::size_t const J = I+1;
         using U = mp_at_c<variant<T...>, I>;
 
-        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A...>(), mp_all<variant2::detail::is_trivially_move_constructible<U>, variant2::detail::is_trivially_move_assignable<T>...>(), std::forward<A>(a)... );
+        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A&&...>(), mp_all<variant2::detail::is_trivially_move_constructible<U>, variant2::detail::is_trivially_move_assignable<T>...>(), std::forward<A>(a)... );
     }
 };
 
@@ -670,8 +672,6 @@ template<class... T> struct variant_base_impl<false, true, T...>
     {
         size_t const J = I+1;
 
-        std::size_t const K = mp_find<mp_list<T...>, valueless>::value;
-
         using U = mp_at_c<variant<T...>, I>;
 
         if( std::is_nothrow_constructible<U, A...>::value )
@@ -681,8 +681,10 @@ template<class... T> struct variant_base_impl<false, true, T...>
             st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
             ix_ = J;
         }
-        else if( K < sizeof...(T) ) // have valueless
+        else if( can_be_valueless<T...>::value ) // T0 == valueless
         {
+            std::size_t const K = 0;
+
             _destroy();
 
             try
@@ -692,8 +694,8 @@ template<class... T> struct variant_base_impl<false, true, T...>
             }
             catch( ... )
             {
-                st1_.emplace( mp_size_t<K>() );
-                ix_ = K;
+                st1_.emplace( mp_size_t<K+1>() );
+                ix_ = K+1;
 
                 throw;
             }
