@@ -1,4 +1,4 @@
-# Copyright 2016 Peter Dimov
+# Copyright 2016-2018 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -8,14 +8,11 @@ sudo: false
 
 python: "2.7"
 
-os:
-  - linux
-  - osx
-
 branches:
   only:
     - master
     - develop
+    - /feature\/.*/
 
 env:
   matrix:
@@ -29,17 +26,7 @@ matrix:
   include:
     - os: linux
       compiler: g++-5
-      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14
-      addons:
-        apt:
-          packages:
-            - g++-5
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      compiler: g++-5
-      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++1z
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -49,7 +36,7 @@ matrix:
 
     - os: linux
       compiler: g++-6
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -58,19 +45,8 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      compiler: g++-6
-      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z
-      addons:
-        apt:
-          packages:
-            - g++-6
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - os: linux
-      dist: trusty
       compiler: g++-7
-      env: TOOLSET=gcc COMPILER=g++-7 CXXSTD=c++14
+      env: TOOLSET=gcc COMPILER=g++-7 CXXSTD=14,17
       addons:
         apt:
           packages:
@@ -79,19 +55,28 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
-      dist: trusty
-      compiler: g++-7
-      env: TOOLSET=gcc COMPILER=g++-7 CXXSTD=c++1z
+      compiler: g++-8
+      env: TOOLSET=gcc COMPILER=g++-7 CXXSTD=14,17
       addons:
         apt:
           packages:
-            - g++-7
+            - g++-8
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      compiler: g++-8
+      env: UBSAN=1 TOOLSET=gcc COMPILER=g++-8 CXXSTD=14,17 UBSAN_OPTIONS=print_stacktrace=1 LINKFLAGS=-fuse-ld=gold
+      addons:
+        apt:
+          packages:
+            - g++-8
           sources:
             - ubuntu-toolchain-r-test
 
     - os: linux
       compiler: clang++-3.5
-      env: TOOLSET=clang COMPILER=clang++-3.5 CXXSTD=c++14
+      env: TOOLSET=clang COMPILER=clang++-3.5 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -103,7 +88,7 @@ matrix:
 
     - os: linux
       compiler: clang++-3.6
-      env: TOOLSET=clang COMPILER=clang++-3.6 CXXSTD=c++14
+      env: TOOLSET=clang COMPILER=clang++-3.6 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -114,7 +99,7 @@ matrix:
 
     - os: linux
       compiler: clang++-3.7
-      env: TOOLSET=clang COMPILER=clang++-3.7 CXXSTD=c++14
+      env: TOOLSET=clang COMPILER=clang++-3.7 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -125,18 +110,7 @@ matrix:
 
     - os: linux
       compiler: clang++-3.8
-      env: TOOLSET=clang COMPILER=clang++-3.8 CXXSTD=c++14
-      addons:
-        apt:
-          packages:
-            - clang-3.8
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
-
-    - os: linux
-      compiler: clang++-3.8
-      env: TOOLSET=clang COMPILER=clang++-3.8 CXXSTD=c++1z
+      env: TOOLSET=clang COMPILER=clang++-3.8 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -147,7 +121,7 @@ matrix:
 
     - os: linux
       compiler: clang++-3.9
-      env: TOOLSET=clang COMPILER=clang++-3.9 CXXSTD=c++14
+      env: TOOLSET=clang COMPILER=clang++-3.9 CXXSTD=14,1z
       addons:
         apt:
           packages:
@@ -157,59 +131,78 @@ matrix:
             - llvm-toolchain-precise-3.9
 
     - os: linux
-      compiler: clang++-3.9
-      env: TOOLSET=clang COMPILER=clang++-3.9 CXXSTD=c++1z
-      addons:
-        apt:
-          packages:
-            - clang-3.9
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.9
-
-    - os: linux
-      dist: trusty
       compiler: clang++-4.0
-      env: TOOLSET=clang COMPILER=clang++-4.0 CXXSTD=c++14
+      env: TOOLSET=clang COMPILER=clang++-4.0 CXXSTD=14,1z
       addons:
         apt:
           packages:
             - clang-4.0
-            - libstdc++-4.9-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-4.0
 
     - os: linux
-      dist: trusty
-      compiler: clang++-4.0
-      env: TOOLSET=clang COMPILER=clang++-4.0 CXXSTD=c++1z
+      compiler: clang++-5.0
+      env: TOOLSET=clang COMPILER=clang++-5.0 CXXSTD=14,1z
       addons:
         apt:
           packages:
-            - clang-4.0
-            - libstdc++-4.9-dev
+            - clang-5.0
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-trusty-5.0
+
+    - os: linux
+      compiler: clang++-6.0
+      env: TOOLSET=clang COMPILER=clang++-6.0 CXXSTD=14,17
+      addons:
+        apt:
+          packages:
+            - clang-6.0
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+
+    - os: linux
+      compiler: clang++-6.0
+      env: UBSAN=1 TOOLSET=clang COMPILER=clang++-6.0 CXXSTD=14,1z UBSAN_OPTIONS=print_stacktrace=1
+      addons:
+        apt:
+          packages:
+            - clang-6.0
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+
+    - os: linux
+      compiler: clang++-libc++
+      env: TOOLSET=clang COMPILER=clang++-libc++ CXXSTD=11,14,1z
+      addons:
+        apt:
+          packages:
+            - libc++-dev
+
+    - os: linux
+      compiler: clang++-libc++
+      env: UBSAN=1 TOOLSET=clang COMPILER=clang++-libc++ CXXSTD=14,1z UBSAN_OPTIONS=print_stacktrace=1
+      addons:
+        apt:
+          packages:
+            - libc++-dev
 
     - os: osx
       compiler: clang++
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14
-
-    - os: osx
-      compiler: clang++
-      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=14,1z
 
 install:
+  - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
   - cd ..
-  - git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+  - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
   - git submodule update --init tools/build
   - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
-  - git clone -b $TRAVIS_BRANCH https://github.com/pdimov/mp11 libs/mp11
-  - mkdir libs/variant2
+  - mkdir -p libs/variant2
   - cp -r $TRAVIS_BUILD_DIR/* libs/variant2
   - python tools/boostdep/depinst/depinst.py variant2
   - ./bootstrap.sh
@@ -217,8 +210,8 @@ install:
 
 script:
   - |-
-    echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
-  - ./b2 libs/variant2/test toolset=$TOOLSET
+    echo "using $TOOLSET : : $COMPILER ;" > ~/user-config.jam
+  - ./b2 libs/variant2/test toolset=$TOOLSET cxxstd=$CXXSTD variant=debug,release ${UBSAN:+cxxflags=-fsanitize=undefined cxxflags=-fno-sanitize-recover=undefined linkflags=-fsanitize=undefined define=UBSAN=1 debug-symbols=on} ${LINKFLAGS:+linkflags=$LINKFLAGS}
 
 notifications:
   email:
