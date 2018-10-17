@@ -56,7 +56,7 @@ matrix:
 
     - os: linux
       compiler: g++-8
-      env: TOOLSET=gcc COMPILER=g++-7 CXXSTD=14,17
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=14,17
       addons:
         apt:
           packages:

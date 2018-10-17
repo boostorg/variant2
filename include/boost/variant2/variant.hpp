@@ -439,7 +439,7 @@ template<class T1, class... T> struct overload<T1, T...>: overload<T...>
     mp_identity<T1> operator()(T1) const;
 };
 
-#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
 
 template<class U, class... T> using resolve_overload_type_ = decltype( overload<T...>()(std::declval<U>()) );
 
@@ -848,7 +848,7 @@ using std::swap;
 
 template<class T> using is_swappable_impl = decltype(swap(std::declval<T&>(), std::declval<T&>()));
 
-#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
 
 template<class T> struct is_nothrow_swappable_impl_
 {
@@ -869,7 +869,7 @@ template<class T> struct is_swappable: mp_valid<det2::is_swappable_impl, T>
 {
 };
 
-#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
 
 template<class T> struct is_nothrow_swappable: mp_eval_if<mp_not<is_swappable<T>>, mp_false, det2::is_nothrow_swappable_impl, T>
 {
@@ -1321,7 +1321,7 @@ template<class V> using var_size = variant_size<std::remove_reference_t<V>>;
 
 template<class V, class N, class T = variant_alternative_t<N::value, std::remove_reference_t<V>>> using apply_cv_ref_ = mp_if<std::is_reference<V>, T&, T>;
 
-#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
 
 template<class V> struct apply_cv_ref_impl
 {
@@ -1358,7 +1358,7 @@ template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::
     });
 }
 
-#if BOOST_WORKAROUND( BOOST_MSVC, <= 1910 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
 
 template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> variant2::detail::Vret<F, V1, V2>
 {
