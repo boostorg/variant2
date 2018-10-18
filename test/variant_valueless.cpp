@@ -84,7 +84,7 @@ STATIC_ASSERT( !std::is_nothrow_default_constructible<X3>::value );
 STATIC_ASSERT( !std::is_nothrow_copy_constructible<X3>::value );
 STATIC_ASSERT( !std::is_nothrow_move_constructible<X3>::value );
 STATIC_ASSERT( std::is_trivially_destructible<X3>::value );
-STATIC_ASSERT( v2d::is_trivially_move_assignable<X3>::value );
+//STATIC_ASSERT( v2d::is_trivially_move_assignable<X3>::value );
 STATIC_ASSERT( std::is_nothrow_constructible<X3, E3>::value );
 STATIC_ASSERT( !std::is_nothrow_constructible<X3, E3x>::value );
 
