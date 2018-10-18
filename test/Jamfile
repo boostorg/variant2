@@ -9,7 +9,7 @@
 import testing ;
 import ../../config/checks/config : requires ;
 
-project : requirements [ requires cxx11_variadic_templates cxx11_template_aliases cxx11_decltype cxx11_hdr_type_traits cxx11_constexpr ] ;
+project : requirements [ requires cxx11_variadic_templates cxx11_template_aliases cxx11_decltype cxx11_constexpr ] ;
 
 run variant_size.cpp ;
 run variant_alternative.cpp ;
