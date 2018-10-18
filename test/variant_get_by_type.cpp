@@ -54,6 +54,17 @@ int main()
 
         BOOST_TEST_EQ( get<int>(v), 0 );
         BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 0 );
+    }
+
+    {
+        variant<int> const v;
+
+        BOOST_TEST_EQ( get<int>(v), 0 );
+        BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 0 );
     }
 
     {
@@ -61,6 +72,17 @@ int main()
 
         BOOST_TEST_EQ( get<int>(v), 1 );
         BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 1 );
+    }
+
+    {
+        variant<int> const v( 1 );
+
+        BOOST_TEST_EQ( get<int>(v), 1 );
+        BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 1 );
     }
 
     {
@@ -119,6 +141,20 @@ int main()
 
         BOOST_TEST_THROWS( get<float>(v), bad_variant_access );
         BOOST_TEST_EQ( get_if<float>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 0 );
+    }
+
+    {
+        variant<int, float> const v;
+
+        BOOST_TEST_EQ( get<int>(v), 0 );
+        BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_THROWS( get<float>(v), bad_variant_access );
+        BOOST_TEST_EQ( get_if<float>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 0 );
     }
 
     {
@@ -129,6 +165,20 @@ int main()
 
         BOOST_TEST_THROWS( get<float>(v), bad_variant_access );
         BOOST_TEST_EQ( get_if<float>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 1 );
+    }
+
+    {
+        variant<int, float> const v( 1 );
+
+        BOOST_TEST_EQ( get<int>(v), 1 );
+        BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_THROWS( get<float>(v), bad_variant_access );
+        BOOST_TEST_EQ( get_if<float>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 1 );
     }
 
     {
@@ -139,6 +189,20 @@ int main()
 
         BOOST_TEST_EQ( get<float>(v), 3.14f );
         BOOST_TEST_EQ( get_if<float>(&v), &get<float>(v) );
+
+        BOOST_TEST_EQ( get<float>(std::move(v)), 3.14f );
+    }
+
+    {
+        variant<int, float> const v( 3.14f );
+
+        BOOST_TEST_THROWS( get<int>(v), bad_variant_access );
+        BOOST_TEST_EQ( get_if<int>(&v), nullptr );
+
+        BOOST_TEST_EQ( get<float>(v), 3.14f );
+        BOOST_TEST_EQ( get_if<float>(&v), &get<float>(v) );
+
+        BOOST_TEST_EQ( get<float>(std::move(v)), 3.14f );
     }
 
     {
@@ -146,6 +210,17 @@ int main()
 
         BOOST_TEST_EQ( get<int>(v), 0 );
         BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 0 );
+    }
+
+    {
+        variant<int, float, float> const v;
+
+        BOOST_TEST_EQ( get<int>(v), 0 );
+        BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 0 );
     }
 
     {
@@ -153,6 +228,17 @@ int main()
 
         BOOST_TEST_EQ( get<int>(v), 1 );
         BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 1 );
+    }
+
+    {
+        variant<int, float, float> const v( 1 );
+
+        BOOST_TEST_EQ( get<int>(v), 1 );
+        BOOST_TEST_EQ( get_if<int>(&v), &get<int>(v) );
+
+        BOOST_TEST_EQ( get<int>(std::move(v)), 1 );
     }
 
     {
@@ -160,6 +246,17 @@ int main()
 
         BOOST_TEST_EQ( get<float>(v), 3.14f );
         BOOST_TEST_EQ( get_if<float>(&v), &get<float>(v) );
+
+        BOOST_TEST_EQ( get<float>(std::move(v)), 3.14f );
+    }
+
+    {
+        variant<int, int, float> const v( 3.14f );
+
+        BOOST_TEST_EQ( get<float>(v), 3.14f );
+        BOOST_TEST_EQ( get_if<float>(&v), &get<float>(v) );
+
+        BOOST_TEST_EQ( get<float>(std::move(v)), 3.14f );
     }
 
     {
