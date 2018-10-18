@@ -9,7 +9,7 @@
 import testing ;
 import ../../config/checks/config : requires ;
 
-project : requirements [ requires cxx11_variadic_templates cxx11_template_aliases cxx11_decltype cxx11_hdr_type_traits cxx14_constexpr ] ;
+project : requirements [ requires cxx11_variadic_templates cxx11_template_aliases cxx11_decltype cxx11_hdr_type_traits cxx11_constexpr ] ;
 
 run variant_size.cpp ;
 run variant_alternative.cpp ;
@@ -42,19 +42,19 @@ run variant_in_place_type_construct.cpp ;
 compile variant_in_place_type_construct_cx.cpp ;
 
 run variant_copy_assign.cpp ;
-compile variant_copy_assign_cx.cpp ;
+compile variant_copy_assign_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_move_assign.cpp ;
-compile variant_move_assign_cx.cpp ;
+compile variant_move_assign_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_value_assign.cpp ;
-compile variant_value_assign_cx.cpp ;
+compile variant_value_assign_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_emplace_index.cpp ;
-compile variant_emplace_index_cx.cpp ;
+compile variant_emplace_index_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_emplace_type.cpp ;
-compile variant_emplace_type_cx.cpp ;
+compile variant_emplace_type_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_swap.cpp ;
 run variant_eq_ne.cpp ;

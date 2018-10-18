@@ -62,7 +62,7 @@ int main()
     }
 
     {
-        variant<int, int, float> v1, v2, v3( in_place_index<1> ), v4( in_place_index<1> ), v5( 3.14f ), v6( 3.14f );
+		variant<int, int, float> v1, v2, v3( in_place_index_t<1>{} ), v4( in_place_index_t<1>{} ), v5( 3.14f ), v6( 3.14f );
 
         TEST_EQ( v1, v2 )
         TEST_LE( v1, v3 )
