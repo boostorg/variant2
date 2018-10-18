@@ -1503,36 +1503,97 @@ template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> variant2::
     return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), detail::visit_L1<F, V1>{ std::forward<F>(f), std::forward<V1>(v1) } );
 }
 
-#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
+#if defined(BOOST_NO_CXX14_GENERIC_LAMBDAS) || BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
+
+namespace detail
+{
+
+template<class F, class A> struct bind_front_
+{
+    F&& f;
+    A&& a;
+
+    template<class... T> auto operator()( T&&... t ) -> decltype( std::forward<F>(f)( std::forward<A>(a), std::forward<T>(t)... ) )
+    {
+        return std::forward<F>(f)( std::forward<A>(a), std::forward<T>(t)... );
+    }
+};
+
+template<class F, class A> bind_front_<F, A> bind_front( F&& f, A&& a )
+{
+    return bind_front_<F, A>{ std::forward<F>(f), std::forward<A>(a) };
+}
+
+template<class F, class V1, class V2> struct visit_L2
+{
+    F&& f;
+
+    V1&& v1;
+    V2&& v2;
+
+    template<class I> auto operator()( I ) const -> Vret<F, V1, V2>
+    {
+        auto f2 = bind_front( std::forward<F>(f), get<I::value>( std::forward<V1>(v1) ) );
+        return visit( f2, std::forward<V2>(v2) );
+    }
+};
+
+} // namespace detail
 
 template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> variant2::detail::Vret<F, V1, V2>
 {
-    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
-
-        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
-        return visit( f2, std::forward<V2>(v2) );
-
-    });
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), detail::visit_L2<F, V1, V2>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2) } );
 }
+
+namespace detail
+{
+
+template<class F, class V1, class V2, class V3> struct visit_L3
+{
+    F&& f;
+
+    V1&& v1;
+    V2&& v2;
+    V3&& v3;
+
+    template<class I> auto operator()( I ) const -> Vret<F, V1, V2, V3>
+    {
+        auto f2 = bind_front( std::forward<F>(f), get<I::value>( std::forward<V1>(v1) ) );
+        return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3) );
+    }
+};
+
+} // namespace detail
 
 template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3 ) -> variant2::detail::Vret<F, V1, V2, V3>
 {
-    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
-
-        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
-        return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3) );
-
-    });
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), detail::visit_L3<F, V1, V2, V3>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3) } );
 }
+
+namespace detail
+{
+
+template<class F, class V1, class V2, class V3, class V4> struct visit_L4
+{
+    F&& f;
+
+    V1&& v1;
+    V2&& v2;
+    V3&& v3;
+    V4&& v4;
+
+    template<class I> auto operator()( I ) const -> Vret<F, V1, V2, V3, V4>
+    {
+        auto f2 = bind_front( std::forward<F>(f), get<I::value>( std::forward<V1>(v1) ) );
+        return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) );
+    }
+};
+
+} // namespace detail
 
 template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3, V4&& v4 ) -> variant2::detail::Vret<F, V1, V2, V3, V4>
 {
-    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), [&]( auto I ){
-
-        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
-        return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) );
-
-    });
+    return mp_with_index<variant2::detail::var_size<V1>>( v1.index(), detail::visit_L4<F, V1, V2, V3, V4>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) } );
 }
 
 #else
