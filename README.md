@@ -18,8 +18,8 @@ a Boost clone or release, but the header `variant.hpp` will also work
 
 Supported compilers:
 
-* g++ 4.8 or later with -std=c++11 or above
-* clang++ 3.5 or later with -std=c++11 or above
+* g++ 4.8 or later with `-std=c++11` or above
+* clang++ 3.5 or later with `-std=c++11` or above
 * Visual Studio 2015, 2017
 
 Tested on [Travis](https://travis-ci.org/pdimov/variant2/) and
@@ -45,7 +45,7 @@ back to using double storage unless
 * one of the alternatives has a nonthrowing default constructor, or
 * all the contained types are nothrow move constructible.
 
-If the first two bullets doesn't hold, but the third does, the variant uses
+If the first two bullets don't hold, but the third does, the variant uses
 single storage, but `emplace` constructs a temporary and moves it into place
 if the construction of the object can throw. In case this is undesirable, one
 can force `emplace` into always constructing in-place by adding `monostate` as
