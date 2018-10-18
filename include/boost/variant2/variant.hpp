@@ -101,9 +101,61 @@ template<std::size_t I, class T> struct variant_alternative;
 
 template<std::size_t I, class T> using variant_alternative_t = typename variant_alternative<I, T>::type;
 
+#if BOOST_WORKAROUND(BOOST_GCC, < 40900)
+
 namespace detail
 {
-    template<class I, class T, class Q> using var_alt_impl = mp_invoke<Q, variant_alternative_t<I::value, T>>;
+
+template<std::size_t I, class T, bool E> struct variant_alternative_impl
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...>, true>
+{
+    using type = mp_at_c<variant<T...>, I>;
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> const, true>: std::add_const< mp_at_c<variant<T...>, I> >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> volatile, true>: std::add_volatile< mp_at_c<variant<T...>, I> >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> const volatile, true>: std::add_cv< mp_at_c<variant<T...>, I> >
+{
+};
+
+} // namespace detail
+
+template<std::size_t I, class T> struct variant_alternative
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>>: public detail::variant_alternative_impl<I, variant<T...>, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const>: public detail::variant_alternative_impl<I, variant<T...> const, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> volatile>: public detail::variant_alternative_impl<I, variant<T...> volatile, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const volatile>: public detail::variant_alternative_impl<I, variant<T...> const volatile, (I < sizeof...(T))>
+{
+};
+
+#else
+
+namespace detail
+{
+
+template<class I, class T, class Q> using var_alt_impl = mp_invoke<Q, variant_alternative_t<I::value, T>>;
+
 } // namespace detail
 
 template<std::size_t I, class T> struct variant_alternative
@@ -125,6 +177,8 @@ template<std::size_t I, class T> struct variant_alternative<I, T const volatile>
 template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>>: mp_defer<mp_at, variant<T...>, mp_size_t<I>>
 {
 };
+
+#endif
 
 // holds_alternative
 
