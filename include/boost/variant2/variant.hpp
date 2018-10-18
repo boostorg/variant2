@@ -58,19 +58,6 @@ constexpr bool operator>=(monostate, monostate) noexcept { return true; }
 constexpr bool operator==(monostate, monostate) noexcept { return true; }
 constexpr bool operator!=(monostate, monostate) noexcept { return false; }
 
-// valueless
-
-struct valueless
-{
-};
-
-constexpr bool operator<(valueless, valueless) noexcept { return false; }
-constexpr bool operator>(valueless, valueless) noexcept { return false; }
-constexpr bool operator<=(valueless, valueless) noexcept { return true; }
-constexpr bool operator>=(valueless, valueless) noexcept { return true; }
-constexpr bool operator==(valueless, valueless) noexcept { return true; }
-constexpr bool operator!=(valueless, valueless) noexcept { return false; }
-
 // variant forward declaration
 
 template<class... T> class variant;
@@ -459,7 +446,8 @@ template<class U, class... T> using resolve_overload_index = mp_find<mp_list<T..
 
 // variant_base
 
-template<class... T> using can_be_valueless = std::is_same<mp_first<mp_list<T...>>, valueless>;
+template<class... T> using can_be_valueless = mp_any<std::is_same<T, monostate>..., std::is_nothrow_default_constructible<T>...>;
+template<class... T> using valueless_index = mp_if<mp_contains<mp_list<T...>, monostate>, mp_find<mp_list<T...>, monostate>, mp_find_if<mp_list<T...>, std::is_nothrow_default_constructible>>;
 
 template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl; // trivially destructible, single buffered
 template<class... T> using variant_base = variant_base_impl<mp_all<std::is_trivially_destructible<T>...>::value, mp_any<mp_all<std::is_nothrow_move_constructible<T>...>, can_be_valueless<T...>>::value, T...>;
@@ -519,9 +507,11 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t J, class U, class... A> void emplace_impl( mp_false, mp_false, A&&... a )
     {
-        if( can_be_valueless<T...>::value ) // T0 == valueless
+        if( can_be_valueless<T...>::value )
         {
-            std::size_t const K = 0;
+            std::size_t const K = valueless_index<T...>::value;
+
+            assert( K < sizeof...(T) );
 
             try
             {
@@ -681,9 +671,11 @@ template<class... T> struct variant_base_impl<false, true, T...>
             st1_.emplace( mp_size_t<J>(), std::forward<A>(a)... );
             ix_ = J;
         }
-        else if( can_be_valueless<T...>::value ) // T0 == valueless
+        else if( can_be_valueless<T...>::value )
         {
-            std::size_t const K = 0;
+            std::size_t const K = valueless_index<T...>::value;
+
+            assert( K < sizeof...(T) );
 
             _destroy();
 
