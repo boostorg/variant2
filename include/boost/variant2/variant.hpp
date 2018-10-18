@@ -1,12 +1,17 @@
 #ifndef BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 #define BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 
-//  Copyright 2017 Peter Dimov.
+// Copyright 2017, 2018 Peter Dimov.
 //
-//  Distributed under the Boost Software License, Version 1.0.
+// Distributed under the Boost Software License, Version 1.0.
 //
-//  See accompanying file LICENSE_1_0.txt or copy at
-//  http://www.boost.org/LICENSE_1_0.txt
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+
+#if defined(_MSC_VER) && _MSC_VER < 1910
+# pragma warning( push )
+# pragma warning( disable: 4521 4522 ) // multiple copy operators
+#endif
 
 #ifndef BOOST_MP11_HPP_INCLUDED
 #include <boost/mp11.hpp>
@@ -1028,7 +1033,7 @@ private:
             }
             else
             {
-                this_->variant_base::template emplace<i>( r._get_impl( i ) );
+                this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
             }
         }
     };
@@ -1070,7 +1075,7 @@ private:
             }
             else
             {
-                this_->variant_base::template emplace<i>( std::move( r._get_impl( i ) ) );
+                this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
             }
         }
     };
@@ -1485,9 +1490,9 @@ template<class F, class V1> struct visit_L1
     F&& f;
     V1&& v1;
 
-    template<class I> auto operator()( I i ) const -> Vret<F, V1>
+    template<class I> auto operator()( I ) const -> Vret<F, V1>
     {
-        return std::forward<F>(f)( get<i>( std::forward<V1>(v1) ) );
+        return std::forward<F>(f)( get<I::value>( std::forward<V1>(v1) ) );
     }
 };
 
@@ -1555,5 +1560,9 @@ void swap( variant<T...> & v, variant<T...> & w )
 
 } // namespace variant2
 } // namespace boost
+
+#if defined(_MSC_VER) && _MSC_VER < 1910
+# pragma warning( pop )
+#endif
 
 #endif // #ifndef BOOST_VARIANT2_VARIANT_HPP_INCLUDED
