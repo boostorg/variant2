@@ -130,7 +130,7 @@ int main()
         BOOST_TEST_EQ( v.index(), 0 );
         BOOST_TEST_EQ( get<0>(v), 0 );
 
-		variant<int, int, float, std::string> v2( in_place_index_t<1>{}, 1 );
+        variant<int, int, float, std::string> v2( in_place_index_t<1>{}, 1 );
 
         BOOST_TEST_EQ( v2.index(), 1 );
         BOOST_TEST_EQ( get<1>(v2), 1 );
@@ -215,7 +215,7 @@ int main()
         BOOST_TEST_EQ( v2.index(), 0 );
         BOOST_TEST_EQ( get<0>(v2).v, 0 );
 
-		variant<X1, X2> v3( in_place_index_t<1>{}, 2 );
+        variant<X1, X2> v3( in_place_index_t<1>{}, 2 );
 
         BOOST_TEST_EQ( v3.index(), 1 );
         BOOST_TEST_EQ( get<1>(v3).v, 2 );
@@ -228,7 +228,7 @@ int main()
         BOOST_TEST_EQ( v3.index(), 0 );
         BOOST_TEST_EQ( get<0>(v3).v, 1 );
 
-		variant<X1, X2> v4( in_place_index_t<1>{}, 3 );
+        variant<X1, X2> v4( in_place_index_t<1>{}, 3 );
 
         BOOST_TEST_EQ( v4.index(), 1 );
         BOOST_TEST_EQ( get<1>(v4).v, 3 );
@@ -241,7 +241,7 @@ int main()
         BOOST_TEST_EQ( v4.index(), 1 );
         BOOST_TEST_EQ( get<1>(v4).v, 2 );
 
-		variant<X1, X2> v5( in_place_index_t<0>{}, 4 );
+        variant<X1, X2> v5( in_place_index_t<0>{}, 4 );
 
         BOOST_TEST_EQ( v5.index(), 0 );
         BOOST_TEST_EQ( get<0>(v5).v, 4 );

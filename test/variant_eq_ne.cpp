@@ -60,7 +60,7 @@ int main()
     }
 
     {
-		variant<int, int, float> v1, v2, v3( in_place_index_t<1>{} ), v4( in_place_index_t<1>{} ), v5( 3.14f ), v6( 3.14f );
+        variant<int, int, float> v1, v2, v3( in_place_index_t<1>{} ), v4( in_place_index_t<1>{} ), v5( 3.14f ), v6( 3.14f );
 
         BOOST_TEST( v1 == v2 );
         BOOST_TEST_NOT( v1 != v2 );

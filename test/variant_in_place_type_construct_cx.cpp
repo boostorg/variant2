@@ -22,7 +22,7 @@ struct X
 int main()
 {
     {
-		constexpr variant<int> v( in_place_type_t<int>{} );
+        constexpr variant<int> v( in_place_type_t<int>{} );
 
         STATIC_ASSERT( v.index() == 0 );
         STATIC_ASSERT( get<0>(v) == 0 );
@@ -31,7 +31,7 @@ int main()
     }
 
     {
-		constexpr variant<X> v( in_place_type_t<X>{} );
+        constexpr variant<X> v( in_place_type_t<X>{} );
 
         STATIC_ASSERT( v.index() == 0 );
 
@@ -39,7 +39,7 @@ int main()
     }
 
     {
-		constexpr variant<int> v( in_place_type_t<int>{}, 1 );
+        constexpr variant<int> v( in_place_type_t<int>{}, 1 );
 
         STATIC_ASSERT( v.index() == 0 );
         STATIC_ASSERT( get<0>(v) == 1 );
@@ -48,7 +48,7 @@ int main()
     }
 
     {
-		constexpr variant<int, float> v( in_place_type_t<int>{} );
+        constexpr variant<int, float> v( in_place_type_t<int>{} );
 
         STATIC_ASSERT( v.index() == 0 );
         STATIC_ASSERT( get<0>(v) == 0 );
@@ -57,7 +57,7 @@ int main()
     }
 
     {
-		constexpr variant<int, float> v( in_place_type_t<int>{}, 1 );
+        constexpr variant<int, float> v( in_place_type_t<int>{}, 1 );
 
         STATIC_ASSERT( v.index() == 0 );
         STATIC_ASSERT( get<0>(v) == 1 );
@@ -66,7 +66,7 @@ int main()
     }
 
     {
-		constexpr variant<int, float> v( in_place_type_t<float>{} );
+        constexpr variant<int, float> v( in_place_type_t<float>{} );
 
         STATIC_ASSERT( v.index() == 1 );
         STATIC_ASSERT( get<1>(v) == 0 );
@@ -75,7 +75,7 @@ int main()
     }
 
     {
-		constexpr variant<int, float> v( in_place_type_t<float>{}, 3.14f );
+        constexpr variant<int, float> v( in_place_type_t<float>{}, 3.14f );
 
         STATIC_ASSERT( v.index() == 1 );
         STATIC_ASSERT( get<1>(v) == 3.14f );
@@ -84,7 +84,7 @@ int main()
     }
 
     {
-		constexpr variant<int, int, float, X> v( in_place_type_t<float>{}, 3.14f );
+        constexpr variant<int, int, float, X> v( in_place_type_t<float>{}, 3.14f );
 
         STATIC_ASSERT( v.index() == 2 );
         STATIC_ASSERT( get<2>(v) == 3.14f );
@@ -93,7 +93,7 @@ int main()
     }
 
     {
-		constexpr variant<int, int, float, float, X> v( in_place_type_t<X>{} );
+        constexpr variant<int, int, float, float, X> v( in_place_type_t<X>{} );
 
         STATIC_ASSERT( v.index() == 4 );
 
@@ -101,7 +101,7 @@ int main()
     }
 
     {
-		constexpr variant<int, int, float, float, X> v( in_place_type_t<X>{}, 0, 0 );
+        constexpr variant<int, int, float, float, X> v( in_place_type_t<X>{}, 0, 0 );
 
         STATIC_ASSERT( v.index() == 4 );
 
