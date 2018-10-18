@@ -42,7 +42,7 @@ To avoid going into a valueless-by-exception state, this implementation falls
 back to using double storage unless
 
 * one of the alternatives is the type `monostate`,
-* one of the alterantives has a nonthtowing default constructor, or
+* one of the alternatives has a nonthrowing default constructor, or
 * all the contained types are nothrow move constructible.
 
 If the first two bullets doesn't hold, but the third does, the variant uses
