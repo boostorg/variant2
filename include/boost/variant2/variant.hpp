@@ -140,7 +140,17 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>&& get(variant<T...>&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
+
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+
     return (void)( v.index() != I? throw bad_variant_access(): 0 ), std::move( v._get_impl( mp_size_t<I>() ) );
+
+#else
+
+    if( v.index() != I ) throw bad_variant_access();
+    return std::move( v._get_impl( mp_size_t<I>() ) );
+
+#endif
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const& get(variant<T...> const& v)
@@ -152,7 +162,17 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const&& get(variant<T...> const&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
+
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+
     return (void)( v.index() != I? throw bad_variant_access(): 0 ), std::move( v._get_impl( mp_size_t<I>() ) );
+
+#else
+
+    if( v.index() != I ) throw bad_variant_access();
+    return std::move( v._get_impl( mp_size_t<I>() ) );
+
+#endif
 }
 
 // get (type)
@@ -172,7 +192,16 @@ template<class U, class... T> constexpr U&& get(variant<T...>&& v)
 
     using I = mp_find<variant<T...>, U>;
 
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+
     return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), std::move( v._get_impl( I() ) );
+
+#else
+
+    if( v.index() != I::value ) throw bad_variant_access();
+    return std::move( v._get_impl( I() ) );
+
+#endif
 }
 
 template<class U, class... T> constexpr U const& get(variant<T...> const& v)
@@ -190,7 +219,16 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
 
     using I = mp_find<variant<T...>, U>;
 
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+
     return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), std::move( v._get_impl( I() ) );
+
+#else
+
+    if( v.index() != I::value ) throw bad_variant_access();
+    return std::move( v._get_impl( I() ) );
+
+#endif
 }
 
 // get_if
