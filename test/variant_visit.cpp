@@ -14,6 +14,7 @@
 #include <boost/mp11.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
+#include <boost/config.hpp>
 #include <type_traits>
 #include <utility>
 #include <string>
@@ -112,7 +113,13 @@ int main()
         BOOST_TEST_EQ( decltype(visit(F{}, v))::value, 1 );
         BOOST_TEST_EQ( decltype(visit(F{}, cv))::value, 2 );
         BOOST_TEST_EQ( decltype(visit(F{}, std::move(v)))::value, 3 );
+
+#if !BOOST_WORKAROUND(BOOST_GCC, < 40900)
+
+        // g++ 4.8 doesn't handle const&& particularly well
         BOOST_TEST_EQ( decltype(visit(F{}, std::move(cv)))::value, 4 );
+
+#endif
     }
 
     return boost::report_errors();

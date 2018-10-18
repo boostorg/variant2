@@ -1374,6 +1374,10 @@ public:
         return mp_with_index<sizeof...(T)>( index(), L10<U...>{ this } );
     }
 
+#if !BOOST_WORKAROUND(BOOST_GCC, < 40900)
+
+    // g++ 4.8 doesn't handle const&& particularly well
+
 private:
 
     template<class... U> struct L11
@@ -1395,6 +1399,8 @@ public:
     {
         return mp_with_index<sizeof...(T)>( index(), L11<U...>{ this } );
     }
+
+#endif
 };
 
 // relational operators
