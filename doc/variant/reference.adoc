@@ -1,0 +1,402 @@
+////
+Copyright 2018 Peter Dimov
+
+Distributed under the Boost Software License, Version 1.0.
+
+See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt
+////
+
+[#reference]
+# Reference
+:idprefix: ref_
+
+## <boost/variant2/variant.hpp>
+
+### Synopsis
+
+```
+namespace boost {
+namespace variant2 {
+
+// in_place_type
+
+template<class T> struct in_place_type_t {};
+template<class T> constexpr in_place_type_t<T> in_place_type{};
+
+// in_place_index
+
+template<std::size_t I> struct in_place_index_t {};
+template<std::size_t I> constexpr in_place_index_t<I> in_place_index{};
+
+// variant
+
+template<class... T> class variant;
+
+// variant_size
+
+template<class T> struct variant_size {};
+
+template<class T> struct variant_size<T const>: variant_size<T> {};
+template<class T> struct variant_size<T volatile>: variant_size<T> {};
+template<class T> struct variant_size<T const volatile>: variant_size<T> {};
+
+template<class T>
+  inline constexpr size_t variant_size_v = variant_size<T>::value;
+
+template<class... T>
+  struct variant_size<variant<T...>>:
+    std::integral_constant<std::size_t, sizeof...(T)> {};
+
+// variant_alternative
+
+template<size_t I, class T> struct variant_alternative {};
+
+template<size_t I, class T> struct variant_alternative<I, T const>;
+template<size_t I, class T> struct variant_alternative<I, T volatile>;
+template<size_t I, class T> struct variant_alternative<I, T const volatile>;
+
+template<size_t I, class T>
+  using variant_alternative_t = typename variant_alternative<I, T>::type;
+
+template<size_t I, class... T>
+  struct variant_alternative<I, variant<T...>>;
+
+// variant_npos
+
+constexpr std::size_t variant_npos = -1;
+
+// holds_alternative
+
+template<class U, class... T>
+  constexpr bool holds_alternative(const variant<T...>&) noexcept;
+
+// get
+
+template<size_t I, class... T>
+  constexpr variant_alternative_t<I, variant<T...>>&
+    get(variant<Types...>&);
+template<size_t I, class... T>
+  constexpr variant_alternative_t<I, variant<T...>>&&
+    get(variant<Types...>&&);
+template<size_t I, class... T>
+  constexpr const variant_alternative_t<I, variant<T...>>&
+    get(const variant<Types...>&);
+template<size_t I, class... T>
+  constexpr const variant_alternative_t<I, variant<T...>>&&
+    get(const variant<Types...>&&);
+
+template<class U, class... T>
+  constexpr U& get(variant<T...>&);
+template<class U, class... T>
+  constexpr U&& get(variant<T...>&&);
+template<class U, class... T>
+  constexpr const U& get(const variant<T...>&);
+template<class U, class... T>
+  constexpr const U&& get(const variant<T...>&&);
+
+// get_if
+
+template<size_t I, class... T>
+  constexpr add_pointer_t<variant_alternative_t<I, variant<T...>>>
+    get_if(variant<T...>*) noexcept;
+template<size_t I, class... T>
+  constexpr add_pointer_t<const variant_alternative_t<I, variant<T...>>>
+    get_if(const variant<T...>*) noexcept;
+template<class T, class... T>
+  constexpr add_pointer_t<T>
+    get_if(variant<T...>*) noexcept;
+template<class T, class... T>
+  constexpr add_pointer_t<const T>
+    get_if(const variant<T...>*) noexcept;
+
+// relational operators
+
+template<class... T>
+  constexpr bool operator==(const variant<T...>&, const variant<T...>&);
+template<class... T>
+  constexpr bool operator!=(const variant<T...>&, const variant<T...>&);
+template<class... T>
+  constexpr bool operator<(const variant<T...>&, const variant<T...>&);
+template<class... T>
+  constexpr bool operator>(const variant<T...>&, const variant<T...>&);
+template<class... T>
+  constexpr bool operator<=(const variant<T...>&, const variant<T...>&);
+template<class... T>
+  constexpr bool operator>=(const variant<T...>&, const variant<T...>&);
+
+// visit
+
+template<class F, class... V>
+  constexpr /*see below*/ visit(F&&, V&&...);
+
+// monostate
+
+struct monostate {};
+
+constexpr bool operator==(monostate, monostate) noexcept { return true; }
+constexpr bool operator!=(monostate, monostate) noexcept { return false; }
+constexpr bool operator<(monostate, monostate) noexcept { return false; }
+constexpr bool operator>(monostate, monostate) noexcept { return false; }
+constexpr bool operator<=(monostate, monostate) noexcept { return true; }
+constexpr bool operator>=(monostate, monostate) noexcept { return true; }
+
+// swap
+
+template<class... T>
+  void swap(variant<T...>&, variant<T...>&) noexcept( see below );
+
+// bad_variant_access
+
+class bad_variant_access;
+
+} // namespace variant2
+} // namespace boost
+```
+
+### variant
+
+```
+namespace boost {
+namespace variant2 {
+
+template<class... T> class variant
+{
+public:
+
+  // constructors
+
+  constexpr variant() noexcept( /*see below*/ );
+
+  constexpr variant(variant const &) noexcept( /*see below*/ );
+  constexpr variant(variant&&) noexcept( /*see below*/ );
+
+  template<class U>
+    constexpr variant(U&&) noexcept( /*see below*/ );
+
+  template<class U, class... A>
+    constexpr explicit variant(in_place_type_t<U>, A&&...);
+  template<class U, class V, class... A>
+    constexpr explicit variant(in_place_type_t<U>, initializer_list<V>,
+      A&&...);
+
+  template<size_t I, class... A>
+    constexpr explicit variant(in_place_index_t<I>, A&&...);
+  template<size_t I, class V, class... A>
+    constexpr explicit variant(in_place_index_t<I>, initializer_list<V>,
+      A&&...);
+
+  // destructor
+
+  ~variant();
+
+  // assignment
+
+  constexpr variant& operator=(variant const &) noexcept( /*see below*/ );
+  constexpr variant& operator=(variant&&) noexcept( /*see below*/ );
+
+  template<class U> constexpr variant& operator=(U&&) noexcept( /*see below*/ );
+
+  // modifiers
+
+  template<class U, class... A>
+    constexpr U& emplace(A&&...);
+  template<class U, class V, class... A>
+    constexpr T& emplace(initializer_list<U>, A&&...);
+
+  template<size_t I, class... A>
+    constexpr variant_alternative_t<I, variant<T...>>&
+      emplace(A&&...);
+  template<size_t I, class V, class... A>
+    constexpr variant_alternative_t<I, variant<T...>>&
+      emplace(initializer_list<V>, A&&...);
+
+  // value status
+
+  constexpr bool valueless_by_exception() const noexcept;
+  constexpr size_t index() const noexcept;
+
+  // swap
+
+  void swap(variant&) noexcept( /*see below*/ );
+
+  // converting constructors (extension)
+
+  template<class... U> variant( variant<U...> const& r )
+    noexcept( /*see below*/ );
+
+  template<class... U> variant( variant<U...>&& r )
+    noexcept( /*see below*/ );
+
+  // subset (extension)
+
+  template<class... U> constexpr variant<U...> subset() & ;
+  template<class... U> constexpr variant<U...> subset() && ;
+  template<class... U> constexpr variant<U...> subset() const& ;
+  template<class... U> constexpr variant<U...> subset() const&& ;
+};
+
+} // namespace variant2
+} // namespace boost
+```
+
+#### Constructors
+
+```
+constexpr variant() noexcept(is_nothrow_default_constructible_v<T0>);
+```
+[none]
+* {blank}
++
+Effects: :: Constructs a `variant` holding a value-initialized value of
+  type `T0`.
+Ensures: :: `index() == 0`.
+Throws: :: Any exception thrown by the value-initialization of `T0`.
+Remarks: :: This function does not participate in overload resolution unless
+  `is_default_constructible_v<T0>` is `true`.
+
+```
+constexpr variant(variant const & w)
+  noexcept( mp_all<is_nothrow_copy_constructible<T>...>::value );
+```
+[none]
+* {blank}
++
+Effects: :: Initializes the variant to hold the same alternative and value as
+  `w`.
+Throws: :: Any exception thrown by the initialization of the contained value.
+Remarks: :: This function does not participate in overload resolution unless
+  `is_copy_constructible_v<Ti>` is `true` for all `i`.
+
+```
+constexpr variant(variant&& w)
+  noexcept( mp_all<is_nothrow_move_constructible<T>...>::value );
+```
+[none]
+* {blank}
++
+Effects: :: Initializes the variant to hold the same alternative and value as
+  `w`.
+Throws: :: Any exception thrown by the move-initialization of the contained
+  value.
+Remarks: :: This function does not participate in overload resolution unless
+  `is_move_constructible_v<Ti>` is `true` for all `i`.
+
+```
+template<class U> constexpr variant(U&& u) noexcept(/*see below*/);
+```
+[none]
+* {blank}
++
+Let `Tj` be a type that is determined as follows: build an imaginary function
+`FUN(Ti)` for each alternative type `Ti`. The overload `FUN(Tj)` selected by
+overload resolution for the expression `FUN(std::forward<U>(u))` defines the
+alternative `Tj` which is the type of the contained value after construction.
+
+Effects: :: Initializes `*this` to hold the alternative type `Tj` and
+  initializes the contained value from `std::forward<U>(u)`.
+Ensures: :: `holds_alternative<Tj>(*this)`.
+Throws: :: Any exception thrown by the initialization of the contained value.
+Remarks: :: The expression inside `noexcept` is equivalent to
+`is_nothrow_constructible_v<Tj, U>`. This function does not participate in
+overload resolution unless
+- `sizeof...(T)` is nonzero,
+- `is_same_v<remove_cvref_t<U>, variant>` is `false`,
+- `remove_cvref_t<U>` is neither a specialization of `in_place_type_t` nor a
+specialization of `in_place_index_t`,
+- `is_constructible_v<Tj, U>` is `true`, and
+- the expression `FUN(std::forward<U>(u))` is well-formed.
+
+```
+template<class U, class... A>
+  constexpr explicit variant(in_place_type_t<U>, A&&... a);
+```
+[none]
+* {blank}
++
+Effects: :: Initializes the contained value of type `U` with the arguments
+  `std::forward<A>(a)...`.
+Ensures: :: `holds_alternative<U>(*this)`.
+Throws: :: Any exception thrown by the initialization of the contained value.
+Remarks: :: This function does not participate in overload resolution unless
+  there is exactly one occurrence of `U` in `T...` and
+  `is_constructible_v<U, A...>` is true.
+
+```
+template<class U, class V, class... A>
+  constexpr explicit variant(in_place_type_t<U>, initializer_list<V> il,
+    A&&... a);
+```
+[none]
+* {blank}
++
+Effects: :: Initializes the contained value of type `U` with the arguments `il`,
+  `std::forward<A>(a)...`.
+Ensures: :: `holds_alternative<U>(*this)`.
+Throws: :: Any exception thrown by the initialization of the contained value.
+Remarks: :: This function does not participate in overload resolution unless
+  there is exactly one occurrence of `U` in `T...` and
+  `is_constructible_v<U, initializer_list<V>&, A...>` is `true`.
+
+```
+template<size_t I, class... A>
+  constexpr explicit variant(in_place_index_t<I>, A&&... a);
+```
+[none]
+* {blank}
++
+Effects: :: Initializes the contained value of type `TI` with the arguments
+  `std::forward<A>(a)...`.
+Ensures: :: `index() == I`.
+Throws: :: Any exception thrown by the initialization of the contained value.
+Remarks: :: This function does not participate in overload resolution unless
+ `I < sizeof...(T)` and `is_constructible_v<TI, A...>` is `true`.
+
+```
+template<size_t I, class V, class... A>
+  constexpr explicit variant(in_place_index_t<I>, initializer_list<V> il,
+    A&&... a);
+```
+[none]
+* {blank}
++
+Effects: :: Initializes the contained value of type `TI` with the arguments
+  `il`, `std::forward<A>(a)...`.
+Ensures: :: `index() == I`.
+Throws: :: Any exception thrown by the initialization of the contained value.
+Remarks: :: This function does not participate in overload resolution unless
+ `I < sizeof...(Types)` and
+ `is_constructible_v<TI, initializer_list<V>&, A...>` is `true`.
+
+#### Destructor
+
+```
+~variant();
+```
+[none]
+* {blank}
++
+Effects: :: Destroys the currently contained value.
+
+#### Assignment
+
+```
+constexpr variant& operator=(const variant& rhs)
+  noexcept( mp_all<std::is_nothrow_copy_constructible<T>...,
+    std::is_nothrow_copy_assignable<T>...>::value );
+```
+[none]
+* {blank}
++
+Let `j` be `rhs.index()`.
+
+Effects: ::
+- If `index() == j`, assigns the value contained in `rhs` to the value
+  contained in `*this`.
+- Otherwise, equivalent to `emplace<j>(get<j>(rhs))`.
+Returns: :: `*this`.
+Ensures: :: `index() == rhs.index()`.
+Remarks: :: This operator does not participate in overload resolution unless
+  `is_copy_constructible_v<Ti> && is_copy_assignable_v<Ti>` is `true` for all
+  `i`.
+

@@ -1,0 +1,23 @@
+////
+Copyright 2018 Peter Dimov
+
+Distributed under the Boost Software License, Version 1.0.
+
+See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt
+////
+
+# Boost.Variant2: A never valueless variant type
+Peter Dimov
+:toc: left
+:toclevels: 4
+:idprefix:
+:docinfo: private-footer
+
+:leveloffset: +1
+
+include::variant/overview.adoc[]
+include::variant/reference.adoc[]
+include::variant/copyright.adoc[]
+
+:leveloffset: -1

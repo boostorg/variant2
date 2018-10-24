@@ -1,0 +1,40 @@
+////
+Copyright 2018 Peter Dimov
+
+Distributed under the Boost Software License, Version 1.0.
+
+See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt
+////
+
+[#overview]
+# Overview
+:idprefix:
+
+This library implements a type-safe discriminated union (variant) type,
+`variant<T...>`, that almost conforms to the {cpp}17 Standard's
+http://en.cppreference.com/w/cpp/utility/variant[`std::variant<T...>`]. The
+main differences between the two are:
+
+* `variant<T...>` does not have a valueless-by-exception state;
+* A converting constructor from, e.g. `variant<int, float>` to 
+  `variant<float, double, int>` is provided as an extension;
+* The reverse operation, going from `variant<float, double, int>` to
+  `variant<int, float>` is provided as the member function `subset<U...>`.
+  (This operation can throw if the current state of the variant cannot be
+  represented.)
+* `variant<T...>` is not trivial when all contained types are trivial, as
+   mandated by {cpp}17.
+
+To avoid the valueless-by-exception state, this implementation falls
+back to using double storage unless
+
+* one of the alternatives is the type `monostate`,
+* one of the alternatives has a nonthrowing default constructor, or
+* all the contained types are nothrow move constructible.
+
+If the first two bullets don't hold, but the third does, the variant uses
+single storage, but `emplace` constructs a temporary and moves it into place
+if the construction of the object can throw. In case this is undesirable, one
+can force `emplace` into always constructing in-place by adding `monostate` as
+one of the alternatives.
