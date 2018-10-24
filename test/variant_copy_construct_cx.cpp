@@ -6,13 +6,6 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
-#if !defined( __cpp_constexpr ) || __cpp_constexpr < 201603
-
-// no constexpr lambda support
-int main() {}
-
-#else
-
 #include <boost/variant2/variant.hpp>
 
 using namespace boost::variant2;
@@ -40,10 +33,9 @@ enum E
 
 #define STATIC_ASSERT(...) static_assert(__VA_ARGS__, #__VA_ARGS__)
 
-template<class T, class V> constexpr T test( V const& v )
+template<class T, class V> constexpr T test( V const v )
 {
-    V v2( v );
-    return get<T>(v);
+    return get<T>( v );
 }
 
 int main()
@@ -118,5 +110,3 @@ int main()
 
 #endif
 }
-
-#endif // constexpr lambda support
