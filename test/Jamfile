@@ -27,7 +27,7 @@ run variant_default_construct.cpp ;
 compile variant_default_construct_cx.cpp ;
 
 run variant_copy_construct.cpp ;
-compile variant_copy_construct_cx.cpp ;
+compile variant_copy_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_move_construct.cpp ;
 compile variant_move_construct_cx.cpp ;
