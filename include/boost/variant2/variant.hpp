@@ -154,7 +154,7 @@ template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> 
 namespace detail
 {
 
-template<class I, class T, class Q> using var_alt_impl = mp_invoke<Q, variant_alternative_t<I::value, T>>;
+template<class I, class T, class Q> using var_alt_impl = mp_invoke_q<Q, variant_alternative_t<I::value, T>>;
 
 } // namespace detail
 
