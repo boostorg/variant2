@@ -1171,16 +1171,20 @@ public:
 
     // modifiers
 
-    template<class U, class... A, class I = mp_find<variant<T...>, U>, class E = typename std::enable_if<std::is_constructible<U, A...>::value>::type>
+    template<class U, class... A,
+        class E = typename std::enable_if< mp_count<variant<T...>, U>::value == 1 && std::is_constructible<U, A...>::value >::type>
     BOOST_CXX14_CONSTEXPR U& emplace( A&&... a )
     {
+        using I = mp_find<variant<T...>, U>;
         variant_base::template emplace<I::value>( std::forward<A>(a)... );
         return _get_impl( I() );
     }
 
-    template<class U, class V, class... A, class I = mp_find<variant<T...>, U>, class E = typename std::enable_if<std::is_constructible<U, std::initializer_list<V>&, A...>::value>::type>
+    template<class U, class V, class... A,
+        class E = typename std::enable_if< mp_count<variant<T...>, U>::value == 1 && std::is_constructible<U, std::initializer_list<V>&, A...>::value >::type>
     BOOST_CXX14_CONSTEXPR U& emplace( std::initializer_list<V> il, A&&... a )
     {
+        using I = mp_find<variant<T...>, U>;
         variant_base::template emplace<I::value>( il, std::forward<A>(a)... );
         return _get_impl( I() );
     }
