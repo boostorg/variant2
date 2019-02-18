@@ -1148,7 +1148,7 @@ public:
     }
 
     template<class U,
-    class E1 = typename std::enable_if<!std::is_same<typename std::decay<U>::type, variant>::value>::type,
+        class E1 = typename std::enable_if<!std::is_same<typename std::decay<U>::type, variant>::value>::type,
         class V = variant2::detail::resolve_overload_type<U, T...>,
         class E2 = typename std::enable_if<std::is_assignable<V&, U>::value && std::is_constructible<V, U>::value>::type
     >
