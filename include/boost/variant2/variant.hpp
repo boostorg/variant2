@@ -83,6 +83,14 @@ template<class T> struct variant_size<T const volatile>: variant_size<T>
 {
 };
 
+template<class T> struct variant_size<T&>: variant_size<T>
+{
+};
+
+template<class T> struct variant_size<T&&>: variant_size<T>
+{
+};
+
 #if !defined(BOOST_NO_CXX14_VARIABLE_TEMPLATES)
 
 template <class T> /*inline*/ constexpr std::size_t variant_size_v = variant_size<T>::value;
