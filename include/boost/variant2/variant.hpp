@@ -1544,13 +1544,13 @@ template<class F> struct Qret
 
 template<class L> using front_if_same = mp11::mp_if<mp11::mp_apply<mp11::mp_same, L>, mp11::mp_front<L>>;
 
-template<class V, class N, class T = variant_alternative_t<N::value, typename std::remove_reference<V>::type>> using apply_cv_ref_ = mp11::mp_if<std::is_reference<V>, T&, T>;
+template<class N, class V> using var_alt = variant_alternative_t<N::value, V>;
 
 #if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
 
 template<class V> struct apply_cv_ref_impl
 {
-    template<class T> using _f = apply_cv_ref_<V, T>;
+    template<class N> using _f = var_alt<N, V>;
 
     using L = mp11::mp_iota<variant_size<V>>;
 
@@ -1561,7 +1561,7 @@ template<class V> using apply_cv_ref = typename apply_cv_ref_impl<V>::type;
 
 #else
 
-template<class V> using apply_cv_ref = mp11::mp_transform_q<mp11::mp_bind_front<apply_cv_ref_, V>, mp11::mp_iota<variant_size<V>>>;
+template<class V> using apply_cv_ref = mp11::mp_transform_q<mp11::mp_bind_back<var_alt, V>, mp11::mp_iota<variant_size<V>>>;
 
 #endif
 
