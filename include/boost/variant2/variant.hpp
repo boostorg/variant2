@@ -1520,8 +1520,6 @@ template<class F> struct Qret
 
 template<class L> using front_if_same = mp11::mp_if<mp11::mp_apply<mp11::mp_same, L>, mp11::mp_front<L>>;
 
-template<class V> using var_size = variant_size<typename std::remove_reference<V>::type>;
-
 template<class V, class N, class T = variant_alternative_t<N::value, typename std::remove_reference<V>::type>> using apply_cv_ref_ = mp11::mp_if<std::is_reference<V>, T&, T>;
 
 #if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
@@ -1530,7 +1528,7 @@ template<class V> struct apply_cv_ref_impl
 {
     template<class T> using _f = apply_cv_ref_<V, T>;
 
-    using L = mp11::mp_iota<var_size<V>>;
+    using L = mp11::mp_iota<variant_size<V>>;
 
     using type = mp11::mp_transform<_f, L>;
 };
@@ -1539,7 +1537,7 @@ template<class V> using apply_cv_ref = typename apply_cv_ref_impl<V>::type;
 
 #else
 
-template<class V> using apply_cv_ref = mp11::mp_transform_q<mp11::mp_bind_front<apply_cv_ref_, V>, mp11::mp_iota<var_size<V>>>;
+template<class V> using apply_cv_ref = mp11::mp_transform_q<mp11::mp_bind_front<apply_cv_ref_, V>, mp11::mp_iota<variant_size<V>>>;
 
 #endif
 
@@ -1570,7 +1568,7 @@ template<class F, class V1> struct visit_L1
 
 template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> detail::Vret<F, V1>
 {
-    return mp11::mp_with_index<detail::var_size<V1>>( v1.index(), detail::visit_L1<F, V1>{ std::forward<F>(f), std::forward<V1>(v1) } );
+    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L1<F, V1>{ std::forward<F>(f), std::forward<V1>(v1) } );
 }
 
 #if defined(BOOST_NO_CXX14_GENERIC_LAMBDAS) || BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
@@ -1612,7 +1610,7 @@ template<class F, class V1, class V2> struct visit_L2
 
 template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> detail::Vret<F, V1, V2>
 {
-    return mp11::mp_with_index<detail::var_size<V1>>( v1.index(), detail::visit_L2<F, V1, V2>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2) } );
+    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L2<F, V1, V2>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2) } );
 }
 
 namespace detail
@@ -1637,7 +1635,7 @@ template<class F, class V1, class V2, class V3> struct visit_L3
 
 template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3 ) -> detail::Vret<F, V1, V2, V3>
 {
-    return mp11::mp_with_index<detail::var_size<V1>>( v1.index(), detail::visit_L3<F, V1, V2, V3>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3) } );
+    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L3<F, V1, V2, V3>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3) } );
 }
 
 namespace detail
@@ -1663,14 +1661,14 @@ template<class F, class V1, class V2, class V3, class V4> struct visit_L4
 
 template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3, V4&& v4 ) -> detail::Vret<F, V1, V2, V3, V4>
 {
-    return mp11::mp_with_index<detail::var_size<V1>>( v1.index(), detail::visit_L4<F, V1, V2, V3, V4>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) } );
+    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L4<F, V1, V2, V3, V4>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) } );
 }
 
 #else
 
 template<class F, class V1, class V2, class... V> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V&&... v ) -> detail::Vret<F, V1, V2, V...>
 {
-    return mp11::mp_with_index<detail::var_size<V1>>( v1.index(), [&]( auto I ){
+    return mp11::mp_with_index<variant_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V>(v)... );
