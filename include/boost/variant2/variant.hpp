@@ -133,6 +133,14 @@ template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T
 {
 };
 
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...>&, true>: std::add_lvalue_reference< mp11::mp_at_c<variant<T...>, I> >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...>&&, true>: std::add_rvalue_reference< mp11::mp_at_c<variant<T...>, I> >
+{
+};
+
 } // namespace detail
 
 template<std::size_t I, class T> struct variant_alternative
@@ -152,6 +160,14 @@ template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> 
 };
 
 template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const volatile>: public detail::variant_alternative_impl<I, variant<T...> const volatile, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>&>: public detail::variant_alternative_impl<I, variant<T...>&, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>&&>: public detail::variant_alternative_impl<I, variant<T...>&&, (I < sizeof...(T))>
 {
 };
 
@@ -177,6 +193,14 @@ template<std::size_t I, class T> struct variant_alternative<I, T volatile>: mp11
 };
 
 template<std::size_t I, class T> struct variant_alternative<I, T const volatile>: mp11::mp_defer<detail::var_alt_impl, mp11::mp_size_t<I>, T, mp11::mp_quote_trait<std::add_cv>>
+{
+};
+
+template<std::size_t I, class T> struct variant_alternative<I, T&>: mp11::mp_defer<detail::var_alt_impl, mp11::mp_size_t<I>, T, mp11::mp_quote_trait<std::add_lvalue_reference>>
+{
+};
+
+template<std::size_t I, class T> struct variant_alternative<I, T&&>: mp11::mp_defer<detail::var_alt_impl, mp11::mp_size_t<I>, T, mp11::mp_quote_trait<std::add_rvalue_reference>>
 {
 };
 
