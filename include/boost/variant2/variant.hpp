@@ -1594,7 +1594,7 @@ template<class L> using front_if_same = mp11::mp_if<mp11::mp_apply<mp11::mp_same
 
 template<class N, class V> using var_alt = variant_alternative_t<N::value, V>;
 
-#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 ) || ( defined(__clang__) && __clang_major__ == 3 && __clang_minor__ == 8 )
 
 template<class V> struct apply_cv_ref_impl
 {
