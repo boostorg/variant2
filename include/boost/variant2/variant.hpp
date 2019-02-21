@@ -137,7 +137,31 @@ template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T
 {
 };
 
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> const&, true>: std::add_lvalue_reference< mp11::mp_at_c<variant<T...>, I> const >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> volatile&, true>: std::add_lvalue_reference< mp11::mp_at_c<variant<T...>, I> volatile >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> const volatile&, true>: std::add_lvalue_reference< mp11::mp_at_c<variant<T...>, I> const volatile >
+{
+};
+
 template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...>&&, true>: std::add_rvalue_reference< mp11::mp_at_c<variant<T...>, I> >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> const&&, true>: std::add_rvalue_reference< mp11::mp_at_c<variant<T...>, I> const >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> volatile&&, true>: std::add_rvalue_reference< mp11::mp_at_c<variant<T...>, I> volatile >
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative_impl<I, variant<T...> const volatile&&, true>: std::add_rvalue_reference< mp11::mp_at_c<variant<T...>, I> const volatile >
 {
 };
 
@@ -167,7 +191,31 @@ template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>&
 {
 };
 
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const&>: public detail::variant_alternative_impl<I, variant<T...> const&, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> volatile&>: public detail::variant_alternative_impl<I, variant<T...> volatile&, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const volatile&>: public detail::variant_alternative_impl<I, variant<T...> const volatile&, (I < sizeof...(T))>
+{
+};
+
 template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>&&>: public detail::variant_alternative_impl<I, variant<T...>&&, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const&&>: public detail::variant_alternative_impl<I, variant<T...> const&&, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> volatile&&>: public detail::variant_alternative_impl<I, variant<T...> volatile&&, (I < sizeof...(T))>
+{
+};
+
+template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> const volatile&&>: public detail::variant_alternative_impl<I, variant<T...> const volatile&&, (I < sizeof...(T))>
 {
 };
 
