@@ -6,14 +6,14 @@
 
 import asciidoctor ;
 
-html variant.html : variant.adoc ;
+html variant2.html : variant2.adoc ;
 
-install html_ : variant.html : <location>html ;
+install html_ : variant2.html : <location>html ;
 
-pdf variant.pdf : variant.adoc ;
-explicit variant.pdf ;
+pdf variant2.pdf : variant2.adoc ;
+explicit variant2.pdf ;
 
-install pdf_ : variant.pdf : <location>pdf ;
+install pdf_ : variant2.pdf : <location>pdf ;
 explicit pdf_ ;
 
 ###############################################################################

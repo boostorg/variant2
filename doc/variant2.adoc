@@ -16,8 +16,8 @@ Peter Dimov
 
 :leveloffset: +1
 
-include::variant/overview.adoc[]
-include::variant/reference.adoc[]
-include::variant/copyright.adoc[]
+include::variant2/overview.adoc[]
+include::variant2/reference.adoc[]
+include::variant2/copyright.adoc[]
 
 :leveloffset: -1
