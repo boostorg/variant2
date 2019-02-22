@@ -41,6 +41,9 @@ template<class T> struct variant_size<T const>: variant_size<T> {};
 template<class T> struct variant_size<T volatile>: variant_size<T> {};
 template<class T> struct variant_size<T const volatile>: variant_size<T> {};
 
+template<class T> struct variant_size<T&>: variant_size<T> {}; // extension
+template<class T> struct variant_size<T&&>: variant_size<T> {}; // extension
+
 template<class T>
   inline constexpr size_t variant_size_v = variant_size<T>::value;
 
@@ -55,6 +58,9 @@ template<size_t I, class T> struct variant_alternative {};
 template<size_t I, class T> struct variant_alternative<I, T const>;
 template<size_t I, class T> struct variant_alternative<I, T volatile>;
 template<size_t I, class T> struct variant_alternative<I, T const volatile>;
+
+template<size_t I, class T> struct variant_alternative<I, T&>; // extension
+template<size_t I, class T> struct variant_alternative<I, T&&>; // extension
 
 template<size_t I, class T>
   using variant_alternative_t = typename variant_alternative<I, T>::type;
@@ -630,6 +636,12 @@ template<size_t I, class T> struct variant_alternative<I, T volatile>;
 ```
 template<size_t I, class T> struct variant_alternative<I, T const volatile>;
 ```
+```
+template<size_t I, class T> struct variant_alternative<I, T&>; // extension
+```
+```
+template<size_t I, class T> struct variant_alternative<I, T&&>; // extension
+```
 [none]
 * {blank}
 +
@@ -639,8 +651,10 @@ If `typename variant_alternative<I, T>::type` exists and is `U`,
 * `variant_alternative<I, T const>::type` is `U const`;
 * `variant_alternative<I, T volatile>::type` is `U volatile`;
 * `variant_alternative<I, T const volatile>::type` is `U const volatile`.
+* `variant_alternative<I, T&>::type` is `U&`.
+* `variant_alternative<I, T&&>::type` is `U&&`.
 
-Otherwise, the three structs have no `type` member.
+Otherwise, these structs have no member `type`.
 --
 
 ```
@@ -651,7 +665,7 @@ template<size_t I, class... T>
 * {blank}
 +
 When `I < sizeof...(T)`, the nested type `type` is an alias for the `I`-th
-(zero-based) type in `T...`. Otherwise, there is no `type` member.
+(zero-based) type in `T...`. Otherwise, there is no member `type`.
 
 ### holds_alternative
 
