@@ -14,7 +14,7 @@ Boost.Config.
 
 The repository is intended to be placed into the `libs/variant2` directory of
 a Boost clone or release, but the header `variant.hpp` will also work
-[standalone](https://godbolt.org/z/6LSV3Z).
+[standalone](https://godbolt.org/z/CTZztA).
 
 Supported compilers:
 
