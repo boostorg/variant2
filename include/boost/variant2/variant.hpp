@@ -1585,6 +1585,40 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 namespace detail
 {
 
+template<class T> using remove_cv_ref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
+template<class T, class U> struct copy_cv_ref
+{
+	using type = T;
+};
+
+template<class T, class U> struct copy_cv_ref<T, U const>
+{
+	using type = T const;
+};
+
+template<class T, class U> struct copy_cv_ref<T, U volatile>
+{
+	using type = T volatile;
+};
+
+template<class T, class U> struct copy_cv_ref<T, U const volatile>
+{
+	using type = T const volatile;
+};
+
+template<class T, class U> struct copy_cv_ref<T, U&>
+{
+	using type = typename copy_cv_ref<T, U>::type&;
+};
+
+template<class T, class U> struct copy_cv_ref<T, U&&>
+{
+	using type = typename copy_cv_ref<T, U>::type&&;
+};
+
+template<class T, class U> using copy_cv_ref_t = typename copy_cv_ref<T, U>::type;
+
 template<class F> struct Qret
 {
     template<class... T> using fn = decltype( std::declval<F>()( std::declval<T>()... ) );
@@ -1592,26 +1626,7 @@ template<class F> struct Qret
 
 template<class L> using front_if_same = mp11::mp_if<mp11::mp_apply<mp11::mp_same, L>, mp11::mp_front<L>>;
 
-template<class N, class V> using var_alt = variant_alternative_t<N::value, V>;
-
-#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
-
-template<class V> struct apply_cv_ref_impl
-{
-    template<class N> using _f = var_alt<N, V>;
-
-    using L = mp11::mp_iota<variant_size<V>>;
-
-    using type = mp11::mp_transform<_f, L>;
-};
-
-template<class V> using apply_cv_ref = typename apply_cv_ref_impl<V>::type;
-
-#else
-
-template<class V> using apply_cv_ref = mp11::mp_transform_q<mp11::mp_bind_back<var_alt, V>, mp11::mp_iota<variant_size<V>>>;
-
-#endif
+template<class V> using apply_cv_ref = mp11::mp_product<copy_cv_ref_t, remove_cv_ref_t<V>, mp11::mp_list<V>>;
 
 template<class F, class... V> using Vret = front_if_same<mp11::mp_product_q<Qret<F>, apply_cv_ref<V>...>>;
 
