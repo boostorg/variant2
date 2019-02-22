@@ -312,6 +312,37 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 #endif
 }
 
+// detail::unsafe_get (for visit)
+
+namespace detail
+{
+
+template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>& unsafe_get(variant<T...>& v)
+{
+    static_assert( I < sizeof...(T), "Index out of bounds" );
+    return v._get_impl( mp11::mp_size_t<I>() );
+}
+
+template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>&& unsafe_get(variant<T...>&& v)
+{
+    static_assert( I < sizeof...(T), "Index out of bounds" );
+    return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
+}
+
+template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const& unsafe_get(variant<T...> const& v)
+{
+    static_assert( I < sizeof...(T), "Index out of bounds" );
+    return v._get_impl( mp11::mp_size_t<I>() );
+}
+
+template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const&& unsafe_get(variant<T...> const&& v)
+{
+    static_assert( I < sizeof...(T), "Index out of bounds" );
+    return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
+}
+
+} // namespace detail
+
 // get (type)
 
 template<class U, class... T> constexpr U& get(variant<T...>& v)
@@ -1589,32 +1620,32 @@ template<class T> using remove_cv_ref_t = typename std::remove_cv<typename std::
 
 template<class T, class U> struct copy_cv_ref
 {
-	using type = T;
+    using type = T;
 };
 
 template<class T, class U> struct copy_cv_ref<T, U const>
 {
-	using type = T const;
+    using type = T const;
 };
 
 template<class T, class U> struct copy_cv_ref<T, U volatile>
 {
-	using type = T volatile;
+    using type = T volatile;
 };
 
 template<class T, class U> struct copy_cv_ref<T, U const volatile>
 {
-	using type = T const volatile;
+    using type = T const volatile;
 };
 
 template<class T, class U> struct copy_cv_ref<T, U&>
 {
-	using type = typename copy_cv_ref<T, U>::type&;
+    using type = typename copy_cv_ref<T, U>::type&;
 };
 
 template<class T, class U> struct copy_cv_ref<T, U&&>
 {
-	using type = typename copy_cv_ref<T, U>::type&&;
+    using type = typename copy_cv_ref<T, U>::type&&;
 };
 
 template<class T, class U> using copy_cv_ref_t = typename copy_cv_ref<T, U>::type;
@@ -1647,7 +1678,7 @@ template<class F, class V1> struct visit_L1
 
     template<class I> auto operator()( I ) const -> Vret<F, V1>
     {
-        return std::forward<F>(f)( get<I::value>( std::forward<V1>(v1) ) );
+        return std::forward<F>(f)( unsafe_get<I::value>( std::forward<V1>(v1) ) );
     }
 };
 
@@ -1688,7 +1719,7 @@ template<class F, class V1, class V2> struct visit_L2
 
     template<class I> auto operator()( I ) const -> Vret<F, V1, V2>
     {
-        auto f2 = bind_front( std::forward<F>(f), get<I::value>( std::forward<V1>(v1) ) );
+        auto f2 = bind_front( std::forward<F>(f), unsafe_get<I::value>( std::forward<V1>(v1) ) );
         return visit( f2, std::forward<V2>(v2) );
     }
 };
@@ -1713,7 +1744,7 @@ template<class F, class V1, class V2, class V3> struct visit_L3
 
     template<class I> auto operator()( I ) const -> Vret<F, V1, V2, V3>
     {
-        auto f2 = bind_front( std::forward<F>(f), get<I::value>( std::forward<V1>(v1) ) );
+        auto f2 = bind_front( std::forward<F>(f), unsafe_get<I::value>( std::forward<V1>(v1) ) );
         return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3) );
     }
 };
@@ -1739,7 +1770,7 @@ template<class F, class V1, class V2, class V3, class V4> struct visit_L4
 
     template<class I> auto operator()( I ) const -> Vret<F, V1, V2, V3, V4>
     {
-        auto f2 = bind_front( std::forward<F>(f), get<I::value>( std::forward<V1>(v1) ) );
+        auto f2 = bind_front( std::forward<F>(f), unsafe_get<I::value>( std::forward<V1>(v1) ) );
         return visit( f2, std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) );
     }
 };
@@ -1757,7 +1788,7 @@ template<class F, class V1, class V2, class... V> constexpr auto visit( F&& f, V
 {
     return mp11::mp_with_index<variant_size<V1>>( v1.index(), [&]( auto I ){
 
-        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
+        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( detail::unsafe_get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V>(v)... );
 
     });
