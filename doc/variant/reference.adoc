@@ -109,11 +109,12 @@ template<size_t I, class... T>
 template<size_t I, class... T>
   constexpr add_pointer_t<const variant_alternative_t<I, variant<T...>>>
     get_if(const variant<T...>* v) noexcept;
-template<class T, class... T>
-  constexpr add_pointer_t<T>
+
+template<class U, class... T>
+  constexpr add_pointer_t<U>
     get_if(variant<T...>* v) noexcept;
-template<class T, class... T>
-  constexpr add_pointer_t<const T>
+template<class U, class... T>
+  constexpr add_pointer_t<const U>
     get_if(const variant<T...>* v) noexcept;
 
 // relational operators
@@ -745,22 +746,30 @@ template<size_t I, class... T>
   constexpr add_pointer_t<const variant_alternative_t<I, variant<T...>>>
     get_if(const variant<T...>* v) noexcept;
 ```
-```
-template<class T, class... T>
-  constexpr add_pointer_t<T>
-    get_if(variant<T...>* v) noexcept;
-```
-```
-template<class T, class... T>
-  constexpr add_pointer_t<const T>
-    get_if(const variant<T...>* v) noexcept;
-```
 [none]
 * {blank}
 +
 Requires: :: `I < sizeof...(U)`. Otherwise, the program is ill-formed.
 Effects:  :: A pointer to the value stored in the variant, if
   `v != nullptr && v\->index() == I`. Otherwise, `nullptr`.
+
+```
+template<class U, class... T>
+  constexpr add_pointer_t<U>
+    get_if(variant<T...>* v) noexcept;
+```
+```
+template<class U, class... T>
+  constexpr add_pointer_t<const U>
+    get_if(const variant<T...>* v) noexcept;
+```
+[none]
+* {blank}
++
+Requires: :: The type `U` occurs exactly once in `T...`. Otherwise, the
+  program is ill-formed.
+Effects:  :: Equivalent to: `return get_if<I>(v);` with `I` being
+  the zero-based index of `U` in `T...`.
 
 ### Relational Operators
 
