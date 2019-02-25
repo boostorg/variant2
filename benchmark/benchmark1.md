@@ -159,3 +159,109 @@ N=100000000:
 boost::variant:   8419 ms; S=7.14286e+14
   std::variant:   8659 ms; S=7.14286e+14
 ```
+
+## clang++ 5.0.1 -std=c++17 -stdlib=libc++ (Cygwin 64 bit)
+
+### -O0
+
+#### Compile time
+
+```
+      variant2 (-DONLY_V2): 2190 ms
+boost::variant (-DONLY_BV): 3537 ms
+  std::variant (-DONLY_SV): 2151 ms
+```
+
+#### Run time
+
+```
+N=100000000:
+        double:   6063 ms; S=7.14286e+14
+      variant2:  23616 ms; S=7.14286e+14
+boost::variant:  92730 ms; S=7.14286e+14
+  std::variant:  23160 ms; S=7.14286e+14
+
+N=100000000:
+        double:   6054 ms; S=7.14286e+14
+      variant2:  52738 ms; S=7.14286e+14
+boost::variant:  96896 ms; S=7.14286e+14
+  std::variant:  72595 ms; S=7.14286e+14
+```
+
+### -O1
+
+#### Compile time
+
+```
+      variant2 (-DONLY_V2): 2722 ms
+boost::variant (-DONLY_BV): 4337 ms
+  std::variant (-DONLY_SV): 2697 ms
+```
+
+#### Run time
+
+```
+N=100000000:
+        double:   2171 ms; S=7.14286e+14
+      variant2:   9280 ms; S=7.14286e+14
+boost::variant:  51478 ms; S=7.14286e+14
+  std::variant:   5642 ms; S=7.14286e+14
+
+N=100000000:
+        double:   2171 ms; S=7.14286e+14
+      variant2:  22166 ms; S=7.14286e+14
+boost::variant:  54084 ms; S=7.14286e+14
+  std::variant:  14330 ms; S=7.14286e+14
+```
+
+### -O2 -DNDEBUG
+
+#### Compile time
+
+```
+      variant2 (-DONLY_V2): 2499 ms
+boost::variant (-DONLY_BV): 3826 ms
+  std::variant (-DONLY_SV): 2645 ms
+```
+
+#### Run time
+
+```
+N=100000000:
+        double:   1604 ms; S=7.14286e+14
+      variant2:   2726 ms; S=7.14286e+14
+boost::variant:   6662 ms; S=7.14286e+14
+  std::variant:   3869 ms; S=7.14286e+14
+
+N=100000000:
+        double:   1598 ms; S=7.14286e+14
+      variant2:   8136 ms; S=7.14286e+14
+boost::variant:   9236 ms; S=7.14286e+14
+  std::variant:   6279 ms; S=7.14286e+14
+```
+
+### -O3 -DNDEBUG
+
+#### Compile time
+
+```
+      variant2 (-DONLY_V2): 2509 ms
+boost::variant (-DONLY_BV): 3845 ms
+  std::variant (-DONLY_SV): 2638 ms
+```
+
+#### Run time
+
+```
+N=100000000:
+        double:   1592 ms; S=7.14286e+14
+      variant2:   2697 ms; S=7.14286e+14
+boost::variant:   6648 ms; S=7.14286e+14
+  std::variant:   3826 ms; S=7.14286e+14
+
+N=100000000:
+        double:   1614 ms; S=7.14286e+14
+      variant2:   8035 ms; S=7.14286e+14
+boost::variant:   9221 ms; S=7.14286e+14
+  std::variant:   6319 ms; S=7.14286e+14
+```
