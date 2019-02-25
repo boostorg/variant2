@@ -1,6 +1,6 @@
 # benchmark1.cpp results
 
-## VS 2017 15.9.7 64 bit (cl.exe 19.16, /std:c++17)
+## VS 2017 15.9.7 64 bit (cl.exe 19.16, /EHsc /std:c++17)
 
 ### /Od
 
@@ -28,7 +28,7 @@ boost::variant: 110441 ms; S=7.14286e+14
   std::variant:  92974 ms; S=7.14286e+14
 ```
 
-### /O2 /NDEBUG
+### /O2 /DNDEBUG
 
 #### Compile time
 
