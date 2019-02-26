@@ -64,3 +64,7 @@ run variant_lt_gt.cpp ;
 run variant_convert_construct.cpp ;
 run variant_subset.cpp ;
 run variant_valueless.cpp ;
+
+run variant_copy_construct_throw.cpp ;
+run variant_move_construct_throw.cpp ;
+run variant_convert_construct_throw.cpp ;
