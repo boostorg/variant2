@@ -608,6 +608,13 @@ template<class... T> struct variant_base_impl<true, true, T...>
     {
     }
 
+    // requires: ix_ == 0
+    template<class I, class... A> void _replace( I, A&&... a )
+    {
+        ::new( &st1_ ) variant_storage<none, T...>( mp11::mp_size_t<I::value + 1>(), std::forward<A>(a)... );
+        ix_ = I::value + 1;
+    }
+
     constexpr std::size_t index() const noexcept
     {
         return ix_ - 1;
@@ -700,6 +707,13 @@ template<class... T> struct variant_base_impl<true, false, T...>
     {
     }
 
+    // requires: ix_ == 0
+    template<class I, class... A> void _replace( I, A&&... a )
+    {
+        ::new( &st1_ ) variant_storage<none, T...>( mp11::mp_size_t<I::value + 1>(), std::forward<A>(a)... );
+        ix_ = I::value + 1;
+    }
+
     constexpr std::size_t index() const noexcept
     {
         return ix_ >= 0? ix_ - 1: -ix_ - 1;
@@ -753,6 +767,13 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
     template<class I, class... A> constexpr explicit variant_base_impl( I, A&&... a ): ix_( I::value + 1 ), st1_( mp11::mp_size_t<I::value + 1>(), std::forward<A>(a)... )
     {
+    }
+
+    // requires: ix_ == 0
+    template<class I, class... A> void _replace( I, A&&... a )
+    {
+        ::new( &st1_ ) variant_storage<none, T...>( mp11::mp_size_t<I::value + 1>(), std::forward<A>(a)... );
+        ix_ = I::value + 1;
     }
 
     //[&]( auto I ){
@@ -867,6 +888,13 @@ template<class... T> struct variant_base_impl<false, false, T...>
 
     template<class I, class... A> constexpr explicit variant_base_impl( I, A&&... a ): ix_( I::value + 1 ), st1_( mp11::mp_size_t<I::value + 1>(), std::forward<A>(a)... ), st2_( mp11::mp_size_t<0>() )
     {
+    }
+
+    // requires: ix_ == 0
+    template<class I, class... A> void _replace( I, A&&... a )
+    {
+        ::new( &st1_ ) variant_storage<none, T...>( mp11::mp_size_t<I::value + 1>(), std::forward<A>(a)... );
+        ix_ = I::value + 1;
     }
 
     //[&]( auto I ){
@@ -1090,7 +1118,7 @@ private:
 
         template<class I> void operator()( I i ) const
         {
-            ::new( static_cast<void*>( this_ ) ) variant_base( i, r._get_impl( i ) );
+            this_->_replace( i, r._get_impl( i ) );
         }
     };
 
@@ -1123,7 +1151,7 @@ private:
 
         template<class I> void operator()( I i ) const
         {
-            ::new( static_cast<void*>( this_ ) ) variant_base( i, std::move( r._get_impl( i ) ) );
+            this_->_replace( i, std::move( r._get_impl( i ) ) );
         }
     };
 
@@ -1369,7 +1397,7 @@ private:
         template<class I> void operator()( I i ) const
         {
             using J = mp11::mp_find<mp11::mp_list<T...>, mp11::mp_at<mp11::mp_list<U...>, I>>;
-            ::new( static_cast<void*>(this_) ) variant_base( J{}, r._get_impl( i ) );
+            this_->_replace( J{}, r._get_impl( i ) );
         }
     };
 
@@ -1393,7 +1421,7 @@ private:
         template<class I> void operator()( I i ) const
         {
             using J = mp11::mp_find<mp11::mp_list<T...>, mp11::mp_at<mp11::mp_list<U...>, I>>;
-            ::new( static_cast<void*>(this_) ) variant_base( J{}, std::move( r._get_impl( i ) ) );
+            this_->_replace( J{}, std::move( r._get_impl( i ) ) );
         }
     };
 
