@@ -69,6 +69,16 @@ int main()
     test( variant<int, float>(1) );
     test( variant<int, float>(3.14f) );
 
+    test( variant<int const, float const>() );
+    test( variant<int const, float const>(1) );
+    test( variant<int const, float const>(3.14f) );
+
+    test( variant<std::string>() );
+    test( variant<std::string>("test") );
+
+    test( variant<std::string const>() );
+    test( variant<std::string const>("test") );
+
     test( variant<int, float, std::string>() );
     test( variant<int, float, std::string>(1) );
     test( variant<int, float, std::string>(3.14f) );
@@ -84,6 +94,8 @@ int main()
     test( variant<int, int, float, float, std::string>("test") );
 
     test( variant<std::string, std::string, float>() );
+
+    test( variant<X1 const>() );
 
     test( variant<X1, X2>() );
     test( variant<X1, X2, int>() );
