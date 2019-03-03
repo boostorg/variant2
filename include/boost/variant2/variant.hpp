@@ -1201,7 +1201,7 @@ public:
 
     // assignment
     template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_assignable<T>...>, E1>
+        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>, E1>
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( variant const & r ) noexcept
     {
@@ -1232,7 +1232,7 @@ private:
 public:
 
     template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_assignable<T>...>>, E1>,
+        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>>, E1>,
         class E3 = mp11::mp_if<mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( variant const & r )
@@ -1243,7 +1243,7 @@ public:
     }
 
     template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_assignable<T>...>, E1>
+        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>, E1>
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( variant && r ) noexcept
     {
@@ -1274,7 +1274,7 @@ private:
 public:
 
     template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_assignable<T>...>>, E1>,
+        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>>, E1>,
         class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
     >
     variant& operator=( variant && r )
