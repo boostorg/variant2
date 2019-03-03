@@ -14,7 +14,7 @@ using namespace boost::variant2;
 
 struct Y1
 {
-    Y1(){} // =default fails on msvc-14.0
+    Y1() noexcept {} // =default fails on msvc-14.0
 
     Y1(Y1 const&)
     {
@@ -26,7 +26,7 @@ struct Y1
 
 struct Y2
 {
-    Y2(){}
+    Y2() noexcept {}
 
     Y2(Y2 const&)
     {
