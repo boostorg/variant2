@@ -224,7 +224,15 @@ template<std::size_t I, class... T> struct variant_alternative<I, variant<T...> 
 namespace detail
 {
 
+#if defined( BOOST_MP11_VERSION ) && BOOST_MP11_VERSION >= 107000
+
 template<class I, class T, class Q> using var_alt_impl = mp11::mp_invoke_q<Q, variant_alternative_t<I::value, T>>;
+
+#else
+
+template<class I, class T, class Q> using var_alt_impl = mp11::mp_invoke<Q, variant_alternative_t<I::value, T>>;
+
+#endif
 
 } // namespace detail
 
