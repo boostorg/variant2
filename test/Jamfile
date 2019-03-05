@@ -57,7 +57,10 @@ run variant_emplace_type.cpp ;
 compile variant_emplace_type_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_swap.cpp ;
+
 run variant_eq_ne.cpp ;
+compile variant_eq_ne_cx.cpp : [ requires cxx14_constexpr ] ;
+
 run variant_destroy.cpp ;
 run variant_visit.cpp ;
 run variant_lt_gt.cpp ;

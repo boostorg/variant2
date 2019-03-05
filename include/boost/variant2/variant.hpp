@@ -1562,7 +1562,7 @@ template<class... T> struct eq_L
     variant<T...> const & v;
     variant<T...> const & w;
 
-    template<class I> bool operator()( I i ) const
+    template<class I> constexpr bool operator()( I i ) const
     {
         return v._get_impl( i ) == w._get_impl( i );
     }
@@ -1583,7 +1583,7 @@ template<class... T> struct ne_L
     variant<T...> const & v;
     variant<T...> const & w;
 
-    template<class I> bool operator()( I i ) const
+    template<class I> constexpr bool operator()( I i ) const
     {
         return v._get_impl( i ) != w._get_impl( i );
     }
@@ -1604,7 +1604,7 @@ template<class... T> struct lt_L
     variant<T...> const & v;
     variant<T...> const & w;
 
-    template<class I> bool operator()( I i ) const
+    template<class I> constexpr bool operator()( I i ) const
     {
         return v._get_impl( i ) < w._get_impl( i );
     }
@@ -1630,7 +1630,7 @@ template<class... T> struct le_L
     variant<T...> const & v;
     variant<T...> const & w;
 
-    template<class I> bool operator()( I i ) const
+    template<class I> constexpr bool operator()( I i ) const
     {
         return v._get_impl( i ) <= w._get_impl( i );
     }
