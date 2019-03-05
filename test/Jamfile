@@ -61,9 +61,12 @@ run variant_swap.cpp ;
 run variant_eq_ne.cpp ;
 compile variant_eq_ne_cx.cpp : [ requires cxx14_constexpr ] ;
 
+run variant_lt_gt.cpp ;
+compile variant_lt_gt_cx.cpp : [ requires cxx14_constexpr ] ;
+
 run variant_destroy.cpp ;
 run variant_visit.cpp ;
-run variant_lt_gt.cpp ;
+
 run variant_convert_construct.cpp ;
 run variant_subset.cpp ;
 run variant_valueless.cpp ;
