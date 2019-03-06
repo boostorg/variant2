@@ -496,7 +496,7 @@ template<size_t I, class... A>
 [none]
 * {blank}
 +
-Requires: :: `I < sizeof(T...)`.
+Requires: :: `I < sizeof...(T)`.
 Effects:  ::
   Destroys the currently contained value, then initializes a new contained
   value as if using the expression `Ti(std::forward<A>(a)...)`.
@@ -514,7 +514,7 @@ template<size_t I, class V, class... A>
 [none]
 * {blank}
 +
-Requires: :: `I < sizeof(T...)`.
+Requires: :: `I < sizeof...(T)`.
 Effects:  ::
   Destroys the currently contained value, then initializes a new contained
   value as if using the expression `Ti(il, std::forward<A>(a)...)`.
