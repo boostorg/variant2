@@ -268,7 +268,7 @@ template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>>
 
 // variant_npos
 
-constexpr std::size_t variant_npos = -1;
+constexpr std::size_t variant_npos = ~static_cast<std::size_t>( 0 );
 
 // holds_alternative
 
