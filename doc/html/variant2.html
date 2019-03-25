@@ -1346,7 +1346,7 @@ and <code>U</code> occurs exactly once in <code>T&#8230;&#8203;</code>.</p>
 <dl>
 <dt class="hdlist1">Requires: </dt>
 <dd>
-<p><code>I &lt; sizeof(T&#8230;&#8203;)</code>.</p>
+<p><code>I &lt; sizeof&#8230;&#8203;(T)</code>.</p>
 </dd>
 <dt class="hdlist1">Effects:  </dt>
 <dd>
@@ -1360,6 +1360,14 @@ value as if using the expression <code>Ti(std::forward&lt;A&gt;(a)&#8230;&#8203;
 <dt class="hdlist1">Returns:  </dt>
 <dd>
 <p>A reference to the new contained value.</p>
+</dd>
+<dt class="hdlist1">Throws:   </dt>
+<dd>
+<p>Nothing unless the initialization of the new contained value throws.</p>
+</dd>
+<dt class="hdlist1">Exception Safety: </dt>
+<dd>
+<p>Basic. On exception the value of the variant is valid but unspecified.</p>
 </dd>
 <dt class="hdlist1">Remarks:  </dt>
 <dd>
@@ -1386,7 +1394,7 @@ value as if using the expression <code>Ti(std::forward&lt;A&gt;(a)&#8230;&#8203;
 <dl>
 <dt class="hdlist1">Requires: </dt>
 <dd>
-<p><code>I &lt; sizeof(T&#8230;&#8203;)</code>.</p>
+<p><code>I &lt; sizeof&#8230;&#8203;(T)</code>.</p>
 </dd>
 <dt class="hdlist1">Effects:  </dt>
 <dd>
@@ -1400,6 +1408,14 @@ value as if using the expression <code>Ti(il, std::forward&lt;A&gt;(a)&#8230;&#8
 <dt class="hdlist1">Returns:  </dt>
 <dd>
 <p>A reference to the new contained value.</p>
+</dd>
+<dt class="hdlist1">Throws:   </dt>
+<dd>
+<p>Nothing unless the initialization of the new contained value throws.</p>
+</dd>
+<dt class="hdlist1">Exception Safety: </dt>
+<dd>
+<p>Basic. On exception the value of the variant is valid but unspecified.</p>
 </dd>
 <dt class="hdlist1">Remarks:  </dt>
 <dd>
@@ -2141,7 +2157,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-22 19:16:54 GTBST
+Last updated 2019-02-22 19:21:28 GTBST
 </div>
 </div>
 <style>

@@ -502,6 +502,10 @@ Effects:  ::
   value as if using the expression `Ti(std::forward<A>(a)...)`.
 Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
+Throws:   ::
+  Nothing unless the initialization of the new contained value throws.
+Exception Safety: ::
+  Basic. On exception the value of the variant is valid but unspecified.
 Remarks:  ::
   This function shall not participate in overload resolution unless
   `std::is_constructible_v<Ti, A...>` is `true`.
@@ -520,6 +524,10 @@ Effects:  ::
   value as if using the expression `Ti(il, std::forward<A>(a)...)`.
 Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
+Throws:   ::
+  Nothing unless the initialization of the new contained value throws.
+Exception Safety: ::
+  Basic. On exception the value of the variant is valid but unspecified.
 Remarks:  ::
   This function shall not participate in overload resolution unless
   `std::is_constructible_v<Ti, std::initializer_list<V>&, A...>` is `true`.
