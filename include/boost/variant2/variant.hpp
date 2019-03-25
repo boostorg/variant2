@@ -1,7 +1,7 @@
 #ifndef BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 #define BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 
-// Copyright 2017, 2018 Peter Dimov.
+// Copyright 2017-2019 Peter Dimov.
 //
 // Distributed under the Boost Software License, Version 1.0.
 //
@@ -265,6 +265,10 @@ template<std::size_t I, class... T> struct variant_alternative<I, variant<T...>>
 };
 
 #endif
+
+// variant_npos
+
+constexpr std::size_t variant_npos = ~static_cast<std::size_t>( 0 );
 
 // holds_alternative
 
@@ -1349,6 +1353,11 @@ public:
     }
 
     // value status
+
+    constexpr bool valueless_by_exception() const noexcept
+    {
+        return false;
+    }
 
     using variant_base::index;
 
