@@ -504,8 +504,13 @@ Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
   Nothing unless the initialization of the new contained value throws.
-Exception Safety: ::
-  Basic. On exception the value of the variant is valid but unspecified.
+Exception Safety: :: On exception:
+  - If the list of alternatives contains `monostate`, the contained value
+    is either unchanged, or `monostate{}`;
+  - Otherwise, if the list of alternatives contains types for which
+    `is_nothrow_default_constructible_v` is `true`, the contained value
+    is either unchanged, or `Tj{}`, where `Tj` is the first such alternative;
+  - Otherwise, the contained value is unchanged.
 Remarks:  ::
   This function shall not participate in overload resolution unless
   `std::is_constructible_v<Ti, A...>` is `true`.
@@ -526,8 +531,13 @@ Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
   Nothing unless the initialization of the new contained value throws.
-Exception Safety: ::
-  Basic. On exception the value of the variant is valid but unspecified.
+Exception Safety: :: On exception:
+  - If the list of alternatives contains `monostate`, the contained value
+    is either unchanged, or `monostate{}`;
+  - Otherwise, if the list of alternatives contains types for which
+    `is_nothrow_default_constructible_v` is `true`, the contained value
+    is either unchanged, or `Tj{}`, where `Tj` is the first such alternative;
+  - Otherwise, the contained value is unchanged.
 Remarks:  ::
   This function shall not participate in overload resolution unless
   `std::is_constructible_v<Ti, std::initializer_list<V>&, A...>` is `true`.

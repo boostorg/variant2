@@ -1367,7 +1367,23 @@ value as if using the expression <code>Ti(std::forward&lt;A&gt;(a)&#8230;&#8203;
 </dd>
 <dt class="hdlist1">Exception Safety: </dt>
 <dd>
-<p>Basic. On exception the value of the variant is valid but unspecified.</p>
+<p>On exception:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If the list of alternatives contains <code>monostate</code>, the contained value
+is either unchanged, or <code>monostate{}</code>;</p>
+</li>
+<li>
+<p>Otherwise, if the list of alternatives contains types for which
+<code>is_nothrow_default_constructible_v</code> is <code>true</code>, the contained value
+is either unchanged, or <code>Tj{}</code>, where <code>Tj</code> is the first such alternative;</p>
+</li>
+<li>
+<p>Otherwise, the contained value is unchanged.</p>
+</li>
+</ul>
+</div>
 </dd>
 <dt class="hdlist1">Remarks:  </dt>
 <dd>
@@ -1415,7 +1431,23 @@ value as if using the expression <code>Ti(il, std::forward&lt;A&gt;(a)&#8230;&#8
 </dd>
 <dt class="hdlist1">Exception Safety: </dt>
 <dd>
-<p>Basic. On exception the value of the variant is valid but unspecified.</p>
+<p>On exception:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>If the list of alternatives contains <code>monostate</code>, the contained value
+is either unchanged, or <code>monostate{}</code>;</p>
+</li>
+<li>
+<p>Otherwise, if the list of alternatives contains types for which
+<code>is_nothrow_default_constructible_v</code> is <code>true</code>, the contained value
+is either unchanged, or <code>Tj{}</code>, where <code>Tj</code> is the first such alternative;</p>
+</li>
+<li>
+<p>Otherwise, the contained value is unchanged.</p>
+</li>
+</ul>
+</div>
 </dd>
 <dt class="hdlist1">Remarks:  </dt>
 <dd>
