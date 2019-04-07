@@ -247,6 +247,8 @@ public:
 } // namespace boost
 ```
 
+In the descriptions that follow, let `i` be in the range `[0, sizeof...(T))`, and `Ti` be the `i`-th type in `T`.
+
 #### Constructors
 
 ```
@@ -725,7 +727,8 @@ template<size_t I, class... T>
 [none]
 * {blank}
 +
-Effects: :: If `v.index()` is `I`, returns a reference to the object stored in
+Requires: :: `I < sizeof...(T)`. Otherwise, the program is ill-formed.
+Effects:  :: If `v.index()` is `I`, returns a reference to the object stored in
   the variant. Otherwise, throws `bad_variant_access`.
 
 ```
@@ -767,7 +770,7 @@ template<size_t I, class... T>
 [none]
 * {blank}
 +
-Requires: :: `I < sizeof...(U)`. Otherwise, the program is ill-formed.
+Requires: :: `I < sizeof...(T)`. Otherwise, the program is ill-formed.
 Effects:  :: A pointer to the value stored in the variant, if
   `v != nullptr && v\->index() == I`. Otherwise, `nullptr`.
 
@@ -798,7 +801,7 @@ template<class... T>
 [none]
 * {blank}
 +
-Returns: :: `v.index() == w.index && get<I>(v) == get<I>(w)`, where `I`
+Returns: :: `v.index() == w.index() && get<I>(v) == get<I>(w)`, where `I`
   is `v.index()`.
 
 ```
@@ -817,7 +820,7 @@ template<class... T>
 [none]
 * {blank}
 +
-Returns: :: `v.index() < w.index || (v.index() == w.index && get<I>(v) < get<I>(w))`,
+Returns: :: `v.index() < w.index() || (v.index() == w.index() && get<I>(v) < get<I>(w))`,
   where `I` is `v.index()`.
 
 ```
@@ -836,7 +839,7 @@ template<class... T>
 [none]
 * {blank}
 +
-Returns: :: `v.index() < w.index || (v.index() == w.index && get<I>(v) \<= get<I>(w))`,
+Returns: :: `v.index() < w.index() || (v.index() == w.index() && get<I>(v) \<= get<I>(w))`,
   where `I` is `v.index()`.
 
 ```
