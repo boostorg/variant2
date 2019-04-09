@@ -57,6 +57,16 @@ STATIC_ASSERT( !std::is_nothrow_move_constructible<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_copy_assignable<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_move_assignable<X2>::value );
 
+struct Y1
+{
+};
+
+struct Guard
+{
+    explicit Guard(int) {}
+    Guard(Guard&&) = delete;
+};
+
 int main()
 {
     {
@@ -163,6 +173,11 @@ int main()
         v.emplace<X1>( 4 );
         BOOST_TEST_EQ( v.index(), 0 );
         BOOST_TEST_EQ( get<0>(v).v, 4 );
+    }
+
+    {
+        variant<Y1, Guard> v;
+        v.emplace<Guard>( 1 );
     }
 
     return boost::report_errors();

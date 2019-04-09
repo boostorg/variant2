@@ -651,12 +651,16 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t J, class U, bool B, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_true, mp11::mp_bool<B>, A&&... a )
     {
+        static_assert( std::is_nothrow_constructible<U, A&&...>::value, "Logic error: U must be nothrow constructible from A&&" );
+
         st1_.emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
         ix_ = J;
     }
 
     template<std::size_t J, class U, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_false, mp11::mp_true, A&&... a )
     {
+        static_assert( std::is_nothrow_move_constructible<U>::value, "Logic error: U must be nothrow move constructible" );
+
         U tmp( std::forward<A>(a)... );
 
         st1_.emplace( mp11::mp_size_t<J>(), std::move(tmp) );
@@ -665,33 +669,23 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t J, class U, class... A> void emplace_impl( mp11::mp_false, mp11::mp_false, A&&... a )
     {
-        if( can_be_valueless<T...>::value )
+        static_assert( can_be_valueless<T...>::value, "Logic error: T... must have a fallback type" );
+
+        std::size_t const K = valueless_index<T...>::value;
+
+        static_assert( K < sizeof...(T), "Logic error: T... must have a fallback index" );
+
+        try
         {
-            std::size_t const K = valueless_index<T...>::value;
-
-            assert( K < sizeof...(T) );
-
-            try
-            {
-                st1_.emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
-                ix_ = J;
-            }
-            catch( ... )
-            {
-                st1_.emplace( mp11::mp_size_t<K+1>() );
-                ix_ = K+1;
-
-                throw;
-            }
-        }
-        else
-        {
-            assert( std::is_nothrow_move_constructible<U>::value );
-
-            U tmp( std::forward<A>(a)... );
-
-            st1_.emplace( mp11::mp_size_t<J>(), std::move(tmp) );
+            st1_.emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
             ix_ = J;
+        }
+        catch( ... )
+        {
+            st1_.emplace( mp11::mp_size_t<K+1>() );
+            ix_ = K+1;
+
+            throw;
         }
     }
 
@@ -700,7 +694,10 @@ template<class... T> struct variant_base_impl<true, true, T...>
         std::size_t const J = I+1;
         using U = mp11::mp_at_c<variant<T...>, I>;
 
-        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A&&...>(), mp11::mp_all<detail::is_trivially_move_constructible<U>, detail::is_trivially_move_assignable<T>...>(), std::forward<A>(a)... );
+        constexpr bool B1 = can_be_valueless<T...>::value;
+        constexpr bool B2 = mp11::mp_all<detail::is_trivially_move_constructible<U>, detail::is_trivially_move_assignable<T>...>::value;
+
+        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A&&...>(), mp11::mp_bool<B2 || !B1>(), std::forward<A>(a)... );
     }
 };
 
