@@ -1190,30 +1190,30 @@ public:
         class Ud = typename std::decay<U>::type,
         class E1 = typename std::enable_if< !std::is_same<Ud, variant>::value && !detail::is_in_place_index<Ud>::value && !detail::is_in_place_type<Ud>::value >::type,
         class V = detail::resolve_overload_type<U&&, T...>,
-        class E2 = typename std::enable_if<std::is_constructible<V, U>::value>::type
+        class E2 = typename std::enable_if<std::is_constructible<V, U&&>::value>::type
         >
     constexpr variant( U&& u )
-        noexcept( std::is_nothrow_constructible<V, U>::value )
+        noexcept( std::is_nothrow_constructible<V, U&&>::value )
         : variant_base( detail::resolve_overload_index<U&&, T...>(), std::forward<U>(u) )
     {
     }
 
-    template<class U, class... A, class I = mp11::mp_find<variant<T...>, U>, class E = typename std::enable_if<std::is_constructible<U, A...>::value>::type>
+    template<class U, class... A, class I = mp11::mp_find<variant<T...>, U>, class E = typename std::enable_if<std::is_constructible<U, A&&...>::value>::type>
     constexpr explicit variant( in_place_type_t<U>, A&&... a ): variant_base( I(), std::forward<A>(a)... )
     {
     }
 
-    template<class U, class V, class... A, class I = mp11::mp_find<variant<T...>, U>, class E = typename std::enable_if<std::is_constructible<U, std::initializer_list<V>&, A...>::value>::type>
+    template<class U, class V, class... A, class I = mp11::mp_find<variant<T...>, U>, class E = typename std::enable_if<std::is_constructible<U, std::initializer_list<V>&, A&&...>::value>::type>
     constexpr explicit variant( in_place_type_t<U>, std::initializer_list<V> il, A&&... a ): variant_base( I(), il, std::forward<A>(a)... )
     {
     }
 
-    template<std::size_t I, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, A...>::value>::type>
+    template<std::size_t I, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, A&&...>::value>::type>
     constexpr explicit variant( in_place_index_t<I>, A&&... a ): variant_base( mp11::mp_size_t<I>(), std::forward<A>(a)... )
     {
     }
 
-    template<std::size_t I, class V, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, std::initializer_list<V>&, A...>::value>::type>
+    template<std::size_t I, class V, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, std::initializer_list<V>&, A&&...>::value>::type>
     constexpr explicit variant( in_place_index_t<I>, std::initializer_list<V> il, A&&... a ): variant_base( mp11::mp_size_t<I>(), il, std::forward<A>(a)... )
     {
     }
@@ -1306,10 +1306,10 @@ public:
     template<class U,
         class E1 = typename std::enable_if<!std::is_same<typename std::decay<U>::type, variant>::value>::type,
         class V = detail::resolve_overload_type<U, T...>,
-        class E2 = typename std::enable_if<std::is_assignable<V&, U>::value && std::is_constructible<V, U>::value>::type
+        class E2 = typename std::enable_if<std::is_assignable<V&, U&&>::value && std::is_constructible<V, U&&>::value>::type
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( U&& u )
-        noexcept( std::is_nothrow_assignable<V&, U>::value && std::is_nothrow_constructible<V, U>::value )
+        noexcept( std::is_nothrow_assignable<V&, U&&>::value && std::is_nothrow_constructible<V, U&&>::value )
     {
         std::size_t const I = detail::resolve_overload_index<U, T...>::value;
 
@@ -1328,7 +1328,7 @@ public:
     // modifiers
 
     template<class U, class... A,
-        class E = typename std::enable_if< mp11::mp_count<variant<T...>, U>::value == 1 && std::is_constructible<U, A...>::value >::type>
+        class E = typename std::enable_if< mp11::mp_count<variant<T...>, U>::value == 1 && std::is_constructible<U, A&&...>::value >::type>
     BOOST_CXX14_CONSTEXPR U& emplace( A&&... a )
     {
         using I = mp11::mp_find<variant<T...>, U>;
@@ -1337,7 +1337,7 @@ public:
     }
 
     template<class U, class V, class... A,
-        class E = typename std::enable_if< mp11::mp_count<variant<T...>, U>::value == 1 && std::is_constructible<U, std::initializer_list<V>&, A...>::value >::type>
+        class E = typename std::enable_if< mp11::mp_count<variant<T...>, U>::value == 1 && std::is_constructible<U, std::initializer_list<V>&, A&&...>::value >::type>
     BOOST_CXX14_CONSTEXPR U& emplace( std::initializer_list<V> il, A&&... a )
     {
         using I = mp11::mp_find<variant<T...>, U>;
@@ -1345,14 +1345,14 @@ public:
         return _get_impl( I() );
     }
 
-    template<std::size_t I, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, A...>::value>::type>
+    template<std::size_t I, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, A&&...>::value>::type>
     BOOST_CXX14_CONSTEXPR variant_alternative_t<I, variant<T...>>& emplace( A&&... a )
     {
         variant_base::template emplace<I>( std::forward<A>(a)... );
         return _get_impl( mp11::mp_size_t<I>() );
     }
 
-    template<std::size_t I, class V, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, std::initializer_list<V>&, A...>::value>::type>
+    template<std::size_t I, class V, class... A, class E = typename std::enable_if<std::is_constructible<mp11::mp_at_c<variant<T...>, I>, std::initializer_list<V>&, A&&...>::value>::type>
     BOOST_CXX14_CONSTEXPR variant_alternative_t<I, variant<T...>>& emplace( std::initializer_list<V> il, A&&... a )
     {
         variant_base::template emplace<I>( il, std::forward<A>(a)... );
