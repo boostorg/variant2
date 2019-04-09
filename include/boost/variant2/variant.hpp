@@ -290,7 +290,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
     return (void)( v.index() != I? throw bad_variant_access(): 0 ), std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 
@@ -312,7 +312,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
     return (void)( v.index() != I? throw bad_variant_access(): 0 ), std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 
@@ -372,7 +372,7 @@ template<class U, class... T> constexpr U&& get(variant<T...>&& v)
 
     using I = mp11::mp_find<variant<T...>, U>;
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
     return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), std::move( v._get_impl( I() ) );
 
@@ -399,7 +399,7 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
 
     using I = mp11::mp_find<variant<T...>, U>;
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1920)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
     return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), std::move( v._get_impl( I() ) );
 
@@ -578,7 +578,7 @@ template<class T1, class... T> struct overload<T1, T...>: overload<T...>
     mp11::mp_identity<T1> operator()(T1) const;
 };
 
-#if BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1930 )
 
 template<class U, class... T> using resolve_overload_type_ = decltype( overload<T...>()(std::declval<U>()) );
 
