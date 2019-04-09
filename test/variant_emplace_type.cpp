@@ -61,6 +61,11 @@ struct Y1
 {
 };
 
+struct Y2
+{
+    ~Y2() {}
+};
+
 struct Guard
 {
     explicit Guard(int) {}
@@ -177,6 +182,11 @@ int main()
 
     {
         variant<Y1, Guard> v;
+        v.emplace<Guard>( 1 );
+    }
+
+    {
+        variant<Y2, Guard> v;
         v.emplace<Guard>( 1 );
     }
 
