@@ -416,13 +416,13 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
 template<std::size_t I, class... T> constexpr typename std::add_pointer<variant_alternative_t<I, variant<T...>>>::type get_if(variant<T...>* v) noexcept
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return v && v->index() == I? &v->_get_impl( mp11::mp_size_t<I>() ): 0;
+    return v && v->index() == I? ::std::addressof(v->_get_impl( mp11::mp_size_t<I>() )): 0;
 }
 
 template<std::size_t I, class... T> constexpr typename std::add_pointer<const variant_alternative_t<I, variant<T...>>>::type get_if(variant<T...> const * v) noexcept
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return v && v->index() == I? &v->_get_impl( mp11::mp_size_t<I>() ): 0;
+    return v && v->index() == I? ::std::addressof(v->_get_impl( mp11::mp_size_t<I>() )): 0;
 }
 
 template<class U, class... T> constexpr typename std::add_pointer<U>::type get_if(variant<T...>* v) noexcept
@@ -431,7 +431,7 @@ template<class U, class... T> constexpr typename std::add_pointer<U>::type get_i
 
     using I = mp11::mp_find<variant<T...>, U>;
 
-    return v && v->index() == I::value? &v->_get_impl( I() ): 0;
+    return v && v->index() == I::value? ::std::addressof(v->_get_impl( I() )): 0;
 }
 
 template<class U, class... T> constexpr typename std::add_pointer<U const>::type get_if(variant<T...> const * v) noexcept
@@ -440,7 +440,7 @@ template<class U, class... T> constexpr typename std::add_pointer<U const>::type
 
     using I = mp11::mp_find<variant<T...>, U>;
 
-    return v && v->index() == I::value? &v->_get_impl( I() ): 0;
+    return v && v->index() == I::value? ::std::addressof(v->_get_impl( I() )): 0;
 }
 
 //
