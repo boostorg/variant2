@@ -503,7 +503,7 @@ Effects:  ::
 Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
-  Nothing unless the initialization of the new contained value throws.
+  Whatever the initialization of the new contained value throws.
 Exception Safety: :: On exception:
   - If the list of alternatives contains `monostate`, the contained value
     is either unchanged, or `monostate{}`;
@@ -530,7 +530,7 @@ Effects:  ::
 Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
-  Nothing unless the initialization of the new contained value throws.
+  Whatever the initialization of the new contained value throws.
 Exception Safety: :: On exception:
   - If the list of alternatives contains `monostate`, the contained value
     is either unchanged, or `monostate{}`;
