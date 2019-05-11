@@ -383,7 +383,8 @@ Remarks: :: This function does not participate in overload resolution unless
 [none]
 * {blank}
 +
-Effects: :: Destroys the currently contained value.
+Effects: ::
+  Destroys the currently contained value.
 
 #### Assignment
 
@@ -558,7 +559,8 @@ constexpr size_t index() const noexcept;
 [none]
 * {blank}
 +
-Returns:  :: The zero-based index of the active alternative.
+Returns:  ::
+  The zero-based index of the active alternative.
 
 #### Swap
 
@@ -846,7 +848,8 @@ template<class... T>
 [none]
 * {blank}
 +
-Returns: :: `w \<= v`.
+Returns: ::
+  `w \<= v`.
 
 ### visit
 
@@ -869,7 +872,8 @@ template<class... T>
 [none]
 * {blank}
 +
-Effects: :: Equivalent to `v.swap(w)`.
+Effects: ::
+  Equivalent to `v.swap(w)`.
 
 ### bad_variant_access
 
