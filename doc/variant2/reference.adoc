@@ -390,18 +390,14 @@ Effects: ::
 
 ```
 constexpr variant& operator=( const variant& r )
-  noexcept( mp_all<std::is_nothrow_copy_constructible<T>...,
-    std::is_nothrow_copy_assignable<T>...>::value );
+  noexcept( mp_all<std::is_nothrow_copy_constructible<T>...>::value );
 ```
 [none]
 * {blank}
 +
 Let `j` be `r.index()`.
 
-Effects: ::
-- If `index() == j`, assigns the value contained in `r` to the value
-  contained in `*this`.
-- Otherwise, equivalent to `emplace<j>(get<j>(r))`.
+Effects: :: `emplace<j>(get<j>(r))`.
 Returns: :: `*this`.
 Ensures: :: `index() == r.index()`.
 Remarks: :: This operator does not participate in overload resolution unless
@@ -410,18 +406,14 @@ Remarks: :: This operator does not participate in overload resolution unless
 
 ```
 constexpr variant& operator=( variant&& r )
-  noexcept( mp_all<std::is_nothrow_move_constructible<T>...,
-    std::is_nothrow_move_assignable<T>...>::value );
+  noexcept( mp_all<std::is_nothrow_move_constructible<T>...>::value );
 ```
 [none]
 * {blank}
 +
 Let `j` be `r.index()`.
 
-Effects: ::
-- If `index() == j`, assigns the value contained in `std::move(r)` to the
-  value contained in `*this`.
-- Otherwise, equivalent to `emplace<j>(get<j>(std::move(r)))`.
+Effects: :: `emplace<j>(get<j>(std::move(r)))`.
 Returns: :: `*this`.
 Ensures: :: `index() == r.index()`.
 Remarks: :: This operator does not participate in overload resolution unless
@@ -440,18 +432,14 @@ Let `Tj` be a type that is determined as follows: build an imaginary function
 overload resolution for the expression `FUN(std::forward<U>(u))` defines the
 alternative `Tj` which is the type of the contained value after construction.
 
-Effects: ::
-- If `index() == j`, assigns `std::forward<U>(u)` to the value contained in
-  `*this`.
-- Otherwise, equivalent to `emplace<j>(std::forward<U>(u))`.
+Effects: :: `emplace<j>(std::forward<U>(u))`.
 Returns: :: `*this`.
 Ensures: :: `index() == j`.
 Remarks: ::
-  The expression inside `noexcept` is `std::is_nothrow_constructible_v<Tj, U>
-    && std::is_nothrow_assignable_v<Tj&, U>`.
+  The expression inside `noexcept` is `std::is_nothrow_constructible_v<Tj, U&&>`.
   This operator does not participate in overload resolution unless
   - `std::is_same_v<std::remove_cvref_t<T>, variant>` is `false`,
-  - `std::is_constructible_v<Tj, U> && std::is_assignable_v<Tj&, U>` is
+  - `std::is_constructible_v<Tj, U&&> && std::is_assignable_v<Tj&, U&&>` is
     `true`,  and
   - the expression `FUN(std::forward<U>(u))` (with `FUN` being the
     above-mentioned set of imaginary functions) is well-formed.
@@ -470,7 +458,7 @@ Let `I` be the zero-based index of `U` in `T...`.
 Effects: :: Equivalent to: `return emplace<I>(std::forward<A>(a)...);`
 Remarks: ::
   This function shall not participate in overload resolution unless
-  `std::is_constructible_v<U, A...>` is `true` and `U` occurs exactly once
+  `std::is_constructible_v<U, A&&...>` is `true` and `U` occurs exactly once
   in `T...`.
 
 ```
@@ -485,7 +473,7 @@ Let `I` be the zero-based index of `U` in `T...`.
 Effects: :: Equivalent to: `return emplace<I>(il, std::forward<A>(a)...);`
 Remarks: ::
   This function shall not participate in overload resolution unless
-  `std::is_constructible_v<U, std::initializer_list<V>&, A...>` is `true`
+  `std::is_constructible_v<U, std::initializer_list<V>&, A&&...>` is `true`
   and `U` occurs exactly once in `T...`.
 
 
@@ -505,16 +493,10 @@ Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
   Nothing unless the initialization of the new contained value throws.
-Exception Safety: :: On exception:
-  - If the list of alternatives contains `monostate`, the contained value
-    is either unchanged, or `monostate{}`;
-  - Otherwise, if the list of alternatives contains types for which
-    `is_nothrow_default_constructible_v` is `true`, the contained value
-    is either unchanged, or `Tj{}`, where `Tj` is the first such alternative;
-  - Otherwise, the contained value is unchanged.
+Exception Safety: :: Strong. On exception, the contained value is unchanged.
 Remarks:  ::
   This function shall not participate in overload resolution unless
-  `std::is_constructible_v<Ti, A...>` is `true`.
+  `std::is_constructible_v<Ti, A&&...>` is `true`.
 
 ```
 template<size_t I, class V, class... A>
@@ -532,16 +514,10 @@ Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
   Nothing unless the initialization of the new contained value throws.
-Exception Safety: :: On exception:
-  - If the list of alternatives contains `monostate`, the contained value
-    is either unchanged, or `monostate{}`;
-  - Otherwise, if the list of alternatives contains types for which
-    `is_nothrow_default_constructible_v` is `true`, the contained value
-    is either unchanged, or `Tj{}`, where `Tj` is the first such alternative;
-  - Otherwise, the contained value is unchanged.
+Exception Safety: :: Strong. On exception, the contained value is unchanged.
 Remarks:  ::
   This function shall not participate in overload resolution unless
-  `std::is_constructible_v<Ti, std::initializer_list<V>&, A...>` is `true`.
+  `std::is_constructible_v<Ti, std::initializer_list<V>&, A&&...>` is `true`.
 
 #### Value Status
 
@@ -552,6 +528,8 @@ constexpr bool valueless_by_exception() const noexcept;
 * {blank}
 +
 Returns:  :: `false`.
+
+NOTE: This function is provided purely for compatibility with `std::variant`.
 
 ```
 constexpr size_t index() const noexcept;
