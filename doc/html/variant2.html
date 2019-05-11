@@ -1437,8 +1437,7 @@ there is exactly one occurrence of <code>U</code> in <code>T&#8230;&#8203;</code
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code>constexpr variant&amp; operator=( const variant&amp; r )
-  noexcept( mp_all&lt;std::is_nothrow_copy_constructible&lt;T&gt;...,
-    std::is_nothrow_copy_assignable&lt;T&gt;...&gt;::value );</code></pre>
+  noexcept( mp_all&lt;std::is_nothrow_copy_constructible&lt;T&gt;...&gt;::value );</code></pre>
 </div>
 </div>
 <div class="ulist none">
@@ -1452,17 +1451,7 @@ there is exactly one occurrence of <code>U</code> in <code>T&#8230;&#8203;</code
 <dl>
 <dt class="hdlist1">Effects: </dt>
 <dd>
-<div class="ulist">
-<ul>
-<li>
-<p>If <code>index() == j</code>, assigns the value contained in <code>r</code> to the value
-contained in <code>*this</code>.</p>
-</li>
-<li>
-<p>Otherwise, equivalent to <code>emplace&lt;j&gt;(get&lt;j&gt;(r))</code>.</p>
-</li>
-</ul>
-</div>
+<p><code>emplace&lt;j&gt;(get&lt;j&gt;(r))</code>.</p>
 </dd>
 <dt class="hdlist1">Returns: </dt>
 <dd>
@@ -1486,8 +1475,7 @@ contained in <code>*this</code>.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code>constexpr variant&amp; operator=( variant&amp;&amp; r )
-  noexcept( mp_all&lt;std::is_nothrow_move_constructible&lt;T&gt;...,
-    std::is_nothrow_move_assignable&lt;T&gt;...&gt;::value );</code></pre>
+  noexcept( mp_all&lt;std::is_nothrow_move_constructible&lt;T&gt;...&gt;::value );</code></pre>
 </div>
 </div>
 <div class="ulist none">
@@ -1501,17 +1489,7 @@ contained in <code>*this</code>.</p>
 <dl>
 <dt class="hdlist1">Effects: </dt>
 <dd>
-<div class="ulist">
-<ul>
-<li>
-<p>If <code>index() == j</code>, assigns the value contained in <code>std::move(r)</code> to the
-value contained in <code>*this</code>.</p>
-</li>
-<li>
-<p>Otherwise, equivalent to <code>emplace&lt;j&gt;(get&lt;j&gt;(std::move(r)))</code>.</p>
-</li>
-</ul>
-</div>
+<p><code>emplace&lt;j&gt;(get&lt;j&gt;(std::move(r)))</code>.</p>
 </dd>
 <dt class="hdlist1">Returns: </dt>
 <dd>
@@ -1552,17 +1530,7 @@ alternative <code>Tj</code> which is the type of the contained value after const
 <dl>
 <dt class="hdlist1">Effects: </dt>
 <dd>
-<div class="ulist">
-<ul>
-<li>
-<p>If <code>index() == j</code>, assigns <code>std::forward&lt;U&gt;(u)</code> to the value contained in
-<code>*this</code>.</p>
-</li>
-<li>
-<p>Otherwise, equivalent to <code>emplace&lt;j&gt;(std::forward&lt;U&gt;(u))</code>.</p>
-</li>
-</ul>
-</div>
+<p><code>emplace&lt;j&gt;(std::forward&lt;U&gt;(u))</code>.</p>
 </dd>
 <dt class="hdlist1">Returns: </dt>
 <dd>
@@ -1574,8 +1542,7 @@ alternative <code>Tj</code> which is the type of the contained value after const
 </dd>
 <dt class="hdlist1">Remarks: </dt>
 <dd>
-<p>The expression inside <code>noexcept</code> is <code>std::is_nothrow_constructible_v&lt;Tj, U&gt;
-  &amp;&amp; std::is_nothrow_assignable_v&lt;Tj&amp;, U&gt;</code>.
+<p>The expression inside <code>noexcept</code> is <code>std::is_nothrow_constructible_v&lt;Tj, U&amp;&amp;&gt;</code>.
 This operator does not participate in overload resolution unless</p>
 <div class="ulist">
 <ul>
@@ -1583,7 +1550,7 @@ This operator does not participate in overload resolution unless</p>
 <p><code>std::is_same_v&lt;std::remove_cvref_t&lt;T&gt;, variant&gt;</code> is <code>false</code>,</p>
 </li>
 <li>
-<p><code>std::is_constructible_v&lt;Tj, U&gt; &amp;&amp; std::is_assignable_v&lt;Tj&amp;, U&gt;</code> is
+<p><code>std::is_constructible_v&lt;Tj, U&amp;&amp;&gt; &amp;&amp; std::is_assignable_v&lt;Tj&amp;, U&amp;&amp;&gt;</code> is
 <code>true</code>,  and</p>
 </li>
 <li>
@@ -1623,7 +1590,7 @@ above-mentioned set of imaginary functions) is well-formed.</p>
 <dt class="hdlist1">Remarks: </dt>
 <dd>
 <p>This function shall not participate in overload resolution unless
-<code>std::is_constructible_v&lt;U, A&#8230;&#8203;&gt;</code> is <code>true</code> and <code>U</code> occurs exactly once
+<code>std::is_constructible_v&lt;U, A&amp;&amp;&#8230;&#8203;&gt;</code> is <code>true</code> and <code>U</code> occurs exactly once
 in <code>T&#8230;&#8203;</code>.</p>
 </dd>
 </dl>
@@ -1653,7 +1620,7 @@ in <code>T&#8230;&#8203;</code>.</p>
 <dt class="hdlist1">Remarks: </dt>
 <dd>
 <p>This function shall not participate in overload resolution unless
-<code>std::is_constructible_v&lt;U, std::initializer_list&lt;V&gt;&amp;, A&#8230;&#8203;&gt;</code> is <code>true</code>
+<code>std::is_constructible_v&lt;U, std::initializer_list&lt;V&gt;&amp;, A&amp;&amp;&#8230;&#8203;&gt;</code> is <code>true</code>
 and <code>U</code> occurs exactly once in <code>T&#8230;&#8203;</code>.</p>
 </dd>
 </dl>
@@ -1697,28 +1664,12 @@ value as if using the expression <code>Ti(std::forward&lt;A&gt;(a)&#8230;&#8203;
 </dd>
 <dt class="hdlist1">Exception Safety: </dt>
 <dd>
-<p>On exception:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>If the list of alternatives contains <code>monostate</code>, the contained value
-is either unchanged, or <code>monostate{}</code>;</p>
-</li>
-<li>
-<p>Otherwise, if the list of alternatives contains types for which
-<code>is_nothrow_default_constructible_v</code> is <code>true</code>, the contained value
-is either unchanged, or <code>Tj{}</code>, where <code>Tj</code> is the first such alternative;</p>
-</li>
-<li>
-<p>Otherwise, the contained value is unchanged.</p>
-</li>
-</ul>
-</div>
+<p>Strong. On exception, the contained value is unchanged.</p>
 </dd>
 <dt class="hdlist1">Remarks:  </dt>
 <dd>
 <p>This function shall not participate in overload resolution unless
-<code>std::is_constructible_v&lt;Ti, A&#8230;&#8203;&gt;</code> is <code>true</code>.</p>
+<code>std::is_constructible_v&lt;Ti, A&amp;&amp;&#8230;&#8203;&gt;</code> is <code>true</code>.</p>
 </dd>
 </dl>
 </div>
@@ -1761,28 +1712,12 @@ value as if using the expression <code>Ti(il, std::forward&lt;A&gt;(a)&#8230;&#8
 </dd>
 <dt class="hdlist1">Exception Safety: </dt>
 <dd>
-<p>On exception:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>If the list of alternatives contains <code>monostate</code>, the contained value
-is either unchanged, or <code>monostate{}</code>;</p>
-</li>
-<li>
-<p>Otherwise, if the list of alternatives contains types for which
-<code>is_nothrow_default_constructible_v</code> is <code>true</code>, the contained value
-is either unchanged, or <code>Tj{}</code>, where <code>Tj</code> is the first such alternative;</p>
-</li>
-<li>
-<p>Otherwise, the contained value is unchanged.</p>
-</li>
-</ul>
-</div>
+<p>Strong. On exception, the contained value is unchanged.</p>
 </dd>
 <dt class="hdlist1">Remarks:  </dt>
 <dd>
 <p>This function shall not participate in overload resolution unless
-<code>std::is_constructible_v&lt;Ti, std::initializer_list&lt;V&gt;&amp;, A&#8230;&#8203;&gt;</code> is <code>true</code>.</p>
+<code>std::is_constructible_v&lt;Ti, std::initializer_list&lt;V&gt;&amp;, A&amp;&amp;&#8230;&#8203;&gt;</code> is <code>true</code>.</p>
 </dd>
 </dl>
 </div>
@@ -1808,6 +1743,18 @@ is either unchanged, or <code>Tj{}</code>, where <code>Tj</code> is the first su
 <p><code>false</code>.</p>
 </dd>
 </dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+This function is provided purely for compatibility with <code>std::variant</code>.
+</td>
+</tr>
+</table>
 </div>
 </li>
 </ul>
@@ -2519,7 +2466,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-05-12 00:11:41 +0300
+Last updated 2019-05-12 00:15:41 +0300
 </div>
 </div>
 <style>
