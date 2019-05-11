@@ -17,6 +17,9 @@ Peter Dimov
 :leveloffset: +1
 
 include::variant2/overview.adoc[]
+include::variant2/changelog.adoc[]
+include::variant2/design.adoc[]
+include::variant2/implementation.adoc[]
 include::variant2/reference.adoc[]
 include::variant2/copyright.adoc[]
 

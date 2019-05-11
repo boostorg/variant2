@@ -1,0 +1,54 @@
+////
+Copyright 2018, 2019 Peter Dimov
+
+Distributed under the Boost Software License, Version 1.0.
+
+See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt
+////
+
+[#design]
+# Design
+:idprefix: design_
+
+## Features
+
+This `variant` implementation has two distinguishing features:
+
+* It's never "valueless", that is, `variant<T1, T2, ..., Tn>` has an
+  invariant that it always contains a valid value of one of the types
+  `T1`, `T2`, ..., `Tn`.
+* It provides the strong exception safety guarantee on assignment and
+  `emplace`.
+
+This is achieved with the use of double storage, unless all of the
+contained types have a non-throwing move constructor.
+
+## Rationale
+
+...
+
+## Differences with std::variant
+
+The main differences between this implementation and `std::variant` are:
+
+* No valueless-by-exception state: `valueless_by_exception()` always
+  returns `false`.
+* Strong exception safety guarantee.
+* `emplace` first constructs the new value and then destroys the old one;
+  in the single storage case, this translates to constructing a temporary
+  and then moving it into place.
+* A converting constructor from, e.g. `variant<int, float>` to 
+  `variant<float, double, int>` is provided as an extension
+* The reverse operation, going from `variant<float, double, int>` to
+  `variant<int, float>` is provided as the member function `subset<U...>`.
+  (This operation can throw if the current state of the variant cannot be
+  represented.)
+* `variant<T...>` is not (yet) trivial when all contained types are trivial,
+   as mandated by {cpp}17.
+* The {cpp}20 additions and changes to `std::variant` have not yet been
+  implemented.
+
+## Differences with Boost.Variant
+
+...
