@@ -598,11 +598,8 @@ template<class U, class... T> using resolve_overload_index = mp11::mp_find<mp11:
 
 // variant_base
 
-template<class... T> using can_be_valueless = mp11::mp_any<std::is_same<T, monostate>..., std::is_nothrow_default_constructible<T>...>;
-template<class... T> using valueless_index = mp11::mp_if<mp11::mp_contains<mp11::mp_list<T...>, monostate>, mp11::mp_find<mp11::mp_list<T...>, monostate>, mp11::mp_find_if<mp11::mp_list<T...>, std::is_nothrow_default_constructible>>;
-
-template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl; // trivially destructible, single buffered
-template<class... T> using variant_base = variant_base_impl<mp11::mp_all<std::is_trivially_destructible<T>...>::value, mp11::mp_any<mp11::mp_all<std::is_nothrow_move_constructible<T>...>, can_be_valueless<T...>>::value, T...>;
+template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl;
+template<class... T> using variant_base = variant_base_impl<mp11::mp_all<std::is_trivially_destructible<T>...>::value, mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value, T...>;
 
 struct none {};
 
@@ -649,7 +646,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
         return st1_.get( mp11::mp_size_t<I+1>() );
     }
 
-    template<std::size_t J, class U, bool B, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_true, mp11::mp_bool<B>, A&&... a )
+    template<std::size_t J, class U, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_true, A&&... a )
     {
         static_assert( std::is_nothrow_constructible<U, A&&...>::value, "Logic error: U must be nothrow constructible from A&&..." );
 
@@ -657,7 +654,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
         ix_ = J;
     }
 
-    template<std::size_t J, class U, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_false, mp11::mp_true, A&&... a )
+    template<std::size_t J, class U, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_false, A&&... a )
     {
         static_assert( std::is_nothrow_move_constructible<U>::value, "Logic error: U must be nothrow move constructible" );
 
@@ -667,37 +664,12 @@ template<class... T> struct variant_base_impl<true, true, T...>
         ix_ = J;
     }
 
-    template<std::size_t J, class U, class... A> void emplace_impl( mp11::mp_false, mp11::mp_false, A&&... a )
-    {
-        static_assert( can_be_valueless<T...>::value, "Logic error: T... must have a fallback type" );
-
-        std::size_t const K = valueless_index<T...>::value;
-
-        static_assert( K < sizeof...(T), "Logic error: T... must have a fallback index" );
-
-        try
-        {
-            st1_.emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
-            ix_ = J;
-        }
-        catch( ... )
-        {
-            st1_.emplace( mp11::mp_size_t<K+1>() );
-            ix_ = K+1;
-
-            throw;
-        }
-    }
-
     template<std::size_t I, class... A> BOOST_CXX14_CONSTEXPR void emplace( A&&... a )
     {
         std::size_t const J = I+1;
         using U = mp11::mp_at_c<variant<T...>, I>;
 
-        constexpr bool B1 = can_be_valueless<T...>::value;
-        constexpr bool B2 = mp11::mp_all<detail::is_trivially_move_constructible<U>, detail::is_trivially_move_assignable<T>...>::value;
-
-        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A&&...>(), mp11::mp_bool<B2 || !B1>(), std::forward<A>(a)... );
+        this->emplace_impl<J, U>( std::is_nothrow_constructible<U, A&&...>(), std::forward<A>(a)... );
     }
 };
 
@@ -836,42 +808,12 @@ template<class... T> struct variant_base_impl<false, true, T...>
         return st1_.get( mp11::mp_size_t<I+1>() );
     }
 
-    template<std::size_t J, class U, class... A> void emplace_impl( mp11::mp_int<0>, A&&... a )
+    template<std::size_t I, class... A> void emplace( A&&... a )
     {
-        static_assert( std::is_nothrow_constructible<U, A&&...>::value, "Logic error: U must be nothrow constructible from A&&..." );
+        size_t const J = I+1;
 
-        _destroy();
+        using U = mp11::mp_at_c<variant<T...>, I>;
 
-        st1_.emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
-        ix_ = J;
-    }
-
-    template<std::size_t J, class U, class... A> void emplace_impl( mp11::mp_int<1>, A&&... a )
-    {
-        static_assert( can_be_valueless<T...>::value, "Logic error: T... must have a fallback type" );
-
-        std::size_t const K = valueless_index<T...>::value;
-
-        static_assert( K < sizeof...(T), "Logic error: T... must have a fallback index" );
-
-        _destroy();
-
-        try
-        {
-            st1_.emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
-            ix_ = J;
-        }
-        catch( ... )
-        {
-            st1_.emplace( mp11::mp_size_t<K+1>() );
-            ix_ = K+1;
-
-            throw;
-        }
-    }
-
-    template<std::size_t J, class U, class... A> void emplace_impl( mp11::mp_int<2>, A&&... a )
-    {
         static_assert( std::is_nothrow_move_constructible<U>::value, "Logic error: U must be nothrow move constructible" );
 
         U tmp( std::forward<A>(a)... );
@@ -880,17 +822,6 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
         st1_.emplace( mp11::mp_size_t<J>(), std::move(tmp) );
         ix_ = J;
-    }
-
-    template<std::size_t I, class... A> void emplace( A&&... a )
-    {
-        size_t const J = I+1;
-
-        using U = mp11::mp_at_c<variant<T...>, I>;
-
-        int const D = std::is_nothrow_constructible<U, A&&...>::value? 0: ( can_be_valueless<T...>::value? 1: 2 );
-
-        this->emplace_impl<J, U>( mp11::mp_int<D>(), std::forward<A>(a)... );
     }
 };
 
@@ -1237,14 +1168,7 @@ private:
 
         template<class I> void operator()( I i ) const
         {
-            if( this_->index() == i )
-            {
-                this_->_get_impl( i ) = r._get_impl( i );
-            }
-            else
-            {
-                this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
-            }
+            this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
         }
     };
 
@@ -1255,7 +1179,7 @@ public:
         class E3 = mp11::mp_if<mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( variant const & r )
-        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>..., std::is_nothrow_copy_assignable<T>...>::value )
+        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
         return *this;
@@ -1279,14 +1203,7 @@ private:
 
         template<class I> void operator()( I i ) const
         {
-            if( this_->index() == i )
-            {
-                this_->_get_impl( i ) = std::move( r._get_impl( i ) );
-            }
-            else
-            {
-                this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
-            }
+            this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
         }
     };
 
@@ -1297,7 +1214,7 @@ public:
         class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
     >
     variant& operator=( variant && r )
-        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>..., std::is_nothrow_move_assignable<T>...>::value )
+        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L4{ this, r } );
         return *this;
@@ -1309,19 +1226,10 @@ public:
         class E2 = typename std::enable_if<std::is_assignable<V&, U&&>::value && std::is_constructible<V, U&&>::value>::type
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( U&& u )
-        noexcept( std::is_nothrow_assignable<V&, U&&>::value && std::is_nothrow_constructible<V, U&&>::value )
+        noexcept( std::is_nothrow_constructible<V, U&&>::value )
     {
         std::size_t const I = detail::resolve_overload_index<U, T...>::value;
-
-        if( index() == I )
-        {
-            _get_impl( mp11::mp_size_t<I>() ) = std::forward<U>(u);
-        }
-        else
-        {
-            this->template emplace<I>( std::forward<U>(u) );
-        }
-
+        this->template emplace<I>( std::forward<U>(u) );
         return *this;
     }
 
