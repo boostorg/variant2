@@ -1168,14 +1168,7 @@ private:
 
         template<class I> void operator()( I i ) const
         {
-            if( this_->index() == i )
-            {
-                this_->_get_impl( i ) = r._get_impl( i );
-            }
-            else
-            {
-                this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
-            }
+            this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
         }
     };
 
@@ -1186,7 +1179,7 @@ public:
         class E3 = mp11::mp_if<mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( variant const & r )
-        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>..., std::is_nothrow_copy_assignable<T>...>::value )
+        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
         return *this;
@@ -1210,14 +1203,7 @@ private:
 
         template<class I> void operator()( I i ) const
         {
-            if( this_->index() == i )
-            {
-                this_->_get_impl( i ) = std::move( r._get_impl( i ) );
-            }
-            else
-            {
-                this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
-            }
+            this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
         }
     };
 
@@ -1228,7 +1214,7 @@ public:
         class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
     >
     variant& operator=( variant && r )
-        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>..., std::is_nothrow_move_assignable<T>...>::value )
+        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L4{ this, r } );
         return *this;
@@ -1240,19 +1226,10 @@ public:
         class E2 = typename std::enable_if<std::is_assignable<V&, U&&>::value && std::is_constructible<V, U&&>::value>::type
     >
     BOOST_CXX14_CONSTEXPR variant& operator=( U&& u )
-        noexcept( std::is_nothrow_assignable<V&, U&&>::value && std::is_nothrow_constructible<V, U&&>::value )
+        noexcept( std::is_nothrow_constructible<V, U&&>::value )
     {
         std::size_t const I = detail::resolve_overload_index<U, T...>::value;
-
-        if( index() == I )
-        {
-            _get_impl( mp11::mp_size_t<I>() ) = std::forward<U>(u);
-        }
-        else
-        {
-            this->template emplace<I>( std::forward<U>(u) );
-        }
-
+        this->template emplace<I>( std::forward<U>(u) );
         return *this;
     }
 
