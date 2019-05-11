@@ -115,8 +115,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // basic guarantee; X1 is nothrow default-constructible
-            BOOST_TEST_EQ( v.index(), 1 );
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 0 );
         }
     }
 
@@ -132,8 +132,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // basic guarantee; X1 is nothrow default-constructible
-            BOOST_TEST_EQ( v.index(), 0 );
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 1 );
         }
     }
 
@@ -149,8 +149,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // basic guarantee; monostate
-            BOOST_TEST_EQ( v.index(), 2 );
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 0 );
         }
     }
 
@@ -166,8 +166,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // basic guarantee; monostate
-            BOOST_TEST_EQ( v.index(), 2 );
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 1 );
         }
     }
 
@@ -183,8 +183,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // basic guarantee; X1 is nothrow default-constructible
-            BOOST_TEST_EQ( v.index(), 2 );
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 0 );
         }
     }
 
@@ -200,8 +200,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // basic guarantee; monostate
-            BOOST_TEST_EQ( v.index(), 3 );
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 0 );
         }
     }
 
@@ -234,18 +234,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // X3 is not v2d::trivially_move_assignable on libstdc++ 4.x
-
-            if( v2d::is_trivially_move_assignable<X3>::value )
-            {
-                // all trivially destructible and move-assignable, no change
-                BOOST_TEST_EQ( v.index(), 0 );
-            }
-            else
-            {
-                // basic guarantee; X1 is nothrow default-constructible
-                BOOST_TEST_EQ( v.index(), 1 );
-            }
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 0 );
         }
     }
 
@@ -261,18 +251,8 @@ int main()
         }
         catch( std::exception const& )
         {
-            // X3 is not v2d::trivially_move_assignable on libstdc++ 4.x
-
-            if( v2d::is_trivially_move_assignable<X3>::value )
-            {
-                // all trivially destructible and move-assignable, no change
-                BOOST_TEST_EQ( v.index(), 0 );
-            }
-            else
-            {
-                // basic guarantee; monostate
-                BOOST_TEST_EQ( v.index(), 2 );
-            }
+            // strong guarantee
+            BOOST_TEST_EQ( v.index(), 0 );
         }
     }
 
