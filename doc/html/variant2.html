@@ -445,7 +445,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#overview">Overview</a></li>
+<li><a href="#overview">Overview</a>
+<ul class="sectlevel2">
+<li><a href="#overview_description">Description</a></li>
+<li><a href="#overview_usage_examples">Usage Examples</a></li>
+<li><a href="#overview_construction_and_assignment">Construction and Assignment</a></li>
+<li><a href="#overview_inspecting_the_value">Inspecting the Value</a></li>
+<li><a href="#overview_visitation">Visitation</a></li>
+<li><a href="#overview_default_construction">Default Construction</a></li>
+</ul>
+</li>
 <li><a href="#reference">Reference</a>
 <ul class="sectlevel2">
 <li><a href="#ref_boostvariant2variant_hpp">&lt;boost/variant2/variant.hpp&gt;</a>
@@ -483,6 +492,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="overview">Overview</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="overview_description">Description</h3>
 <div class="paragraph">
 <p>This library implements a type-safe discriminated/tagged union type,
 <code>variant&lt;T&#8230;&#8203;&gt;</code>, that is API-compatible with the C&#43;&#43;17 Standard&#8217;s
@@ -515,6 +526,9 @@ equivalent to</p>
 };</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="overview_usage_examples">Usage Examples</h3>
 <div class="paragraph">
 <p>Variants can be used to represent dynamically-typed values. A configuration
 file of the form</p>
@@ -650,6 +664,9 @@ int main()
 }</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="overview_construction_and_assignment">Construction and Assignment</h3>
 <div class="paragraph">
 <p>If we look at the</p>
 </div>
@@ -684,6 +701,9 @@ variant::variant(float x);</code></pre>
 <p>and the standard overload resolution rules are used to pick the one that will
 be used. So <code>variant&lt;int, float&gt;((short)1)</code> will hold an <code>int</code>.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="overview_inspecting_the_value">Inspecting the Value</h3>
 <div class="paragraph">
 <p>Putting values into a <code>variant</code> is easy, but taking them out is necessarily a
 bit more convoluted. It&#8217;s not possible for <code>variant&lt;int, float&gt;</code> to define a
@@ -765,6 +785,9 @@ the following lines:</p>
 }</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="overview_visitation">Visitation</h3>
 <div class="paragraph">
 <p>Last but not least, there&#8217;s <code>visit</code>. <code>visit(f, v)</code> calls the a function object
 <code>f</code> with the value contained in the <code>variant</code> <code>v</code> and returns the result. When
@@ -819,6 +842,9 @@ example:</p>
 <code>f(x1, x2)</code>, where <code>x1</code> is the value contained in <code>v1</code> and <code>x2</code> is the value
 in <code>v2</code>.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="overview_default_construction">Default Construction</h3>
 <div class="paragraph">
 <p>The default constructor of <code>variant</code> value-initializes the first type in
 the list. <code>variant&lt;int, float&gt;{}</code> holds <code>0</code> (of type <code>int</code>), and
@@ -831,6 +857,7 @@ avoid constructing a <code>std::mutex</code> by default. A provided type, <code>
 can be used as the first type in those scenarios. <code>variant&lt;monostate,
 std::mutex, std::recursive_mutex&gt;</code> will default-construct a <code>monostate</code>,
 which is basically a no-op, as <code>monostate</code> is effectively an empty <code>struct</code>.</p>
+</div>
 </div>
 </div>
 </div>
@@ -2492,7 +2519,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-05-11 17:49:15 +0300
+Last updated 2019-05-12 00:11:41 +0300
 </div>
 </div>
 <style>
