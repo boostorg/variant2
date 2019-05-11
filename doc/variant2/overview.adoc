@@ -9,7 +9,9 @@ http://www.boost.org/LICENSE_1_0.txt
 
 [#overview]
 # Overview
-:idprefix:
+:idprefix: overview_
+
+## Description
 
 This library implements a type-safe discriminated/tagged union type,
 `variant<T...>`, that is API-compatible with the {cpp}17 Standard's
@@ -38,6 +40,8 @@ struct V
     };
 };
 ```
+
+## Usage Examples
 
 Variants can be used to represent dynamically-typed values. A configuration
 file of the form
@@ -167,6 +171,8 @@ int main()
 }
 ```
 
+## Construction and Assignment
+
 If we look at the
 
 ```
@@ -193,6 +199,8 @@ variant::variant(float x);
 
 and the standard overload resolution rules are used to pick the one that will
 be used. So `variant<int, float>((short)1)` will hold an `int`.
+
+## Inspecting the Value
 
 Putting values into a `variant` is easy, but taking them out is necessarily a
 bit more convoluted. It's not possible for `variant<int, float>` to define a
@@ -265,6 +273,8 @@ void f( variant<int, float> const& v )
 }
 ```
 
+## Visitation
+
 Last but not least, there's `visit`. `visit(f, v)` calls the a function object
 `f` with the value contained in the `variant` `v` and returns the result. When
 `v` is `variant<int, float>`, it will call `f` with either an `int` or a
@@ -310,6 +320,8 @@ void g( variant<int, float> const& v )
 `visit` can also take more than one `variant`. `visit(f, v1, v2)` calls
 `f(x1, x2)`, where `x1` is the value contained in `v1` and `x2` is the value
 in `v2`.
+
+## Default Construction
 
 The default constructor of `variant` value-initializes the first type in
 the list. `variant<int, float>{}` holds `0` (of type `int`), and
