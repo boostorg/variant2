@@ -1310,11 +1310,6 @@ public:
 
     // private accessors
 
-    constexpr int _real_index() const noexcept
-    {
-        return this->ix_;
-    }
-
     using variant_base::_get_impl;
 
     // converting constructors (extension)
