@@ -26,6 +26,12 @@ contained types have a non-throwing move constructor.
 
 ## Rationale
 
+### Never Valueless
+
+...
+
+### Strong Exception Safety
+
 ...
 
 ## Differences with std::variant
@@ -34,12 +40,12 @@ The main differences between this implementation and `std::variant` are:
 
 * No valueless-by-exception state: `valueless_by_exception()` always
   returns `false`.
-* Strong exception safety guarantee.
+* Strong exception safety guarantee on assignment and `emplace`.
 * `emplace` first constructs the new value and then destroys the old one;
   in the single storage case, this translates to constructing a temporary
   and then moving it into place.
 * A converting constructor from, e.g. `variant<int, float>` to 
-  `variant<float, double, int>` is provided as an extension
+  `variant<float, double, int>` is provided as an extension.
 * The reverse operation, going from `variant<float, double, int>` to
   `variant<int, float>` is provided as the member function `subset<U...>`.
   (This operation can throw if the current state of the variant cannot be
@@ -51,4 +57,12 @@ The main differences between this implementation and `std::variant` are:
 
 ## Differences with Boost.Variant
 
-...
+This library is API compatible with `std::variant`. As such, its interface
+is different from Boost.Variant's. For example, visitation is performed via
+`visit` instead of `apply_visitor`.
+
+Recursive variants are not supported.
+
+Double storage is used instead of temporary heap backup. This `variant` is
+always "stack-based", it never allocates, and never throws `bad_alloc` on
+its own.

@@ -15,4 +15,4 @@ http://www.boost.org/LICENSE_1_0.txt
 
 After the Boost formal review, the implementation has been
 changed to provide the strong exception safety guarantee,
-instead of basic. `expected` has been removed, for now.
+instead of basic. `expected` has been removed.

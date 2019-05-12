@@ -13,13 +13,13 @@ http://www.boost.org/LICENSE_1_0.txt
 
 ## Dependencies
 
-This implementation depends on Boost.Config and Boost.Mp11.
+This implementation only depends on Boost.Config and Boost.Mp11.
 
 ## Supported Compilers
 
 * GCC 4.8 or later with `-std=c++11` or above
 * Clang 3.5 or later with `-std=c++11` or above
-* Visual Studio 2015, 2017
+* Visual Studio 2015, 2017, 2019
 
 Tested on https://travis-ci.org/pdimov/variant2/[Travis] and
 https://ci.appveyor.com/project/pdimov/variant2/[Appveyor].

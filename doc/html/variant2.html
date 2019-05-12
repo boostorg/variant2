@@ -455,6 +455,30 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#overview_default_construction">Default Construction</a></li>
 </ul>
 </li>
+<li><a href="#changelog">Revision History</a>
+<ul class="sectlevel2">
+<li><a href="#changelog_changes_in_1_71_0">Changes in 1.71.0</a></li>
+</ul>
+</li>
+<li><a href="#design">Design</a>
+<ul class="sectlevel2">
+<li><a href="#design_features">Features</a></li>
+<li><a href="#design_rationale">Rationale</a>
+<ul class="sectlevel3">
+<li><a href="#design_never_valueless">Never Valueless</a></li>
+<li><a href="#design_strong_exception_safety">Strong Exception Safety</a></li>
+</ul>
+</li>
+<li><a href="#design_differences_with_stdvariant">Differences with std::variant</a></li>
+<li><a href="#design_differences_with_boost_variant">Differences with Boost.Variant</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a>
+<ul class="sectlevel2">
+<li><a href="#implementation_dependencies">Dependencies</a></li>
+<li><a href="#implementation_supported_compilers">Supported Compilers</a></li>
+</ul>
+</li>
 <li><a href="#reference">Reference</a>
 <ul class="sectlevel2">
 <li><a href="#ref_boostvariant2variant_hpp">&lt;boost/variant2/variant.hpp&gt;</a>
@@ -857,6 +881,149 @@ avoid constructing a <code>std::mutex</code> by default. A provided type, <code>
 can be used as the first type in those scenarios. <code>variant&lt;monostate,
 std::mutex, std::recursive_mutex&gt;</code> will default-construct a <code>monostate</code>,
 which is basically a no-op, as <code>monostate</code> is effectively an empty <code>struct</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="changelog">Revision History</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="changelog_changes_in_1_71_0">Changes in 1.71.0</h3>
+<div class="paragraph">
+<p>After the Boost formal review, the implementation has been
+changed to provide the strong exception safety guarantee,
+instead of basic. <code>expected</code> has been removed.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="design">Design</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="design_features">Features</h3>
+<div class="paragraph">
+<p>This <code>variant</code> implementation has two distinguishing features:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It&#8217;s never "valueless", that is, <code>variant&lt;T1, T2, &#8230;&#8203;, Tn&gt;</code> has an
+invariant that it always contains a valid value of one of the types
+<code>T1</code>, <code>T2</code>, &#8230;&#8203;, <code>Tn</code>.</p>
+</li>
+<li>
+<p>It provides the strong exception safety guarantee on assignment and
+<code>emplace</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This is achieved with the use of double storage, unless all of the
+contained types have a non-throwing move constructor.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="design_rationale">Rationale</h3>
+<div class="sect3">
+<h4 id="design_never_valueless">Never Valueless</h4>
+<div class="paragraph">
+<p>&#8230;&#8203;</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="design_strong_exception_safety">Strong Exception Safety</h4>
+<div class="paragraph">
+<p>&#8230;&#8203;</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="design_differences_with_stdvariant">Differences with std::variant</h3>
+<div class="paragraph">
+<p>The main differences between this implementation and <code>std::variant</code> are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>No valueless-by-exception state: <code>valueless_by_exception()</code> always
+returns <code>false</code>.</p>
+</li>
+<li>
+<p>Strong exception safety guarantee on assignment and <code>emplace</code>.</p>
+</li>
+<li>
+<p><code>emplace</code> first constructs the new value and then destroys the old one;
+in the single storage case, this translates to constructing a temporary
+and then moving it into place.</p>
+</li>
+<li>
+<p>A converting constructor from, e.g. <code>variant&lt;int, float&gt;</code> to
+<code>variant&lt;float, double, int&gt;</code> is provided as an extension.</p>
+</li>
+<li>
+<p>The reverse operation, going from <code>variant&lt;float, double, int&gt;</code> to
+<code>variant&lt;int, float&gt;</code> is provided as the member function <code>subset&lt;U&#8230;&#8203;&gt;</code>.
+(This operation can throw if the current state of the variant cannot be
+represented.)</p>
+</li>
+<li>
+<p><code>variant&lt;T&#8230;&#8203;&gt;</code> is not (yet) trivial when all contained types are trivial,
+as mandated by C&#43;&#43;17.</p>
+</li>
+<li>
+<p>The C&#43;&#43;20 additions and changes to <code>std::variant</code> have not yet been
+implemented.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="design_differences_with_boost_variant">Differences with Boost.Variant</h3>
+<div class="paragraph">
+<p>This library is API compatible with <code>std::variant</code>. As such, its interface
+is different from Boost.Variant&#8217;s. For example, visitation is performed via
+<code>visit</code> instead of <code>apply_visitor</code>.</p>
+</div>
+<div class="paragraph">
+<p>Recursive variants are not supported.</p>
+</div>
+<div class="paragraph">
+<p>Double storage is used instead of temporary heap backup. This <code>variant</code> is
+always "stack-based", it never allocates, and never throws <code>bad_alloc</code> on
+its own.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="implementation">Implementation</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="implementation_dependencies">Dependencies</h3>
+<div class="paragraph">
+<p>This implementation only depends on Boost.Config and Boost.Mp11.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="implementation_supported_compilers">Supported Compilers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>GCC 4.8 or later with <code>-std=c++11</code> or above</p>
+</li>
+<li>
+<p>Clang 3.5 or later with <code>-std=c++11</code> or above</p>
+</li>
+<li>
+<p>Visual Studio 2015, 2017, 2019</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Tested on <a href="https://travis-ci.org/pdimov/variant2/">Travis</a> and
+<a href="https://ci.appveyor.com/project/pdimov/variant2/">Appveyor</a>.</p>
 </div>
 </div>
 </div>
@@ -2466,7 +2633,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-05-12 00:15:41 +0300
+Last updated 2019-05-12 02:21:08 +0300
 </div>
 </div>
 <style>
