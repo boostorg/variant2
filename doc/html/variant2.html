@@ -1270,6 +1270,10 @@ public:
 } // namespace boost</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>In the descriptions that follow, let <code>i</code> be in the range <code>[0, sizeof&#8230;&#8203;(T))</code>,
+and <code>Ti</code> be the <code>i</code>-th type in <code>T&#8230;&#8203;</code>.</p>
+</div>
 <div class="sect4">
 <h5 id="ref_constructors">Constructors</h5>
 <div class="listingblock">
@@ -2296,6 +2300,11 @@ in <code>T&#8230;&#8203;</code>.</p>
 <p>If <code>v.index()</code> is <code>I</code>, returns a reference to the object stored in
 the variant. Otherwise, throws <code>bad_variant_access</code>.</p>
 </dd>
+<dt class="hdlist1">Remarks: </dt>
+<dd>
+<p>These functions do not participate in overload resolution
+unless <code>I</code> &lt; <code>sizeof&#8230;&#8203;(T)</code>.</p>
+</dd>
 </dl>
 </div>
 </li>
@@ -2369,14 +2378,15 @@ Otherwise, throws <code>bad_variant_access</code>.</p>
 <p></p>
 <div class="dlist">
 <dl>
-<dt class="hdlist1">Requires: </dt>
-<dd>
-<p><code>I &lt; sizeof&#8230;&#8203;(U)</code>. Otherwise, the program is ill-formed.</p>
-</dd>
 <dt class="hdlist1">Effects:  </dt>
 <dd>
 <p>A pointer to the value stored in the variant, if
 <code>v != nullptr &amp;&amp; v-&gt;index() == I</code>. Otherwise, <code>nullptr</code>.</p>
+</dd>
+<dt class="hdlist1">Remarks: </dt>
+<dd>
+<p>These functions do not participate in overload resolution
+unless <code>I</code> &lt; <code>sizeof&#8230;&#8203;(T)</code>.</p>
 </dd>
 </dl>
 </div>
@@ -2435,7 +2445,7 @@ the zero-based index of <code>U</code> in <code>T&#8230;&#8203;</code>.</p>
 <dl>
 <dt class="hdlist1">Returns: </dt>
 <dd>
-<p><code>v.index() == w.index &amp;&amp; get&lt;I&gt;(v) == get&lt;I&gt;(w)</code>, where <code>I</code>
+<p><code>v.index() == w.index() &amp;&amp; get&lt;I&gt;(v) == get&lt;I&gt;(w)</code>, where <code>I</code>
 is <code>v.index()</code>.</p>
 </dd>
 </dl>
@@ -2478,7 +2488,7 @@ is <code>v.index()</code>.</p>
 <dl>
 <dt class="hdlist1">Returns: </dt>
 <dd>
-<p><code>v.index() &lt; w.index || (v.index() == w.index &amp;&amp; get&lt;I&gt;(v) &lt; get&lt;I&gt;(w))</code>,
+<p><code>v.index() &lt; w.index() || (v.index() == w.index() &amp;&amp; get&lt;I&gt;(v) &lt; get&lt;I&gt;(w))</code>,
 where <code>I</code> is <code>v.index()</code>.</p>
 </dd>
 </dl>
@@ -2521,7 +2531,7 @@ where <code>I</code> is <code>v.index()</code>.</p>
 <dl>
 <dt class="hdlist1">Returns: </dt>
 <dd>
-<p><code>v.index() &lt; w.index || (v.index() == w.index &amp;&amp; get&lt;I&gt;(v) &lt;= get&lt;I&gt;(w))</code>,
+<p><code>v.index() &lt; w.index() || (v.index() == w.index() &amp;&amp; get&lt;I&gt;(v) &lt;= get&lt;I&gt;(w))</code>,
 where <code>I</code> is <code>v.index()</code>.</p>
 </dd>
 </dl>
@@ -2633,7 +2643,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-05-12 02:21:08 +0300
+Last updated 2019-05-12 18:44:13 +0300
 </div>
 </div>
 <style>
