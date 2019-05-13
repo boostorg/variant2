@@ -929,13 +929,155 @@ contained types have a non-throwing move constructor.</p>
 <div class="sect3">
 <h4 id="design_never_valueless">Never Valueless</h4>
 <div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p>It makes intuitive sense that <code>variant&lt;X, Y, Z&gt;</code> can hold only values
+of type <code>X</code>, type <code>Y</code>, or type <code>Z</code>, and nothing else.</p>
+</div>
+<div class="paragraph">
+<p>If we think of <code>variant</code> as an extension of <code>union</code>, since a <code>union</code>
+has a state called "no active member", an argument can be made that a
+<code>variant&lt;X, Y, Z&gt;</code> should also have such an additional state, holding
+none of <code>X</code>, <code>Y</code>, <code>Z</code>.</p>
+</div>
+<div class="paragraph">
+<p>This however makes <code>variant</code> less convenient in practice and less useful
+as a building block. If we really need a variable that only holds <code>X</code>,
+<code>Y</code>, or <code>Z</code>, the additional empty state creates complications that need
+to be worked around. And in the case where we do need this additional
+empty state, we can just use <code>variant&lt;empty, X, Y, Z&gt;</code>, with a suitable
+<code>struct empty {};</code>.</p>
+</div>
+<div class="paragraph">
+<p>From a pure design perspective, the case for no additional empty state is
+solid. Implementation considerations, however, argue otherwise.</p>
+</div>
+<div class="paragraph">
+<p>When we replace the current value of the <code>variant</code> (of, say, type <code>X</code>) with
+another (of type <code>Y</code>), since the new value needs to occupy the same storage
+as the old one, we need to destroy the old <code>X</code> first, then construct a new
+<code>Y</code> in its place. But since this is C&#43;&#43;, the construction can fail with an
+exception. At this point the <code>variant</code> is in the "has no active member"
+state that we&#8217;ve agreed it cannot be in.</p>
+</div>
+<div class="paragraph">
+<p>This is a legitimate problem, and it is this problem that makes having
+an empty/valueless state so appealing. We just leave the <code>variant</code> empty on
+exception and we&#8217;re done.</p>
+</div>
+<div class="paragraph">
+<p>As explained, though, this is undesirable from a design perspective as it
+makes the component less useful and less elegant.</p>
+</div>
+<div class="paragraph">
+<p>There are several ways around the issue. The most straightforward one is to
+just disallow types whose construction can throw. Since we can always create
+a temporary value first, then use the move constructor to initialize the one
+in the <code>variant</code>, it&#8217;s enough to require a nonthrowing move constructor,
+rather than all constructors to be nonthrowing.</p>
+</div>
+<div class="paragraph">
+<p>Unfortunately, under at least one popular standard library implementation,
+node based containers such as <code>std::list</code> and <code>std::map</code> have a potentially
+throwing move constructor. Disallowing <code>variant&lt;X, std::map&lt;Y, Z&gt;&gt;</code> is hardly
+practical, so the exceptional case cannot be avoided.</p>
+</div>
+<div class="paragraph">
+<p>On exception, we could also construct some other value, leaving the <code>variant</code>
+valid; but in the general case, that construction can also throw. If one of
+the types has a nonthrowing default constructor, we can use it; but if not,
+we can&#8217;t.</p>
+</div>
+<div class="paragraph">
+<p>The approach Boost.Variant takes here is to allocate a temporary copy of
+the value on the heap. On exception, a pointer to that temporary copy can be
+stored into the <code>variant</code>. Pointer operations don&#8217;t throw.</p>
+</div>
+<div class="paragraph">
+<p>Another option is to use double buffering. If our <code>variant</code> occupies twice
+the storage, we can construct the new value in the unused half, then, once
+the construction succeeds, destroy the old value in the other half.</p>
+</div>
+<div class="paragraph">
+<p>When <code>std::variant</code> was standardized, none of those approaches was deemed
+palatable, as all of them either introduce overhead or are too restrictive
+with respect to the types a <code>variant</code> can contain. So as a compromise,
+<code>std::variant</code> took a way that can (noncharitably) be described as "having
+your cake and eating it too."</p>
+</div>
+<div class="paragraph">
+<p>Since the described exceptional situation is relatively rare, <code>std::variant</code>
+has a special case, called "valueless", into which it goes on exception,
+but the interface acknowledges its existence as little as possible, allowing
+users to pretend that it doesn&#8217;t exist.</p>
+</div>
+<div class="paragraph">
+<p>This is, arguably, not that bad from a practical point of view, but it leaves
+many of us wanting. Rare states that "never" occur are undertested and when
+that "never" actually happens, it&#8217;s usually in the most inconvenient of times.</p>
+</div>
+<div class="paragraph">
+<p>This implementation does not follow <code>std::variant</code>; it statically guarantees
+that <code>variant</code> is never in a valueless state. The function
+<code>valueless_by_exception</code> is provided for compatibility, but it always returns
+<code>false</code>.</p>
+</div>
+<div class="paragraph">
+<p>Instead, if the contained types are such that it&#8217;s not possible to avoid an
+exceptional situation when changing the contained value, double storage is
+used.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="design_strong_exception_safety">Strong Exception Safety</h4>
 <div class="paragraph">
-<p>&#8230;&#8203;</p>
+<p>The initial submission only provided the basic exception safety guarantee.
+If an attempt to change the contained value (via assignment or <code>emplace</code>)
+failed with an exception, and a type with a nonthrowing default constructor
+existed among the alternatives, a value of that type was created into the
+<code>variant</code>. The upside of this decision was that double storage was needed
+less frequently.</p>
+</div>
+<div class="paragraph">
+<p>The reviewers were fairly united in hating it. Constructing a random type
+was deemed too unpredictable and not complying with the spirit of the
+basic guarantee. The default constructor of the chosen type, even if
+nonthrowing, may still have undesirable side effects. Or, if not that, a
+value of that type may have special significance for the surrounding code.
+Therefore, some argued, the <code>variant</code> should either remain with its
+old value, or transition into the new one, without synthesizing other
+states.</p>
+</div>
+<div class="paragraph">
+<p>At the other side of the spectrum, there were those who considered double
+storage unacceptable. But they considered it unacceptable in principle,
+regardless of the frequency with which it was used.</p>
+</div>
+<div class="paragraph">
+<p>As a result, providing the strong exception safety guarantee on assignment
+and <code>emplace</code> was declared an acceptance condition.</p>
+</div>
+<div class="paragraph">
+<p>In retrospect, this was the right decision. The reason the strong guarantee
+is generally not provided is because it doesn&#8217;t compose. When <code>X</code> and <code>Y</code>
+provide the basic guarantee on assignment, so does <code>struct { X x; Y y; };</code>.
+Similarly, when <code>X</code> and <code>Y</code> have nonthrowing assignments, so does the
+<code>struct</code>. But this doesn&#8217;t hold for the strong guarantee.</p>
+</div>
+<div class="paragraph">
+<p>The usual practice is to provide the basic guarantee on assignment and
+let the user synthesize a "strong" assignment out of either a nonthrowing
+<code>swap</code> or a nonthrowing move assignment. That is, given <code>x1</code> and <code>x2</code> of
+type <code>X</code>, instead of the "basic" <code>x1 = x2;</code>, use either <code>X(x2).swap(x1);</code>
+or <code>x1 = X(x2);</code>.</p>
+</div>
+<div class="paragraph">
+<p>Nearly all types provide a nonthrowing <code>swap</code> or a nonthrowing move
+assignment, so this works well. Nearly all, except <code>variant</code>, which in the
+general case has neither a nonthrowing <code>swap</code> nor a nonthrowing move
+assignment. If <code>variant</code> does not provide the strong guarantee itself, it&#8217;s
+impossible for the user to synthesize it.</p>
+</div>
+<div class="paragraph">
+<p>So it should, and so it does.</p>
 </div>
 </div>
 </div>
@@ -2643,7 +2785,7 @@ the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License, Versi
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-05-12 18:44:13 +0300
+Last updated 2019-05-12 20:14:04 +0300
 </div>
 </div>
 <style>
