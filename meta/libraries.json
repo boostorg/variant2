@@ -7,7 +7,7 @@
     "maintainers": [
         "Peter Dimov <pdimov -at- pdimov.com>"
     ],
-    "description": "A never-valueless implementation of std::variant.",
+    "description": "A never-valueless, strong guarantee implementation of std::variant.",
     "category": [
         "Containers", "Data"
     ]
