@@ -2,7 +2,8 @@
 
 This repository contains a never-valueless, strong guarantee, C++11/14/17
 implementation of [std::variant](http://en.cppreference.com/w/cpp/utility/variant).
-See [the documentation](https://boostorg.github.io/variant2/) for more information.
+See [the documentation](https://www.boost.org/doc/libs/master/libs/variant2/)
+for more information.
 
 The code requires [Boost.Mp11](https://github.com/boostorg/mp11) and
 Boost.Config.
