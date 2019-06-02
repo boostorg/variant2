@@ -15,7 +15,7 @@ add_library(Boost::variant2 ALIAS boost_variant2)
 target_include_directories(boost_variant2 INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_compile_features(boost_variant2 INTERFACE cxx_alias_templates cxx_variadic_templates cxx_decltype)
 
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+if(PROJECT_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     # --target check
 
@@ -36,6 +36,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     fetch_and_include(cmake/boost_fetch.cmake)
     fetch_and_include(cmake/boost_test.cmake)
 
+    # for variant2
     boost_fetch(boostorg/config TAG develop)
     boost_fetch(boostorg/detail TAG develop)
 
@@ -63,9 +64,13 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     #export(EXPORT ${PROJECT_NAME}Targets NAMESPACE Boost:: FILE ${PROJECT_NAME}Config.cmake)
 
-endif()
-
-if(COMMAND boost_test)
+    # for tests
+    boost_fetch(boostorg/assert TAG develop)
+    boost_fetch(boostorg/core TAG develop)
+    boost_fetch(boostorg/preprocessor TAG develop)
+    boost_fetch(boostorg/type_traits TAG develop)
+    boost_fetch(boostorg/static_assert TAG develop)
+    boost_fetch(boostorg/mp11 TAG develop)
 
     add_subdirectory(test)
 
