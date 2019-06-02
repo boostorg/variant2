@@ -36,7 +36,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     fetch_and_include(cmake/boost_fetch.cmake)
     fetch_and_include(cmake/boost_test.cmake)
 
-    boost_fetch(boostorg/assert TAG develop)
     boost_fetch(boostorg/config TAG develop)
     boost_fetch(boostorg/detail TAG develop)
 
