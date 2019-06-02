@@ -89,3 +89,17 @@ run variant_convert_construct_throw.cpp ;
 
 run variant_copy_assign_throw.cpp ;
 run variant_move_assign_throw.cpp ;
+
+local NX =
+    <exception-handling>off
+    <toolset>msvc:<cxxflags>/wd4530
+    <toolset>msvc:<cxxflags>/wd4577
+    ;
+
+run variant_get_by_index.cpp throw_exception.cpp : : : $(NX) : variant_get_by_index_nx ;
+compile variant_get_by_index_cx.cpp : $(NX) : variant_get_by_index_cx_nx ;
+
+run variant_get_by_type.cpp throw_exception.cpp : : : $(NX) : variant_get_by_type_nx ;
+compile variant_get_by_type_cx.cpp : $(NX) : variant_get_by_type_cx_nx ;
+
+run variant_subset.cpp throw_exception.cpp : : : $(NX) : variant_subset_nx ;

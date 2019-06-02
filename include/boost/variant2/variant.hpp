@@ -29,6 +29,13 @@
 
 namespace boost
 {
+
+#ifdef BOOST_NO_EXCEPTIONS
+
+BOOST_NORETURN void throw_exception( std::exception const & e ); // user defined
+
+#endif
+
 namespace variant2
 {
 
@@ -53,7 +60,15 @@ namespace detail
 
 BOOST_NORETURN inline void throw_bad_variant_access()
 {
+#ifdef BOOST_NO_EXCEPTIONS
+
+    boost::throw_exception( bad_variant_access() );
+
+#else
+
     throw bad_variant_access();
+
+#endif
 }
 
 } // namespace detail
