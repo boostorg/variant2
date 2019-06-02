@@ -48,6 +48,16 @@ public:
     }
 };
 
+namespace detail
+{
+
+BOOST_NORETURN inline void throw_bad_variant_access()
+{
+    throw bad_variant_access();
+}
+
+} // namespace detail
+
 // monostate
 
 struct monostate
@@ -283,7 +293,7 @@ template<class U, class... T> constexpr bool holds_alternative( variant<T...> co
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>& get(variant<T...>& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return (void)( v.index() != I? throw bad_variant_access(): 0 ), v._get_impl( mp11::mp_size_t<I>() );
+    return ( v.index() != I? detail::throw_bad_variant_access(): (void)0 ), v._get_impl( mp11::mp_size_t<I>() );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>&& get(variant<T...>&& v)
@@ -292,11 +302,11 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
-    return (void)( v.index() != I? throw bad_variant_access(): 0 ), std::move( v._get_impl( mp11::mp_size_t<I>() ) );
+    return ( v.index() != I? detail::throw_bad_variant_access(): (void)0 ), std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 
 #else
 
-    if( v.index() != I ) throw bad_variant_access();
+    if( v.index() != I ) detail::throw_bad_variant_access();
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 
 #endif
@@ -305,7 +315,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const& get(variant<T...> const& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
-    return (void)( v.index() != I? throw bad_variant_access(): 0 ), v._get_impl( mp11::mp_size_t<I>() );
+    return ( v.index() != I? detail::throw_bad_variant_access(): (void)0 ), v._get_impl( mp11::mp_size_t<I>() );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const&& get(variant<T...> const&& v)
@@ -314,11 +324,11 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
-    return (void)( v.index() != I? throw bad_variant_access(): 0 ), std::move( v._get_impl( mp11::mp_size_t<I>() ) );
+    return ( v.index() != I? detail::throw_bad_variant_access(): (void)0 ), std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 
 #else
 
-    if( v.index() != I ) throw bad_variant_access();
+    if( v.index() != I ) detail::throw_bad_variant_access();
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 
 #endif
@@ -363,7 +373,7 @@ template<class U, class... T> constexpr U& get(variant<T...>& v)
 
     using I = mp11::mp_find<variant<T...>, U>;
 
-    return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), v._get_impl( I() );
+    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), v._get_impl( I() );
 }
 
 template<class U, class... T> constexpr U&& get(variant<T...>&& v)
@@ -374,11 +384,11 @@ template<class U, class... T> constexpr U&& get(variant<T...>&& v)
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
-    return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), std::move( v._get_impl( I() ) );
+    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), std::move( v._get_impl( I() ) );
 
 #else
 
-    if( v.index() != I::value ) throw bad_variant_access();
+    if( v.index() != I::value ) detail::throw_bad_variant_access();
     return std::move( v._get_impl( I() ) );
 
 #endif
@@ -390,7 +400,7 @@ template<class U, class... T> constexpr U const& get(variant<T...> const& v)
 
     using I = mp11::mp_find<variant<T...>, U>;
 
-    return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), v._get_impl( I() );
+    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), v._get_impl( I() );
 }
 
 template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
@@ -401,11 +411,11 @@ template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
-    return (void)( v.index() != I::value? throw bad_variant_access(): 0 ), std::move( v._get_impl( I() ) );
+    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), std::move( v._get_impl( I() ) );
 
 #else
 
-    if( v.index() != I::value ) throw bad_variant_access();
+    if( v.index() != I::value ) detail::throw_bad_variant_access();
     return std::move( v._get_impl( I() ) );
 
 #endif
@@ -1373,7 +1383,7 @@ private:
 
     template<class... U, class V> static variant<U...> _subset_impl( mp11::mp_size_t<sizeof...(U)>, V && /*v*/ )
     {
-        throw bad_variant_access();
+        detail::throw_bad_variant_access();
     }
 
 private:
