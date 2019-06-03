@@ -11,5 +11,5 @@ using namespace boost::variant2;
 int main()
 {
     variant<float, int> v( 2 );
-    return get<1>( v ) == 2;
+    return get<1>( v ) == 2? 0: 1;
 }
