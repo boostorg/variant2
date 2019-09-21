@@ -21,5 +21,5 @@ This implementation only depends on Boost.Config and Boost.Mp11.
 * Clang 3.5 or later with `-std=c++11` or above
 * Visual Studio 2015, 2017, 2019
 
-Tested on https://travis-ci.org/pdimov/variant2/[Travis] and
-https://ci.appveyor.com/project/pdimov/variant2/[Appveyor].
+Tested on https://travis-ci.org/boostorg/variant2/[Travis] and
+https://ci.appveyor.com/project/pdimov/variant2-fkab9[Appveyor].

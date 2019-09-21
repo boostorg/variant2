@@ -19,4 +19,4 @@ Supported compilers:
 * Visual Studio 2015, 2017, 2019
 
 Tested on [Travis](https://travis-ci.org/boostorg/variant2/) and
-[Appveyor](https://ci.appveyor.com/project/pdimov/variant2/).
+[Appveyor](https://ci.appveyor.com/project/pdimov/variant2-fkab9).
