@@ -216,16 +216,17 @@ matrix:
 
     - os: linux
       compiler: clang++-8
-      env: UBSAN=1 TOOLSET=clang COMPILER=clang++-6.0 CXXSTD=11,14,17,2a UBSAN_OPTIONS=print_stacktrace=1
+      env: UBSAN=1 TOOLSET=clang COMPILER=clang++-8 CXXSTD=11,14,17,2a UBSAN_OPTIONS=print_stacktrace=1
       addons:
         apt:
           packages:
             - clang-8
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-6.0
+            - llvm-toolchain-xenial-8
 
     - os: linux
+      dist: trusty
       compiler: clang++-libc++
       env: TOOLSET=clang COMPILER=clang++-libc++ CXXSTD=11,14,1z
       addons:
@@ -234,6 +235,7 @@ matrix:
             - libc++-dev
 
     - os: linux
+      dist: trusty
       compiler: clang++-libc++
       env: UBSAN=1 TOOLSET=clang COMPILER=clang++-libc++ CXXSTD=11,14,1z UBSAN_OPTIONS=print_stacktrace=1
       addons:
@@ -244,6 +246,10 @@ matrix:
     - os: osx
       compiler: clang++
       env: TOOLSET=clang COMPILER=clang++ CXXSTD=11,14,1z
+
+    - os: osx
+      compiler: clang++
+      env: UBSAN=1 TOOLSET=clang COMPILER=clang++ CXXSTD=11,14,1z UBSAN_OPTIONS=print_stacktrace=1
 
     - os: linux
       compiler: g++
