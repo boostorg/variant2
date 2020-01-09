@@ -23,6 +23,8 @@ project
     <toolset>clang:<warnings-as-errors>on
   ;
 
+run quick.cpp ;
+
 run variant_size.cpp ;
 run variant_alternative.cpp ;
 

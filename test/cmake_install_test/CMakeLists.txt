@@ -4,11 +4,9 @@
 
 cmake_minimum_required(VERSION 3.5...3.16)
 
-project(cmake_subdir_test LANGUAGES CXX)
+project(cmake_install_test LANGUAGES CXX)
 
-add_subdirectory(../.. boostorg/variant2)
-add_subdirectory(../../../config boostorg/config)
-add_subdirectory(../../../mp11 boostorg/mp11)
+find_package(boost_variant2 REQUIRED)
 
 add_executable(quick ../quick.cpp)
 target_link_libraries(quick Boost::variant2)
