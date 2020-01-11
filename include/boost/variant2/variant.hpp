@@ -1855,17 +1855,22 @@ template<class V> struct std_hash_impl<V, true>
 } // namespace variant2
 } // namespace boost
 
-template<class... T> struct std::hash< boost::variant2::variant<T...> >: public boost::variant2::detail::std_hash_impl< boost::variant2::variant<T...> >
+namespace std
+{
+
+template<class... T> struct hash< ::boost::variant2::variant<T...> >: public ::boost::variant2::detail::std_hash_impl< ::boost::variant2::variant<T...> >
 {
 };
 
-template<> struct std::hash< boost::variant2::monostate >
+template<> struct hash< ::boost::variant2::monostate >
 {
-    std::size_t operator()( boost::variant2::monostate const & v ) const
+    std::size_t operator()( ::boost::variant2::monostate const & v ) const
     {
         return hash_value( v );
     }
 };
+
+} // namespace std
 
 #if defined(_MSC_VER) && _MSC_VER < 1910
 # pragma warning( pop )
