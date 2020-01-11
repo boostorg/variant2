@@ -4,8 +4,6 @@
 
 language: cpp
 
-sudo: false
-
 dist: xenial
 
 branches:
@@ -25,8 +23,14 @@ matrix:
 
   include:
     - os: linux
-      compiler: g++
-      env: TOOLSET=gcc COMPILER=g++ CXXSTD=11
+      compiler: g++-4.8
+      env: TOOLSET=gcc COMPILER=g++-4.8 CXXSTD=11
+      addons:
+        apt:
+          packages:
+            - g++-4.8
+          sources:
+            - ubuntu-toolchain-r-test
 
     - os: linux
       compiler: g++-4.9
