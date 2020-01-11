@@ -63,7 +63,7 @@ int main()
     test2<boost::hash, int>();
     test2<boost::hash, float>();
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1910)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1910) && ( !defined(_LIBCPP_STD_VER) || _LIBCPP_STD_VER > 11 )
 
     BOOST_TEST_TRAIT_FALSE(( detail::is_hash_enabled<X> ));
 
