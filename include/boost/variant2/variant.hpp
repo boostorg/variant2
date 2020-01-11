@@ -1819,7 +1819,7 @@ template<class V> struct hash_value_L
 
 } // namespace detail
 
-std::size_t hash_value( monostate const & )
+inline std::size_t hash_value( monostate const & )
 {
     return 0xA7EE4757u;
 }
