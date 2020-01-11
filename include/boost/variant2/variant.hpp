@@ -25,6 +25,7 @@
 #include <cassert>
 #include <initializer_list>
 #include <utility>
+#include <functional> // std::hash
 
 //
 
