@@ -1,4 +1,4 @@
-# Copyright 2016-2018 Peter Dimov
+# Copyright 2016-2020 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -21,6 +21,14 @@ environment:
       TOOLSET: msvc-14.1
       ADDRMD: 32,64
       CXXSTD: 14,17
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      TOOLSET: clang-win
+      ADDRMD: 64
+      CXXSTD: 14,17
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      TOOLSET: msvc-14.2
+      ADDRMD: 32,64
+      CXXSTD: 14,17
 
 install:
   - set BOOST_BRANCH=develop
@@ -28,8 +36,6 @@ install:
   - cd ..
   - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
-  - git submodule update --init tools/build
-  - git submodule update --init libs/config
   - git submodule update --init tools/boostdep
   - xcopy /s /e /q %APPVEYOR_BUILD_FOLDER% libs\variant2\
   - python tools/boostdep/depinst/depinst.py variant2
@@ -41,4 +47,4 @@ build: off
 test_script:
   - if not "%CXXSTD%" == "" set CXXSTD=cxxstd=%CXXSTD%
   - if not "%ADDRMD%" == "" set ADDRMD=address-model=%ADDRMD%
-  - b2 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release
+  - b2 -j3 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release
