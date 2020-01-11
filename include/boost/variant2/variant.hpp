@@ -18,6 +18,7 @@
 #endif
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
+#include <boost/cstdint.hpp>
 #include <cstddef>
 #include <type_traits>
 #include <exception>
@@ -1785,8 +1786,86 @@ void swap( variant<T...> & v, variant<T...> & w )
     v.swap( w );
 }
 
+// hashing support
+
+namespace detail
+{
+
+template<class V> struct hash_value_L
+{
+    V const & v;
+
+    template<class I> std::size_t operator()( I ) const
+    {
+        boost::ulong_long_type hv = ( boost::ulong_long_type( 0xCBF29CE4 ) << 32 ) + 0x84222325;
+        boost::ulong_long_type const prime = ( boost::ulong_long_type( 0x00000100 ) << 32 ) + 0x000001B3;
+
+        // index
+
+        hv ^= I::value;
+        hv *= prime;
+
+        // value
+
+        auto const & t = unsafe_get<I::value>( v );
+
+        hv ^= std::hash<remove_cv_ref_t<decltype(t)>>()( t );
+        hv *= prime;
+
+        return static_cast<std::size_t>( hv );
+    }
+};
+
+} // namespace detail
+
+std::size_t hash_value( monostate const & )
+{
+    return 0xA7EE4757u;
+}
+
+template<class... T> std::size_t hash_value( variant<T...> const & v )
+{
+    return mp11::mp_with_index<sizeof...(T)>( v.index(), detail::hash_value_L< variant<T...> >{ v } );
+}
+
+namespace detail
+{
+
+template<class T> using is_hash_enabled = std::is_default_constructible< std::hash<typename std::remove_const<T>::type> >;
+
+template<class V, bool E = mp11::mp_all_of<V, is_hash_enabled>::value> struct std_hash_impl;
+
+template<class V> struct std_hash_impl<V, false>
+{
+    std_hash_impl() = delete;
+    std_hash_impl( std_hash_impl const& ) = delete;
+    std_hash_impl& operator=( std_hash_impl const& ) = delete;
+};
+
+template<class V> struct std_hash_impl<V, true>
+{
+    std::size_t operator()( V const & v ) const
+    {
+        return hash_value( v );
+    }
+};
+
+} // namespace detail
+
 } // namespace variant2
 } // namespace boost
+
+template<class... T> struct std::hash< boost::variant2::variant<T...> >: public boost::variant2::detail::std_hash_impl< boost::variant2::variant<T...> >
+{
+};
+
+template<> struct std::hash< boost::variant2::monostate >
+{
+    std::size_t operator()( boost::variant2::monostate const & v ) const
+    {
+        return hash_value( v );
+    }
+};
 
 #if defined(_MSC_VER) && _MSC_VER < 1910
 # pragma warning( pop )

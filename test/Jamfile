@@ -105,3 +105,5 @@ run variant_get_by_type.cpp throw_exception.cpp : : : $(NX) : variant_get_by_typ
 compile variant_get_by_type_cx.cpp : $(NX) : variant_get_by_type_cx_nx ;
 
 run variant_subset.cpp throw_exception.cpp : : : $(NX) : variant_subset_nx ;
+
+run variant_hash.cpp ;
