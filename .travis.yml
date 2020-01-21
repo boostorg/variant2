@@ -263,7 +263,6 @@ matrix:
         - ctest --output-on-failure -R boost_variant2
 
     - os: linux
-      compiler: g++
       env: CMAKE_SUBDIR_TEST=1
       install:
         - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
