@@ -1054,34 +1054,53 @@ template<class T> struct is_nothrow_swappable: mp11::mp_valid<det2::is_nothrow_s
 
 } // namespace detail
 
-// variant
+// variant_copy_base
 
-template<class... T> class variant: private detail::variant_base<T...>
+namespace detail
 {
-private:
 
+template<bool Trivial, class... T> struct variant_copy_base_impl;
+
+template<class... T> using variant_copy_base = variant_copy_base_impl<
+    mp11::mp_all<
+        std::is_trivially_destructible<T>...,
+        is_trivially_copy_constructible<T>...,
+        is_trivially_move_constructible<T>...,
+        is_trivially_copy_assignable<T>...,
+        is_trivially_move_assignable<T>...>::value, T...>;
+
+template<class... T> struct variant_copy_base_impl<true, T...>: public variant_base<T...>
+{
     using variant_base = detail::variant_base<T...>;
+    using variant_base::variant_base;
+
+    variant_copy_base_impl() = default;
+    variant_copy_base_impl( variant_copy_base_impl const& ) = default;
+    variant_copy_base_impl( variant_copy_base_impl && ) = default;
+    variant_copy_base_impl& operator=( variant_copy_base_impl const& ) = default;
+    variant_copy_base_impl& operator=( variant_copy_base_impl && ) = default;
+};
+
+template<class... T> struct variant_copy_base_impl<false, T...>: public variant_base<T...>
+{
+    using variant_base = detail::variant_base<T...>;
+    using variant_base::variant_base;
 
 private:
 
-    variant( variant const volatile& r ) = delete;
-    variant& operator=( variant const volatile& r ) = delete;
+    variant_copy_base_impl( variant_copy_base_impl const volatile& r ) = delete;
+    variant_copy_base_impl& operator=( variant_copy_base_impl const volatile& r ) = delete;
 
 public:
 
     // constructors
 
-    template<class E1 = void, class E2 = mp11::mp_if<std::is_default_constructible< mp11::mp_first<variant<T...>> >, E1>>
-    constexpr variant()
-        noexcept( std::is_nothrow_default_constructible< mp11::mp_first<variant<T...>> >::value )
-        : variant_base( mp11::mp_size_t<0>() )
-    {
-    }
+    variant_copy_base_impl() = default;
 
     template<class E1 = void,
         class E2 = mp11::mp_if<mp11::mp_all<detail::is_trivially_copy_constructible<T>...>, E1>
     >
-    constexpr variant( variant const& r ) noexcept
+    constexpr variant_copy_base_impl( variant_copy_base_impl const& r ) noexcept
         : variant_base( static_cast<variant_base const&>(r) )
     {
     }
@@ -1091,7 +1110,7 @@ private:
     struct L1
     {
         variant_base * this_;
-        variant const & r;
+        variant_copy_base_impl const & r;
 
         template<class I> void operator()( I i ) const
         {
@@ -1105,7 +1124,7 @@ public:
         class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<detail::is_trivially_copy_constructible<T>...>>, E1>,
         class E3 = mp11::mp_if<mp11::mp_all<std::is_copy_constructible<T>...>, E1>
     >
-    variant( variant const& r )
+    variant_copy_base_impl( variant_copy_base_impl const& r )
         noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L1{ this, r } );
@@ -1114,17 +1133,19 @@ public:
     template<class E1 = void,
         class E2 = mp11::mp_if<mp11::mp_all<detail::is_trivially_move_constructible<T>...>, E1>
     >
-    constexpr variant( variant && r ) noexcept
+    constexpr variant_copy_base_impl( variant_copy_base_impl && r ) noexcept
         : variant_base( static_cast<variant_base&&>(r) )
     {
     }
+
+    // assignment
 
 private:
 
     struct L2
     {
         variant_base * this_;
-        variant & r;
+        variant_copy_base_impl & r;
 
         template<class I> void operator()( I i ) const
         {
@@ -1138,11 +1159,106 @@ public:
         class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<detail::is_trivially_move_constructible<T>...>>, E1>,
         class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>...>, E1>
     >
-    variant( variant && r )
+    variant_copy_base_impl( variant_copy_base_impl && r )
         noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L2{ this, r } );
     }
+
+    template<class E1 = void,
+        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>, E1>
+    >
+    BOOST_CXX14_CONSTEXPR variant_copy_base_impl& operator=( variant_copy_base_impl const & r ) noexcept
+    {
+        static_cast<variant_base&>( *this ) = static_cast<variant_base const&>( r );
+        return *this;
+    }
+
+private:
+
+    struct L3
+    {
+        variant_copy_base_impl * this_;
+        variant_copy_base_impl const & r;
+
+        template<class I> void operator()( I i ) const
+        {
+            this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
+        }
+    };
+
+public:
+
+    template<class E1 = void,
+        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>>, E1>,
+        class E3 = mp11::mp_if<mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
+    >
+    BOOST_CXX14_CONSTEXPR variant_copy_base_impl& operator=( variant_copy_base_impl const & r )
+        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
+    {
+        mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
+        return *this;
+    }
+
+    template<class E1 = void,
+        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>, E1>
+    >
+    BOOST_CXX14_CONSTEXPR variant_copy_base_impl& operator=( variant_copy_base_impl && r ) noexcept
+    {
+        static_cast<variant_base&>( *this ) = static_cast<variant_base&&>( r );
+        return *this;
+    }
+
+private:
+
+    struct L4
+    {
+        variant_copy_base_impl * this_;
+        variant_copy_base_impl & r;
+
+        template<class I> void operator()( I i ) const
+        {
+            this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
+        }
+    };
+
+public:
+
+    template<class E1 = void,
+        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>>, E1>,
+        class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
+    >
+    variant_copy_base_impl& operator=( variant_copy_base_impl && r )
+        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
+    {
+        mp11::mp_with_index<sizeof...(T)>( r.index(), L4{ this, r } );
+        return *this;
+    }
+};
+
+} // namespace detail
+
+// variant
+
+template<class... T> class variant: private detail::variant_copy_base<T...>
+{
+private:
+
+    using variant_base = detail::variant_copy_base<T...>;
+
+public:
+
+    // constructors
+
+    template<class E1 = void, class E2 = mp11::mp_if<std::is_default_constructible< mp11::mp_first<variant<T...>> >, E1>>
+    constexpr variant()
+        noexcept( std::is_nothrow_default_constructible< mp11::mp_first<variant<T...>> >::value )
+        : variant_base( mp11::mp_size_t<0>() )
+    {
+    }
+
+    variant( variant const& ) = default;
+    variant( variant && ) = default;
 
     template<class U,
         class Ud = typename std::decay<U>::type,
@@ -1177,75 +1293,9 @@ public:
     }
 
     // assignment
-    template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>, E1>
-    >
-    BOOST_CXX14_CONSTEXPR variant& operator=( variant const & r ) noexcept
-    {
-        static_cast<variant_base&>( *this ) = static_cast<variant_base const&>( r );
-        return *this;
-    }
 
-private:
-
-    struct L3
-    {
-        variant * this_;
-        variant const & r;
-
-        template<class I> void operator()( I i ) const
-        {
-            this_->variant_base::template emplace<I::value>( r._get_impl( i ) );
-        }
-    };
-
-public:
-
-    template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>>, E1>,
-        class E3 = mp11::mp_if<mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>, E1>
-    >
-    BOOST_CXX14_CONSTEXPR variant& operator=( variant const & r )
-        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
-    {
-        mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
-        return *this;
-    }
-
-    template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>, E1>
-    >
-    BOOST_CXX14_CONSTEXPR variant& operator=( variant && r ) noexcept
-    {
-        static_cast<variant_base&>( *this ) = static_cast<variant_base&&>( r );
-        return *this;
-    }
-
-private:
-
-    struct L4
-    {
-        variant * this_;
-        variant & r;
-
-        template<class I> void operator()( I i ) const
-        {
-            this_->variant_base::template emplace<I::value>( std::move( r._get_impl( i ) ) );
-        }
-    };
-
-public:
-
-    template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>>, E1>,
-        class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>, E1>
-    >
-    variant& operator=( variant && r )
-        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
-    {
-        mp11::mp_with_index<sizeof...(T)>( r.index(), L4{ this, r } );
-        return *this;
-    }
+    variant& operator=( variant const& ) = default;
+    variant& operator=( variant && ) = default;
 
     template<class U,
         class E1 = typename std::enable_if<!std::is_same<typename std::decay<U>::type, variant>::value>::type,
