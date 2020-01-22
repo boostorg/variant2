@@ -1257,8 +1257,26 @@ public:
     {
     }
 
+#if !BOOST_WORKAROUND( BOOST_MSVC, < 1910 )
+
     variant( variant const& ) = default;
     variant( variant && ) = default;
+
+#else
+
+private:
+
+    variant( variant const volatile& ) = delete;
+
+public:
+
+    template<class E = std::enable_if< std::is_copy_constructible<variant_base>::value >::type>
+    constexpr variant( variant const& r ) noexcept( std::is_nothrow_copy_constructible<variant_base>::value ): variant_base( static_cast<variant_base const&>( r ) ) {}
+
+    template<class E = std::enable_if< std::is_move_constructible<variant_base>::value >::type>
+    constexpr variant( variant && r ) noexcept( std::is_nothrow_move_constructible<variant_base>::value ): variant_base( static_cast<variant_base &&>( r ) ) {}
+
+#endif
 
     template<class U,
         class Ud = typename std::decay<U>::type,
@@ -1294,8 +1312,34 @@ public:
 
     // assignment
 
+#if !BOOST_WORKAROUND( BOOST_MSVC, < 1910 )
+
     variant& operator=( variant const& ) = default;
     variant& operator=( variant && ) = default;
+
+#else
+
+private:
+
+    variant& operator=( variant const volatile& ) = delete;
+
+public:
+
+    template<class E = std::enable_if< std::is_copy_assignable<variant_base>::value >::type>
+    variant& operator=( variant const& r ) noexcept( std::is_nothrow_copy_assignable<variant_base>::value )
+    {
+        static_cast< variant_base& >( *this ) = static_cast< variant_base const& >( r );
+        return *this;
+    }
+
+    template<class E = std::enable_if< std::is_move_assignable<variant_base>::value >::type>
+    variant& operator=( variant && r ) noexcept( std::is_nothrow_move_assignable<variant_base>::value )
+    {
+        static_cast< variant_base& >( *this ) = static_cast< variant_base && >( r );
+        return *this;
+    }
+
+#endif
 
     template<class U,
         class E1 = typename std::enable_if<!std::is_same<typename std::decay<U>::type, variant>::value>::type,

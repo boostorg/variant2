@@ -29,16 +29,16 @@ run variant_size.cpp ;
 run variant_alternative.cpp ;
 
 run variant_holds_alternative.cpp ;
-compile variant_holds_alternative_cx.cpp ;
+compile variant_holds_alternative_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_get_by_index.cpp ;
-compile variant_get_by_index_cx.cpp ;
+compile variant_get_by_index_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_get_by_type.cpp ;
-compile variant_get_by_type_cx.cpp ;
+compile variant_get_by_type_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_default_construct.cpp ;
-compile variant_default_construct_cx.cpp ;
+compile variant_default_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_copy_construct.cpp ;
 compile variant_copy_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
@@ -47,13 +47,13 @@ run variant_move_construct.cpp ;
 compile variant_move_construct_cx.cpp : [ requires cxx14_constexpr ] ;
 
 run variant_value_construct.cpp ;
-compile variant_value_construct_cx.cpp ;
+compile variant_value_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_in_place_index_construct.cpp ;
-compile variant_in_place_index_construct_cx.cpp ;
+compile variant_in_place_index_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_in_place_type_construct.cpp ;
-compile variant_in_place_type_construct_cx.cpp ;
+compile variant_in_place_type_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_copy_assign.cpp ;
 compile variant_copy_assign_cx.cpp : [ requires cxx14_constexpr ] ;
@@ -99,10 +99,10 @@ local NX =
     ;
 
 run variant_get_by_index.cpp throw_exception.cpp : : : $(NX) : variant_get_by_index_nx ;
-compile variant_get_by_index_cx.cpp : $(NX) : variant_get_by_index_cx_nx ;
+compile variant_get_by_index_cx.cpp : $(NX) <toolset>msvc-14.0:<build>no : variant_get_by_index_cx_nx ;
 
 run variant_get_by_type.cpp throw_exception.cpp : : : $(NX) : variant_get_by_type_nx ;
-compile variant_get_by_type_cx.cpp : $(NX) : variant_get_by_type_cx_nx ;
+compile variant_get_by_type_cx.cpp : $(NX) <toolset>msvc-14.0:<build>no : variant_get_by_type_cx_nx ;
 
 run variant_subset.cpp throw_exception.cpp : : : $(NX) : variant_subset_nx ;
 
