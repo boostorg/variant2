@@ -1238,9 +1238,28 @@ public:
 
 } // namespace detail
 
+// disable_move_constructor
+
+namespace detail
+{
+
+template<bool MoveConstructible> struct disable_move_constructor;
+
+template<> struct disable_move_constructor<true>
+{
+};
+
+template<> struct disable_move_constructor<false>
+{
+    disable_move_constructor() = default;
+    disable_move_constructor( disable_move_constructor && ) = delete;
+};
+
+} // namespace detail
+
 // variant
 
-template<class... T> class variant: private detail::variant_copy_base<T...>
+template<class... T> class variant: private detail::variant_copy_base<T...>, private detail::disable_move_constructor<mp11::mp_all<std::is_move_constructible<T>...>::value>
 {
 private:
 
@@ -1259,8 +1278,8 @@ public:
 
 #if !BOOST_WORKAROUND( BOOST_MSVC, < 1910 )
 
-    variant( variant const& ) = default;
-    variant( variant && ) = default;
+    // variant( variant const& ) = default;
+    // variant( variant && ) = default;
 
 #else
 
@@ -1314,8 +1333,8 @@ public:
 
 #if !BOOST_WORKAROUND( BOOST_MSVC, < 1910 )
 
-    variant& operator=( variant const& ) = default;
-    variant& operator=( variant && ) = default;
+    // variant& operator=( variant const& ) = default;
+    // variant& operator=( variant && ) = default;
 
 #else
 
