@@ -1052,12 +1052,9 @@ template<class T> struct is_nothrow_swappable: mp11::mp_valid<det2::is_nothrow_s
 
 #endif
 
-} // namespace detail
-
 // variant_copy_base
 
-namespace detail
-{
+/*
 
 template<bool Trivial, class... T> struct variant_copy_base_impl;
 
@@ -1093,9 +1090,9 @@ private:
 
 public:
 
-    // constructors
-
     variant_copy_base_impl() = default;
+
+    // copy constructor
 
     template<class E1 = void,
         class E2 = mp11::mp_if<mp11::mp_all<detail::is_trivially_copy_constructible<T>...>, E1>
@@ -1130,40 +1127,11 @@ public:
         mp11::mp_with_index<sizeof...(T)>( r.index(), L1{ this, r } );
     }
 
-    template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_all<detail::is_trivially_move_constructible<T>...>, E1>
-    >
-    constexpr variant_copy_base_impl( variant_copy_base_impl && r ) noexcept
-        : variant_base( static_cast<variant_base&&>(r) )
-    {
-    }
+    // move constructor
 
-    // assignment
+    variant_copy_base_impl( variant_copy_base_impl && ) = default;
 
-private:
-
-    struct L2
-    {
-        variant_base * this_;
-        variant_copy_base_impl & r;
-
-        template<class I> void operator()( I i ) const
-        {
-            this_->_replace( i, std::move( r._get_impl( i ) ) );
-        }
-    };
-
-public:
-
-    template<class E1 = void,
-        class E2 = mp11::mp_if<mp11::mp_not<mp11::mp_all<detail::is_trivially_move_constructible<T>...>>, E1>,
-        class E3 = mp11::mp_if<mp11::mp_all<std::is_move_constructible<T>...>, E1>
-    >
-    variant_copy_base_impl( variant_copy_base_impl && r )
-        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
-    {
-        mp11::mp_with_index<sizeof...(T)>( r.index(), L2{ this, r } );
-    }
+    // copy assignment
 
     template<class E1 = void,
         class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>, E1>
@@ -1199,6 +1167,8 @@ public:
         mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
         return *this;
     }
+
+    // move assignment
 
     template<class E1 = void,
         class E2 = mp11::mp_if<mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>, E1>
@@ -1236,34 +1206,318 @@ public:
     }
 };
 
-} // namespace detail
+*/
 
-// disable_move_constructor
+// variant_cc_base
 
-namespace detail
+template<bool CopyConstructible, bool TriviallyCopyConstructible, class... T> struct variant_cc_base_impl;
+
+template<class... T> using variant_cc_base = variant_cc_base_impl<
+    mp11::mp_all<std::is_copy_constructible<T>...>::value,
+    mp11::mp_all<detail::is_trivially_copy_constructible<T>...>::value,
+    T...>;
+
+template<class... T> struct variant_cc_base_impl<true, true, T...>: public variant_base<T...>
 {
+    using variant_base = detail::variant_base<T...>;
+    using variant_base::variant_base;
 
-template<bool MoveConstructible> struct disable_move_constructor;
-
-template<> struct disable_move_constructor<true>
-{
+    variant_cc_base_impl() = default;
+    variant_cc_base_impl( variant_cc_base_impl const& ) = default;
+    variant_cc_base_impl( variant_cc_base_impl && ) = default;
+    variant_cc_base_impl& operator=( variant_cc_base_impl const& ) = default;
+    variant_cc_base_impl& operator=( variant_cc_base_impl && ) = default;
 };
 
-template<> struct disable_move_constructor<false>
+template<bool B, class... T> struct variant_cc_base_impl<false, B, T...>: public variant_base<T...>
 {
-    disable_move_constructor() = default;
-    disable_move_constructor( disable_move_constructor && ) = delete;
+    using variant_base = detail::variant_base<T...>;
+    using variant_base::variant_base;
+
+    variant_cc_base_impl() = default;
+    variant_cc_base_impl( variant_cc_base_impl const& ) = delete;
+    variant_cc_base_impl( variant_cc_base_impl && ) = default;
+    variant_cc_base_impl& operator=( variant_cc_base_impl const& ) = default;
+    variant_cc_base_impl& operator=( variant_cc_base_impl && ) = default;
+};
+
+template<class... T> struct variant_cc_base_impl<true, false, T...>: public variant_base<T...>
+{
+    using variant_base = detail::variant_base<T...>;
+    using variant_base::variant_base;
+
+public:
+
+    // constructors
+
+    variant_cc_base_impl() = default;
+
+    // copy constructor
+
+private:
+
+    struct L1
+    {
+        variant_base * this_;
+        variant_base const & r;
+
+        template<class I> void operator()( I i ) const
+        {
+            this_->_replace( i, r._get_impl( i ) );
+        }
+    };
+
+public:
+
+    variant_cc_base_impl( variant_cc_base_impl const& r )
+        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
+    {
+        mp11::mp_with_index<sizeof...(T)>( r.index(), L1{ this, r } );
+    }
+
+    // move constructor
+
+    variant_cc_base_impl( variant_cc_base_impl && ) = default;
+
+    // assignment
+
+    variant_cc_base_impl& operator=( variant_cc_base_impl const & ) = default;
+    variant_cc_base_impl& operator=( variant_cc_base_impl && ) = default;
+};
+
+// variant_ca_base
+
+template<bool CopyAssignable, bool TriviallyCopyAssignable, class... T> struct variant_ca_base_impl;
+
+template<class... T> using variant_ca_base = variant_ca_base_impl<
+    mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>::value,
+    mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>::value,
+    T...>;
+
+template<class... T> struct variant_ca_base_impl<true, true, T...>: public variant_cc_base<T...>
+{
+    using variant_base = detail::variant_cc_base<T...>;
+    using variant_base::variant_base;
+
+    variant_ca_base_impl() = default;
+    variant_ca_base_impl( variant_ca_base_impl const& ) = default;
+    variant_ca_base_impl( variant_ca_base_impl && ) = default;
+    variant_ca_base_impl& operator=( variant_ca_base_impl const& ) = default;
+    variant_ca_base_impl& operator=( variant_ca_base_impl && ) = default;
+};
+
+template<bool B, class... T> struct variant_ca_base_impl<false, B, T...>: public variant_cc_base<T...>
+{
+    using variant_base = detail::variant_cc_base<T...>;
+    using variant_base::variant_base;
+
+    variant_ca_base_impl() = default;
+    variant_ca_base_impl( variant_ca_base_impl const& ) = default;
+    variant_ca_base_impl( variant_ca_base_impl && ) = default;
+    variant_ca_base_impl& operator=( variant_ca_base_impl const& ) = delete;
+    variant_ca_base_impl& operator=( variant_ca_base_impl && ) = default;
+};
+
+template<class... T> struct variant_ca_base_impl<true, false, T...>: public variant_cc_base<T...>
+{
+    using variant_base = detail::variant_cc_base<T...>;
+    using variant_base::variant_base;
+
+public:
+
+    // constructors
+
+    variant_ca_base_impl() = default;
+    variant_ca_base_impl( variant_ca_base_impl const& ) = default;
+    variant_ca_base_impl( variant_ca_base_impl && ) = default;
+
+    // copy assignment
+
+private:
+
+    struct L3
+    {
+        variant_base * this_;
+        variant_base const & r;
+
+        template<class I> void operator()( I i ) const
+        {
+            this_->template emplace<I::value>( r._get_impl( i ) );
+        }
+    };
+
+public:
+
+    BOOST_CXX14_CONSTEXPR variant_ca_base_impl& operator=( variant_ca_base_impl const & r )
+        noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
+    {
+        mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
+        return *this;
+    }
+
+    // move assignment
+
+    variant_ca_base_impl& operator=( variant_ca_base_impl && ) = default;
+};
+
+// variant_mc_base
+
+template<bool MoveConstructible, bool TriviallyMoveConstructible, class... T> struct variant_mc_base_impl;
+
+template<class... T> using variant_mc_base = variant_mc_base_impl<
+    mp11::mp_all<std::is_move_constructible<T>...>::value,
+    mp11::mp_all<detail::is_trivially_move_constructible<T>...>::value,
+    T...>;
+
+template<class... T> struct variant_mc_base_impl<true, true, T...>: public variant_ca_base<T...>
+{
+    using variant_base = detail::variant_ca_base<T...>;
+    using variant_base::variant_base;
+
+    variant_mc_base_impl() = default;
+    variant_mc_base_impl( variant_mc_base_impl const& ) = default;
+    variant_mc_base_impl( variant_mc_base_impl && ) = default;
+    variant_mc_base_impl& operator=( variant_mc_base_impl const& ) = default;
+    variant_mc_base_impl& operator=( variant_mc_base_impl && ) = default;
+};
+
+template<bool B, class... T> struct variant_mc_base_impl<false, B, T...>: public variant_ca_base<T...>
+{
+    using variant_base = detail::variant_ca_base<T...>;
+    using variant_base::variant_base;
+
+    variant_mc_base_impl() = default;
+    variant_mc_base_impl( variant_mc_base_impl const& ) = default;
+    variant_mc_base_impl( variant_mc_base_impl && ) = delete;
+    variant_mc_base_impl& operator=( variant_mc_base_impl const& ) = default;
+    variant_mc_base_impl& operator=( variant_mc_base_impl && ) = default;
+};
+
+template<class... T> struct variant_mc_base_impl<true, false, T...>: public variant_ca_base<T...>
+{
+    using variant_base = detail::variant_ca_base<T...>;
+    using variant_base::variant_base;
+
+public:
+
+    // constructors
+
+    variant_mc_base_impl() = default;
+    variant_mc_base_impl( variant_mc_base_impl const& ) = default;
+
+    // move constructor
+
+private:
+
+    struct L2
+    {
+        variant_base * this_;
+        variant_base & r;
+
+        template<class I> void operator()( I i ) const
+        {
+            this_->_replace( i, std::move( r._get_impl( i ) ) );
+        }
+    };
+
+public:
+
+    variant_mc_base_impl( variant_mc_base_impl && r )
+        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
+    {
+        mp11::mp_with_index<sizeof...(T)>( r.index(), L2{ this, r } );
+    }
+
+    // assignment
+
+    variant_mc_base_impl& operator=( variant_mc_base_impl const & ) = default;
+    variant_mc_base_impl& operator=( variant_mc_base_impl && ) = default;
+};
+
+// variant_ma_base
+
+template<bool MoveAssignable, bool TriviallyMoveAssignable, class... T> struct variant_ma_base_impl;
+
+template<class... T> using variant_ma_base = variant_ma_base_impl<
+    mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>::value,
+    mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>::value,
+    T...>;
+
+template<class... T> struct variant_ma_base_impl<true, true, T...>: public variant_mc_base<T...>
+{
+    using variant_base = detail::variant_mc_base<T...>;
+    using variant_base::variant_base;
+
+    variant_ma_base_impl() = default;
+    variant_ma_base_impl( variant_ma_base_impl const& ) = default;
+    variant_ma_base_impl( variant_ma_base_impl && ) = default;
+    variant_ma_base_impl& operator=( variant_ma_base_impl const& ) = default;
+    variant_ma_base_impl& operator=( variant_ma_base_impl && ) = default;
+};
+
+template<bool B, class... T> struct variant_ma_base_impl<false, B, T...>: public variant_mc_base<T...>
+{
+    using variant_base = detail::variant_mc_base<T...>;
+    using variant_base::variant_base;
+
+    variant_ma_base_impl() = default;
+    variant_ma_base_impl( variant_ma_base_impl const& ) = default;
+    variant_ma_base_impl( variant_ma_base_impl && ) = default;
+    variant_ma_base_impl& operator=( variant_ma_base_impl const& ) = default;
+    variant_ma_base_impl& operator=( variant_ma_base_impl && ) = delete;
+};
+
+template<class... T> struct variant_ma_base_impl<true, false, T...>: public variant_mc_base<T...>
+{
+    using variant_base = detail::variant_mc_base<T...>;
+    using variant_base::variant_base;
+
+public:
+
+    // constructors
+
+    variant_ma_base_impl() = default;
+    variant_ma_base_impl( variant_ma_base_impl const& ) = default;
+    variant_ma_base_impl( variant_ma_base_impl && ) = default;
+
+    // copy assignment
+
+    variant_ma_base_impl& operator=( variant_ma_base_impl const & ) = default;
+
+    // move assignment
+
+private:
+
+    struct L4
+    {
+        variant_base * this_;
+        variant_base & r;
+
+        template<class I> void operator()( I i ) const
+        {
+            this_->template emplace<I::value>( std::move( r._get_impl( i ) ) );
+        }
+    };
+
+public:
+
+    variant_ma_base_impl& operator=( variant_ma_base_impl && r )
+        noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
+    {
+        mp11::mp_with_index<sizeof...(T)>( r.index(), L4{ this, r } );
+        return *this;
+    }
 };
 
 } // namespace detail
 
 // variant
 
-template<class... T> class variant: private detail::variant_copy_base<T...>, private detail::disable_move_constructor<mp11::mp_all<std::is_move_constructible<T>...>::value>
+template<class... T> class variant: private detail::variant_ma_base<T...>
 {
 private:
 
-    using variant_base = detail::variant_copy_base<T...>;
+    using variant_base = detail::variant_ma_base<T...>;
 
 public:
 
