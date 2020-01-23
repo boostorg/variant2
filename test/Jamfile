@@ -109,3 +109,4 @@ run variant_subset.cpp throw_exception.cpp : : : $(NX) : variant_subset_nx ;
 run variant_hash.cpp ;
 
 run variant_trivial.cpp ;
+run variant_special.cpp ;
