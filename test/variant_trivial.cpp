@@ -9,6 +9,7 @@
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
 #include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 
 #include <boost/mp11.hpp>
 using namespace boost::mp11;
@@ -91,8 +92,13 @@ struct test
     {
         using U = mp_inherit<T...>;
 
+#if !BOOST_WORKAROUND( __GNUC__, < 5 )
+
         BOOST_TEST_EQ( v2d::is_trivially_copy_constructible<variant<U>>::value, v2d::is_trivially_copy_constructible<U>::value );
         BOOST_TEST_EQ( v2d::is_trivially_copy_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && v2d::is_trivially_copy_constructible<U>::value && v2d::is_trivially_copy_assignable<U>::value );
+
+#endif
+
         BOOST_TEST_EQ( std::is_trivially_destructible<variant<U>>::value, std::is_trivially_destructible<U>::value );
 
 #if !BOOST_WORKAROUND(BOOST_LIBSTDCXX_VERSION, < 50000)

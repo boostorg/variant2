@@ -9,6 +9,8 @@
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
+#include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 #include <type_traits>
 #include <utility>
 #include <string>
@@ -124,7 +126,11 @@ int main()
         test( v );
     }
 
+#if !BOOST_WORKAROUND( __GNUC__, < 5 )
+
     test( variant<D>() );
+
+#endif
 
     {
         BOOST_TEST_TRAIT_TRUE((std::is_nothrow_copy_constructible<variant<int>>));

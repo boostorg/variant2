@@ -9,6 +9,7 @@
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
 #include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 
 #include <boost/mp11.hpp>
 using namespace boost::mp11;
@@ -90,13 +91,21 @@ struct test
     {
         using U = mp_inherit<T...>;
 
+#if !BOOST_WORKAROUND( __GNUC__, < 5 )
+
         BOOST_TEST_EQ( std::is_copy_constructible<variant<U>>::value, std::is_copy_constructible<U>::value );
         BOOST_TEST_EQ( std::is_nothrow_copy_constructible<variant<U>>::value, std::is_nothrow_copy_constructible<U>::value );
 
+#endif
+
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1910)
+
         BOOST_TEST_EQ( std::is_move_constructible<variant<U>>::value, std::is_move_constructible<U>::value );
+
 #else
+
         BOOST_TEST_GE( std::is_move_constructible<variant<U>>::value, std::is_move_constructible<U>::value );
+
 #endif
 
         BOOST_TEST_EQ( std::is_nothrow_move_constructible<variant<U>>::value, std::is_nothrow_move_constructible<U>::value );
