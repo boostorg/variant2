@@ -54,6 +54,8 @@ template<class V> static void test( V const & v )
 
     BOOST_TEST_EQ( v.index(), v2.index() );
     BOOST_TEST( v == v2 );
+
+    BOOST_TEST_TRAIT_TRUE((std::is_copy_constructible<V>));
 }
 
 int main()
