@@ -94,7 +94,7 @@ struct test
         BOOST_TEST_EQ( std::is_trivially_copy_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && std::is_trivially_copy_constructible<U>::value && std::is_trivially_copy_assignable<U>::value );
         BOOST_TEST_EQ( std::is_trivially_destructible<variant<U>>::value, std::is_trivially_destructible<U>::value );
 
-#if !BOOST_WORKAROUND(BOOST_LIBSTDCXX_VERSION < 50000)
+#if !BOOST_WORKAROUND(BOOST_LIBSTDCXX_VERSION, < 50000)
 
         BOOST_TEST_EQ( std::is_trivially_move_constructible<variant<U>>::value, std::is_trivially_move_constructible<U>::value );
         BOOST_TEST_EQ( std::is_trivially_move_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && std::is_trivially_move_constructible<U>::value && std::is_trivially_move_assignable<U>::value );
