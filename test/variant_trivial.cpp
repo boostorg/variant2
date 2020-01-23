@@ -8,6 +8,7 @@
 
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
+#include <boost/config.hpp>
 
 #include <boost/mp11.hpp>
 using namespace boost::mp11;
@@ -37,7 +38,6 @@ template<template<class...> class L, class T1, class... T> struct mp_power_set_i
 //
 
 using namespace boost::variant2;
-namespace v2d = boost::variant2::detail;
 
 struct D
 {
@@ -90,11 +90,16 @@ struct test
     {
         using U = mp_inherit<T...>;
 
-        BOOST_TEST_EQ( v2d::is_trivially_copy_constructible<variant<U>>::value, v2d::is_trivially_copy_constructible<U>::value );
-        BOOST_TEST_EQ( v2d::is_trivially_move_constructible<variant<U>>::value, v2d::is_trivially_move_constructible<U>::value );
-        BOOST_TEST_EQ( v2d::is_trivially_copy_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && v2d::is_trivially_copy_constructible<U>::value && v2d::is_trivially_copy_assignable<U>::value );
-        BOOST_TEST_EQ( v2d::is_trivially_move_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && v2d::is_trivially_move_constructible<U>::value && v2d::is_trivially_move_assignable<U>::value );
+        BOOST_TEST_EQ( std::is_trivially_copy_constructible<variant<U>>::value, std::is_trivially_copy_constructible<U>::value );
+        BOOST_TEST_EQ( std::is_trivially_copy_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && std::is_trivially_copy_constructible<U>::value && std::is_trivially_copy_assignable<U>::value );
         BOOST_TEST_EQ( std::is_trivially_destructible<variant<U>>::value, std::is_trivially_destructible<U>::value );
+
+#if !BOOST_WORKAROUND(BOOST_LIBSTDCXX_VERSION < 50000)
+
+        BOOST_TEST_EQ( std::is_trivially_move_constructible<variant<U>>::value, std::is_trivially_move_constructible<U>::value );
+        BOOST_TEST_EQ( std::is_trivially_move_assignable<variant<U>>::value, std::is_trivially_destructible<U>::value && std::is_trivially_move_constructible<U>::value && std::is_trivially_move_assignable<U>::value );
+
+#endif
     }
 };
 
