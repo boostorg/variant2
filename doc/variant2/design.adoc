@@ -169,8 +169,6 @@ The main differences between this implementation and `std::variant` are:
   `variant<int, float>` is provided as the member function `subset<U...>`.
   (This operation can throw if the current state of the variant cannot be
   represented.)
-* `variant<T...>` is not (yet) trivial when all contained types are trivial,
-   as mandated by {cpp}17.
 * The {cpp}20 additions and changes to `std::variant` have not yet been
   implemented.
 

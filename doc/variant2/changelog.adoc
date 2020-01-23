@@ -13,7 +13,10 @@ http://www.boost.org/LICENSE_1_0.txt
 
 ## Changes in 1.73.0
 
-* Added support for `std::hash`, `boost::hash`
+* Added support for `std::hash`, `boost::hash`.
+* `variant<T...>` is now trivial when all types in `T...` are trivial.
+  This improves performance by enabling it to be passed to, and returned
+  from, functions in registers.
 
 ## Changes in 1.71.0
 
