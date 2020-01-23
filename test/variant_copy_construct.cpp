@@ -48,6 +48,13 @@ struct Y
     Y( Y const& ) = delete;
 };
 
+struct D
+{
+    ~D() {}
+};
+
+inline bool operator==( D, D ) { return true; }
+
 template<class V> static void test( V const & v )
 {
     V v2( v );
@@ -116,6 +123,8 @@ int main()
 
         test( v );
     }
+
+    test( variant<D>() );
 
     {
         BOOST_TEST_TRAIT_TRUE((std::is_nothrow_copy_constructible<variant<int>>));
