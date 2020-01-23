@@ -107,3 +107,5 @@ compile variant_get_by_type_cx.cpp : $(NX) <toolset>msvc-14.0:<build>no : varian
 run variant_subset.cpp throw_exception.cpp : : : $(NX) : variant_subset_nx ;
 
 run variant_hash.cpp ;
+
+run variant_trivial.cpp ;
