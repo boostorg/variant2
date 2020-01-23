@@ -103,6 +103,11 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: linux
+      dist: trusty
+      compiler: clang++
+      env: DIST=trusty TOOLSET=clang COMPILER=clang++ CXXSTD=11,14,1z
+
+    - os: linux
       compiler: clang++-3.5
       env: TOOLSET=clang COMPILER=clang++-3.5 CXXSTD=11,14,1z
       addons:
