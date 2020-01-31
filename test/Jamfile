@@ -12,7 +12,7 @@ import ../../config/checks/config : requires ;
 project
   : default-build
 
-    <warnings>all
+    <warnings>extra
 
   : requirements
 
