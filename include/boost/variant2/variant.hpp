@@ -1115,6 +1115,7 @@ public:
 
     variant_cc_base_impl( variant_cc_base_impl const& r )
         noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
+        : variant_base()
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L1{ this, r } );
     }
