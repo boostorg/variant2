@@ -14,28 +14,6 @@
 #include <boost/mp11.hpp>
 using namespace boost::mp11;
 
-// mp_power_set<L>
-
-template<class L> struct mp_power_set_impl;
-
-template<class L> using mp_power_set = typename mp_power_set_impl<L>::type;
-
-template<template<class...> class L> struct mp_power_set_impl< L<> >
-{
-    using type = L< L<> >;
-};
-
-template<template<class...> class L, class T1, class... T> struct mp_power_set_impl< L<T1, T...> >
-{
-    using S1 = mp_power_set< L<T...> >;
-
-    template<class L2> using _f = mp_push_front<L2, T1>;
-
-    using S2 = mp_transform<_f, S1>;
-
-    using type = mp_append< S1, S2 >;
-};
-
 //
 
 struct D
