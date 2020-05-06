@@ -1768,6 +1768,25 @@ namespace detail
 
 template<class T> using remove_cv_ref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
+template<class... T> variant<T...> const & extract_variant_base_( variant<T...> const & );
+
+#if BOOST_WORKAROUND( BOOST_MSVC, < 1930 )
+
+template<class V> struct extract_vbase_impl
+{
+    using type = decltype( extract_variant_base_( std::declval<V>() ) );
+};
+
+template<class V> using extract_variant_base = remove_cv_ref_t< typename extract_vbase_impl<V>::type >;
+
+#else
+
+template<class V> using extract_variant_base = remove_cv_ref_t< decltype( extract_variant_base_( std::declval<V>() ) ) >;
+
+#endif
+
+template<class V> using variant_base_size = variant_size< extract_variant_base<V> >;
+
 template<class T, class U> struct copy_cv_ref
 {
     using type = T;
@@ -1807,7 +1826,7 @@ template<class F> struct Qret
 
 template<class L> using front_if_same = mp11::mp_if<mp11::mp_apply<mp11::mp_same, L>, mp11::mp_front<L>>;
 
-template<class V> using apply_cv_ref = mp11::mp_product<copy_cv_ref_t, remove_cv_ref_t<V>, mp11::mp_list<V>>;
+template<class V> using apply_cv_ref = mp11::mp_product<copy_cv_ref_t, extract_variant_base<V>, mp11::mp_list<V>>;
 
 template<class F, class... V> using Vret = front_if_same<mp11::mp_product_q<Qret<F>, apply_cv_ref<V>...>>;
 
@@ -1836,7 +1855,7 @@ template<class F, class V1> struct visit_L1
 
 template<class F, class V1> constexpr auto visit( F&& f, V1&& v1 ) -> detail::Vret<F, V1>
 {
-    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L1<F, V1>{ std::forward<F>(f), std::forward<V1>(v1) } );
+    return mp11::mp_with_index<detail::variant_base_size<V1>>( v1.index(), detail::visit_L1<F, V1>{ std::forward<F>(f), std::forward<V1>(v1) } );
 }
 
 #if defined(BOOST_NO_CXX14_GENERIC_LAMBDAS) || BOOST_WORKAROUND( BOOST_MSVC, < 1920 )
@@ -1878,7 +1897,7 @@ template<class F, class V1, class V2> struct visit_L2
 
 template<class F, class V1, class V2> constexpr auto visit( F&& f, V1&& v1, V2&& v2 ) -> detail::Vret<F, V1, V2>
 {
-    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L2<F, V1, V2>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2) } );
+    return mp11::mp_with_index<detail::variant_base_size<V1>>( v1.index(), detail::visit_L2<F, V1, V2>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2) } );
 }
 
 namespace detail
@@ -1903,7 +1922,7 @@ template<class F, class V1, class V2, class V3> struct visit_L3
 
 template<class F, class V1, class V2, class V3> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3 ) -> detail::Vret<F, V1, V2, V3>
 {
-    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L3<F, V1, V2, V3>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3) } );
+    return mp11::mp_with_index<detail::variant_base_size<V1>>( v1.index(), detail::visit_L3<F, V1, V2, V3>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3) } );
 }
 
 namespace detail
@@ -1929,14 +1948,14 @@ template<class F, class V1, class V2, class V3, class V4> struct visit_L4
 
 template<class F, class V1, class V2, class V3, class V4> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V3&& v3, V4&& v4 ) -> detail::Vret<F, V1, V2, V3, V4>
 {
-    return mp11::mp_with_index<variant_size<V1>>( v1.index(), detail::visit_L4<F, V1, V2, V3, V4>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) } );
+    return mp11::mp_with_index<detail::variant_base_size<V1>>( v1.index(), detail::visit_L4<F, V1, V2, V3, V4>{ std::forward<F>(f), std::forward<V1>(v1), std::forward<V2>(v2), std::forward<V3>(v3), std::forward<V4>(v4) } );
 }
 
 #else
 
 template<class F, class V1, class V2, class... V> constexpr auto visit( F&& f, V1&& v1, V2&& v2, V&&... v ) -> detail::Vret<F, V1, V2, V...>
 {
-    return mp11::mp_with_index<variant_size<V1>>( v1.index(), [&]( auto I ){
+    return mp11::mp_with_index<detail::variant_base_size<V1>>( v1.index(), [&]( auto I ){
 
         auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( detail::unsafe_get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit( f2, std::forward<V2>(v2), std::forward<V>(v)... );
