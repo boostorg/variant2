@@ -29,6 +29,8 @@ template<class I> struct Y
     Y() = default;
     Y( Y const& ) = default;
 
+    explicit Y( int v ): v_( v ) {}
+
     Y& operator=( Y const& ) noexcept = default;
 
     Y& operator=( Y&& r ) noexcept
