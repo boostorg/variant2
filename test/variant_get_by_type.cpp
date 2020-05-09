@@ -6,6 +6,12 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 
+#if defined( __clang__ ) && defined( __has_warning )
+# if __has_warning( "-Wdeprecated-volatile" )
+#  pragma clang diagnostic ignored "-Wdeprecated-volatile"
+# endif
+#endif
+
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
@@ -14,12 +20,6 @@
 #include <string>
 
 using namespace boost::variant2;
-
-#if defined( __clang__ ) && defined( __has_warning )
-# if __has_warning( "-Wdeprecated-volatile" )
-#  pragma clang diagnostic ignored "-Wdeprecated-volatile"
-# endif
-#endif
 
 int main()
 {
