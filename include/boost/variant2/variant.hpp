@@ -590,6 +590,105 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_true, T1, T..
     template<std::size_t I> constexpr mp11::mp_at_c<mp11::mp_list<T...>, I-1> const& get( mp11::mp_size_t<I> ) const noexcept { return rest_.get( mp11::mp_size_t<I-1>() ); }
 };
 
+template<class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class... T> union variant_storage_impl<mp11::mp_true, T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T...>
+{
+    T0 t0_;
+    T1 t1_;
+    T2 t2_;
+    T3 t3_;
+    T4 t4_;
+    T5 t5_;
+    T6 t6_;
+    T7 t7_;
+    T8 t8_;
+    T9 t9_;
+
+    variant_storage<T...> rest_;
+
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<0>, A&&... a ): t0_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<1>, A&&... a ): t1_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<2>, A&&... a ): t2_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<3>, A&&... a ): t3_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<4>, A&&... a ): t4_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<5>, A&&... a ): t5_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<6>, A&&... a ): t6_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<7>, A&&... a ): t7_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<8>, A&&... a ): t8_( std::forward<A>(a)... ) {}
+    template<class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<9>, A&&... a ): t9_( std::forward<A>(a)... ) {}
+
+    template<std::size_t I, class... A> constexpr explicit variant_storage_impl( mp11::mp_size_t<I>, A&&... a ): rest_( mp11::mp_size_t<I-10>(), std::forward<A>(a)... ) {}
+
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<0>, A&&... a ) { ::new( &t0_ ) T0( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<1>, A&&... a ) { ::new( &t1_ ) T1( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<2>, A&&... a ) { ::new( &t2_ ) T2( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<3>, A&&... a ) { ::new( &t3_ ) T3( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<4>, A&&... a ) { ::new( &t4_ ) T4( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<5>, A&&... a ) { ::new( &t5_ ) T5( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<6>, A&&... a ) { ::new( &t6_ ) T6( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<7>, A&&... a ) { ::new( &t7_ ) T7( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<8>, A&&... a ) { ::new( &t8_ ) T8( std::forward<A>(a)... ); }
+    template<class... A> void emplace_impl( mp11::mp_false, mp11::mp_size_t<9>, A&&... a ) { ::new( &t9_ ) T9( std::forward<A>(a)... ); }
+
+    template<std::size_t I, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_false, mp11::mp_size_t<I>, A&&... a )
+    {
+        rest_.emplace( mp11::mp_size_t<I-10>(), std::forward<A>(a)... );
+    }
+
+    template<std::size_t I, class... A> BOOST_CXX14_CONSTEXPR void emplace_impl( mp11::mp_true, mp11::mp_size_t<I>, A&&... a )
+    {
+        *this = variant_storage_impl( mp11::mp_size_t<I>(), std::forward<A>(a)... );
+    }
+
+    template<std::size_t I, class... A> BOOST_CXX14_CONSTEXPR void emplace( mp11::mp_size_t<I>, A&&... a )
+    {
+        this->emplace_impl( mp11::mp_all<
+            detail::is_trivially_move_assignable<T0>,
+            detail::is_trivially_move_assignable<T1>,
+            detail::is_trivially_move_assignable<T2>,
+            detail::is_trivially_move_assignable<T3>,
+            detail::is_trivially_move_assignable<T4>,
+            detail::is_trivially_move_assignable<T5>,
+            detail::is_trivially_move_assignable<T6>,
+            detail::is_trivially_move_assignable<T7>,
+            detail::is_trivially_move_assignable<T8>,
+            detail::is_trivially_move_assignable<T9>,
+            detail::is_trivially_move_assignable<T>...>(), mp11::mp_size_t<I>(), std::forward<A>(a)... );
+    }
+
+    BOOST_CXX14_CONSTEXPR T0& get( mp11::mp_size_t<0> ) noexcept { return t0_; }
+    constexpr T0 const& get( mp11::mp_size_t<0> ) const noexcept { return t0_; }
+
+    BOOST_CXX14_CONSTEXPR T1& get( mp11::mp_size_t<1> ) noexcept { return t1_; }
+    constexpr T1 const& get( mp11::mp_size_t<1> ) const noexcept { return t1_; }
+
+    BOOST_CXX14_CONSTEXPR T2& get( mp11::mp_size_t<2> ) noexcept { return t2_; }
+    constexpr T2 const& get( mp11::mp_size_t<2> ) const noexcept { return t2_; }
+
+    BOOST_CXX14_CONSTEXPR T3& get( mp11::mp_size_t<3> ) noexcept { return t3_; }
+    constexpr T3 const& get( mp11::mp_size_t<3> ) const noexcept { return t3_; }
+
+    BOOST_CXX14_CONSTEXPR T4& get( mp11::mp_size_t<4> ) noexcept { return t4_; }
+    constexpr T4 const& get( mp11::mp_size_t<4> ) const noexcept { return t4_; }
+
+    BOOST_CXX14_CONSTEXPR T5& get( mp11::mp_size_t<5> ) noexcept { return t5_; }
+    constexpr T5 const& get( mp11::mp_size_t<5> ) const noexcept { return t5_; }
+
+    BOOST_CXX14_CONSTEXPR T6& get( mp11::mp_size_t<6> ) noexcept { return t6_; }
+    constexpr T6 const& get( mp11::mp_size_t<6> ) const noexcept { return t6_; }
+
+    BOOST_CXX14_CONSTEXPR T7& get( mp11::mp_size_t<7> ) noexcept { return t7_; }
+    constexpr T7 const& get( mp11::mp_size_t<7> ) const noexcept { return t7_; }
+
+    BOOST_CXX14_CONSTEXPR T8& get( mp11::mp_size_t<8> ) noexcept { return t8_; }
+    constexpr T8 const& get( mp11::mp_size_t<8> ) const noexcept { return t8_; }
+
+    BOOST_CXX14_CONSTEXPR T9& get( mp11::mp_size_t<9> ) noexcept { return t9_; }
+    constexpr T9 const& get( mp11::mp_size_t<9> ) const noexcept { return t9_; }
+
+    template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<mp11::mp_list<T...>, I-10>& get( mp11::mp_size_t<I> ) noexcept { return rest_.get( mp11::mp_size_t<I-10>() ); }
+    template<std::size_t I> constexpr mp11::mp_at_c<mp11::mp_list<T...>, I-10> const& get( mp11::mp_size_t<I> ) const noexcept { return rest_.get( mp11::mp_size_t<I-10>() ); }
+};
+
 // resolve_overload_*
 
 template<class... T> struct overload;
