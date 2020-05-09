@@ -15,6 +15,12 @@
 
 using namespace boost::variant2;
 
+#if defined( __clang__ ) && defined( __has_warning )
+# if __has_warning( "-Wdeprecated-volatile" )
+#  pragma clang diagnostic ignored "-Wdeprecated-volatile"
+# endif
+#endif
+
 int main()
 {
     {
