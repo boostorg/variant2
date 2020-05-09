@@ -65,7 +65,7 @@ template<class V> struct F1
         {
             V v( t );
 
-            BOOST_TEST_EQ( v.index(), t.value );
+            BOOST_TEST_EQ( v.index(), i );
             BOOST_TEST_EQ( get<i>( v ).v_, t.v_ );
             BOOST_TEST_EQ( get<T>( v ).v_, t.v_ );
         }
@@ -73,7 +73,7 @@ template<class V> struct F1
         {
             V const v( t );
 
-            BOOST_TEST_EQ( v.index(), t.value );
+            BOOST_TEST_EQ( v.index(), i );
             BOOST_TEST_EQ( get<i>( v ).v_, t.v_ );
             BOOST_TEST_EQ( get<T>( v ).v_, t.v_ );
         }
@@ -83,7 +83,7 @@ template<class V> struct F1
 
             v = t;
 
-            BOOST_TEST_EQ( v.index(), t.value );
+            BOOST_TEST_EQ( v.index(), i );
             BOOST_TEST_EQ( get<i>( v ).v_, t.v_ );
             BOOST_TEST_EQ( get<T>( v ).v_, t.v_ );
         }
