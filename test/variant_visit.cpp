@@ -38,6 +38,10 @@ struct F
 int main()
 {
     {
+        BOOST_TEST_EQ( (visit( []{ return 5; } )), 5 );
+    }
+
+    {
         variant<int> v( 1 );
 
         BOOST_TEST_EQ( (visit( []( int x ){ return x; }, v )), 1 );
