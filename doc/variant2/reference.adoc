@@ -134,7 +134,7 @@ template<class... T>
 
 // visit
 
-template<class F, class... V>
+template<class R = /*unspecified*/, class F, class... V>
   constexpr /*see below*/ visit(F&& f, V&&... v);
 
 // monostate
@@ -838,7 +838,7 @@ Returns: ::
 ### visit
 
 ```
-template<class F, class... V>
+template<class R = /*unspecified*/, class F, class... V>
   constexpr /*see below*/ visit(F&& f, V&&... v);
 ```
 [none]
@@ -846,6 +846,10 @@ template<class F, class... V>
 +
 Returns: :: `std::forward<F>(f)(get<I>(std::forward<V>(v))...)`, where
   `I...` is `v.index()...`.
+Remarks: :: If `R` is given explicitly, as in `visit<int>`, the return
+  type is `R`. Otherwise, it's deduced from `F`. All possible applications
+  of `F` to the variant alternatives must have the same return type for
+  this deduction to succeed.
 
 ### swap
 
