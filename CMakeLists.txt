@@ -17,13 +17,6 @@ target_link_libraries(boost_variant2
     Boost::mp11
 )
 
-if(BOOST_SUPERPROJECT_VERSION)
-
-  include(BoostInstall)
-  boost_install(TARGETS boost_variant2 HEADER_DIRECTORY include/)
-
-endif()
-
 if(BUILD_TESTING)
 
   add_subdirectory(test)
