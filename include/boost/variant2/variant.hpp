@@ -773,34 +773,50 @@ template<class T0, class T1, class T2, class T3, class T4, class T5, class T6, c
 
 // resolve_overload_*
 
-template<class... T> struct overload;
+template<class T> using remove_cv_ref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
-template<> struct overload<>
+struct narrowing_check_impl
+{
+    template<class T>
+    static auto check(T (&&)[1]) -> mp11::mp_identity<T>;
+
+    template<class T, class U>
+    using fn = decltype(check<T>({ std::declval<U>() }));
+};
+
+template<class T, class U> using narrowing_check = mp11::mp_if<std::is_arithmetic<T>, mp11::mp_identity<T>, mp11::mp_invoke_q<narrowing_check_impl, T, U>>;
+
+template<class T> struct overload
+{
+    template<class U>
+    auto operator()(T, U&&) const -> narrowing_check<T, U>;
+};
+
+template<class T> struct overload_bool
+{
+    template<class U>
+    auto operator()(bool, U&&) const -> mp11::mp_if<std::is_same<remove_cv_ref_t<U>, bool>, mp11::mp_identity<T>>;
+};
+
+template<> struct overload<bool> : overload_bool<bool> {};
+template<> struct overload<const bool> : overload_bool<const bool> {};
+template<> struct overload<volatile bool> : overload_bool<volatile bool> {};
+template<> struct overload<const volatile bool> : overload_bool<const volatile bool> {};
+
+template<class... T> struct overloads : T...
 {
     void operator()() const;
+    using T::operator()...;
 };
 
-template<class T1, class... T> struct overload<T1, T...>: overload<T...>
+template<class U, class L> struct resolve_overload_type_impl;
+
+template<class U, template<class...> class L, class... T> struct resolve_overload_type_impl<U, L<T...>>
 {
-    using overload<T...>::operator();
-    mp11::mp_identity<T1> operator()(T1) const;
+    using type = typename decltype( overloads<overload<T>...>()(std::declval<U>(), std::declval<U>()) )::type;
 };
 
-#if BOOST_WORKAROUND( BOOST_MSVC, < 1930 )
-
-template<class U, class... T> using resolve_overload_type_ = decltype( overload<T...>()(std::declval<U>()) );
-
-template<class U, class... T> struct resolve_overload_type_impl: mp11::mp_defer< resolve_overload_type_, U, T... >
-{
-};
-
-template<class U, class... T> using resolve_overload_type = typename resolve_overload_type_impl<U, T...>::type::type;
-
-#else
-
-template<class U, class... T> using resolve_overload_type = typename decltype( overload<T...>()(std::declval<U>()) )::type;
-
-#endif
+template<class U, class... T> using resolve_overload_type = typename resolve_overload_type_impl<U, mp11::mp_unique<mp11::mp_list<T...>>>::type;
 
 template<class U, class... T> using resolve_overload_index = mp11::mp_find<mp11::mp_list<T...>, resolve_overload_type<U, T...>>;
 
@@ -1946,8 +1962,6 @@ template<class... T> constexpr bool operator>=( variant<T...> const & v, variant
 // visitation
 namespace detail
 {
-
-template<class T> using remove_cv_ref_t = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
 template<class... T> variant<T...> const & extract_variant_base_( variant<T...> const & );
 
