@@ -156,6 +156,20 @@ int main()
         BOOST_TEST( holds_alternative<std::string>( v3 ) );
         BOOST_TEST_EQ( get<std::string>( v2 ), get<std::string>( v3 ) );
     }
+    
+    {
+        variant<bool, std::string> v( "s2" );
+
+        variant<bool, bool, const char *, std::string> v2( v );
+
+        BOOST_TEST( holds_alternative<std::string>( v2 ) );
+        BOOST_TEST_EQ( get<std::string>( v ), get<std::string>( v2 ) );
+
+        variant<bool, bool, const char *, std::string> v3( std::move(v) );
+
+        BOOST_TEST( holds_alternative<std::string>( v3 ) );
+        BOOST_TEST_EQ( get<std::string>( v2 ), get<std::string>( v3 ) );
+    }
 
     {
         variant<X1, X2> v{ X1{1} };
