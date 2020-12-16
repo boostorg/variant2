@@ -10,5 +10,6 @@
     "description": "A never-valueless, strong guarantee implementation of std::variant.",
     "category": [
         "Containers", "Data"
-    ]
+    ],
+    "cxxstd": "11"
 }
