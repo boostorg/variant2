@@ -57,6 +57,60 @@ STATIC_ASSERT( !std::is_nothrow_move_constructible<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_copy_assignable<X2>::value );
 STATIC_ASSERT( !std::is_nothrow_move_assignable<X2>::value );
 
+struct Y1
+{
+    int v = 1;
+
+    Y1() = default;
+    Y1(Y1 const&) = delete;
+    Y1(Y1&&) = delete;
+};
+
+STATIC_ASSERT( !std::is_copy_constructible<Y1>::value );
+STATIC_ASSERT( !std::is_move_constructible<Y1>::value );
+
+struct Y2
+{
+    int v = 2;
+
+    Y2() = default;
+    Y2(Y2 const&) = delete;
+    Y2(Y2&&) = delete;
+};
+
+STATIC_ASSERT( !std::is_copy_constructible<Y2>::value );
+STATIC_ASSERT( !std::is_move_constructible<Y2>::value );
+
+struct Z1
+{
+    static int instances;
+
+    int v = 1;
+
+    Z1() { ++instances; }
+    ~Z1() { --instances; }
+
+    Z1(Z1 const&) = delete;
+    Z1(Z1&&) = delete;
+};
+
+int Z1::instances = 0;
+
+struct Z2
+{
+    static int instances;
+
+    int v = 2;
+
+    Z2() { ++instances; }
+    ~Z2() { --instances; }
+
+    Z2(Z2 const&) = delete;
+    Z2(Z2&&) = delete;
+};
+
+int Z2::instances = 0;
+
 int main()
 {
     {
@@ -176,6 +230,63 @@ int main()
         BOOST_TEST_EQ( v.index(), 0 );
         BOOST_TEST_EQ( get<0>(v).v, 4 );
     }
+
+    {
+        variant<Y1, Y2> v;
+        BOOST_TEST_EQ( v.index(), 0 );
+        BOOST_TEST_EQ( get<0>(v).v, 1 );
+
+        v.emplace<0>();
+        BOOST_TEST_EQ( v.index(), 0 );
+        BOOST_TEST_EQ( get<0>(v).v, 1 );
+
+        v.emplace<1>();
+        BOOST_TEST_EQ( v.index(), 1 );
+        BOOST_TEST_EQ( get<1>(v).v, 2 );
+
+        v.emplace<1>();
+        BOOST_TEST_EQ( v.index(), 1 );
+        BOOST_TEST_EQ( get<1>(v).v, 2 );
+
+        v.emplace<0>();
+        BOOST_TEST_EQ( v.index(), 0 );
+        BOOST_TEST_EQ( get<0>(v).v, 1 );
+    }
+
+    {
+        variant<Z1, Z2> v;
+        BOOST_TEST_EQ( v.index(), 0 );
+        BOOST_TEST_EQ( get<0>(v).v, 1 );
+        BOOST_TEST_EQ( Z1::instances, 1 );
+        BOOST_TEST_EQ( Z2::instances, 0 );
+
+        v.emplace<0>();
+        BOOST_TEST_EQ( v.index(), 0 );
+        BOOST_TEST_EQ( get<0>(v).v, 1 );
+        BOOST_TEST_EQ( Z1::instances, 1 );
+        BOOST_TEST_EQ( Z2::instances, 0 );
+
+        v.emplace<1>();
+        BOOST_TEST_EQ( v.index(), 1 );
+        BOOST_TEST_EQ( get<1>(v).v, 2 );
+        BOOST_TEST_EQ( Z1::instances, 0 );
+        BOOST_TEST_EQ( Z2::instances, 1 );
+
+        v.emplace<1>();
+        BOOST_TEST_EQ( v.index(), 1 );
+        BOOST_TEST_EQ( get<1>(v).v, 2 );
+        BOOST_TEST_EQ( Z1::instances, 0 );
+        BOOST_TEST_EQ( Z2::instances, 1 );
+
+        v.emplace<0>();
+        BOOST_TEST_EQ( v.index(), 0 );
+        BOOST_TEST_EQ( get<0>(v).v, 1 );
+        BOOST_TEST_EQ( Z1::instances, 1 );
+        BOOST_TEST_EQ( Z2::instances, 0 );
+    }
+
+    BOOST_TEST_EQ( Z1::instances, 0 );
+    BOOST_TEST_EQ( Z2::instances, 0 );
 
     return boost::report_errors();
 }
