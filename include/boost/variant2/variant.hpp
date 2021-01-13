@@ -504,11 +504,23 @@ using std::is_trivially_move_assignable;
 
 #endif
 
+#if defined( BOOST_LIBSTDCXX_VERSION ) && BOOST_LIBSTDCXX_VERSION < 40800
+
+template<class T> struct is_trivially_destructible: std::has_trivial_destructor<T>
+{
+};
+
+#else
+
+using std::is_trivially_destructible;
+
+#endif
+
 // variant_storage
 
 template<class D, class... T> union variant_storage_impl;
 
-template<class... T> using variant_storage = variant_storage_impl<mp11::mp_all<std::is_trivially_destructible<T>...>, T...>;
+template<class... T> using variant_storage = variant_storage_impl<mp11::mp_all<detail::is_trivially_destructible<T>...>, T...>;
 
 template<class D> union variant_storage_impl<D>
 {
@@ -807,7 +819,7 @@ template<class U, class... T> using resolve_overload_index = mp11::mp_find<mp11:
 // variant_base
 
 template<bool is_trivially_destructible, bool is_single_buffered, class... T> struct variant_base_impl;
-template<class... T> using variant_base = variant_base_impl<mp11::mp_all<std::is_trivially_destructible<T>...>::value, mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value, T...>;
+template<class... T> using variant_base = variant_base_impl<mp11::mp_all<detail::is_trivially_destructible<T>...>::value, mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value, T...>;
 
 struct none {};
 
@@ -1317,7 +1329,7 @@ template<bool CopyAssignable, bool TriviallyCopyAssignable, class... T> struct v
 
 template<class... T> using variant_ca_base = variant_ca_base_impl<
     mp11::mp_all<std::is_copy_constructible<T>..., std::is_copy_assignable<T>...>::value,
-    mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>::value,
+    mp11::mp_all<detail::is_trivially_destructible<T>..., detail::is_trivially_copy_constructible<T>..., detail::is_trivially_copy_assignable<T>...>::value,
     T...>;
 
 template<class... T> struct variant_ca_base_impl<true, true, T...>: public variant_cc_base<T...>
@@ -1466,7 +1478,7 @@ template<bool MoveAssignable, bool TriviallyMoveAssignable, class... T> struct v
 
 template<class... T> using variant_ma_base = variant_ma_base_impl<
     mp11::mp_all<std::is_move_constructible<T>..., std::is_move_assignable<T>...>::value,
-    mp11::mp_all<std::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>::value,
+    mp11::mp_all<detail::is_trivially_destructible<T>..., detail::is_trivially_move_constructible<T>..., detail::is_trivially_move_assignable<T>...>::value,
     T...>;
 
 template<class... T> struct variant_ma_base_impl<true, true, T...>: public variant_mc_base<T...>
@@ -2085,7 +2097,7 @@ template<class R, class F, class V1, class V2> struct visit_L2
     template<class I> auto operator()( I ) const -> Vret<R, F, V1, V2>
     {
         auto f2 = bind_front( std::forward<F>(f), unsafe_get<I::value>( std::forward<V1>(v1) ) );
-		return visit<R>( f2, std::forward<V2>(v2) );
+        return visit<R>( f2, std::forward<V2>(v2) );
     }
 };
 
