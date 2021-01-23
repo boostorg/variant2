@@ -1032,7 +1032,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
 {
     unsigned ix_;
 
-#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && __GNUC__ < 11 && !defined(__clang__) && !defined(__INTEL_COMPILER)
 
     // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63707 :-(
 
