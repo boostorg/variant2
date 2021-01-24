@@ -834,7 +834,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     constexpr std::size_t index() const noexcept
     {
-        return static_cast<std::size_t>( ix_ ) - 1;
+        return ix_ - 1;
     }
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
@@ -904,7 +904,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
 
     constexpr std::size_t index() const noexcept
     {
-        return static_cast<std::size_t>( ix_ ) / 2 - 1;
+        return ix_ / 2 - 1;
     }
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
@@ -990,7 +990,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
     constexpr std::size_t index() const noexcept
     {
-        return static_cast<std::size_t>( ix_ ) - 1;
+        return ix_ - 1;
     }
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
@@ -1116,7 +1116,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
 
     constexpr std::size_t index() const noexcept
     {
-        return static_cast<std::size_t>( ix_ ) / 2 - 1;
+        return ix_ / 2 - 1;
     }
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
