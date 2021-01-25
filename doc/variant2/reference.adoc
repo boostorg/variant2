@@ -490,8 +490,8 @@ template<size_t I, class... A>
 +
 Requires: :: `I < sizeof...(T)`.
 Effects:  ::
-  Destroys the currently contained value, then initializes a new contained
-  value as if using the expression `Ti(std::forward<A>(a)...)`.
+  Initializes a new contained value as if using the expression
+  `Ti(std::forward<A>(a)...)`, then destroys the currently contained value.
 Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
@@ -511,8 +511,8 @@ template<size_t I, class V, class... A>
 +
 Requires: :: `I < sizeof...(T)`.
 Effects:  ::
-  Destroys the currently contained value, then initializes a new contained
-  value as if using the expression `Ti(il, std::forward<A>(a)...)`.
+  Initializes a new contained value as if using the expression
+  `Ti(il, std::forward<A>(a)...)`, then destroys the currently contained value.
 Ensures:  :: `index() == I`.
 Returns:  :: A reference to the new contained value.
 Throws:   ::
