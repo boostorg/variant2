@@ -105,7 +105,7 @@ int main()
         STATIC_ASSERT( v.index() == 4 );
     }
 
-#if BOOST_WORKAROUND(BOOST_GCC, >= 100000 && BOOST_GCC < 100200)
+#if BOOST_WORKAROUND(BOOST_GCC, >= 100000 && BOOST_GCC < 110000)
 
     // no idea why this fails on g++ 10
 
