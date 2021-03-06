@@ -1,5 +1,5 @@
 ////
-Copyright 2019, 2020 Peter Dimov
+Copyright 2019-2021 Peter Dimov
 
 Distributed under the Boost Software License, Version 1.0.
 
@@ -10,6 +10,10 @@ http://www.boost.org/LICENSE_1_0.txt
 [#changelog]
 # Revision History
 :idprefix: changelog_
+
+## Changes in 1.76.0
+
+* Improved generated code for the double buffered case.
 
 ## Changes in 1.74.0
 
