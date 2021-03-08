@@ -81,12 +81,25 @@ struct monostate
 {
 };
 
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1940)
+
 constexpr bool operator<(monostate, monostate) noexcept { return false; }
 constexpr bool operator>(monostate, monostate) noexcept { return false; }
 constexpr bool operator<=(monostate, monostate) noexcept { return true; }
 constexpr bool operator>=(monostate, monostate) noexcept { return true; }
 constexpr bool operator==(monostate, monostate) noexcept { return true; }
 constexpr bool operator!=(monostate, monostate) noexcept { return false; }
+
+#else
+
+constexpr bool operator<(monostate const&, monostate const&) noexcept { return false; }
+constexpr bool operator>(monostate const&, monostate const&) noexcept { return false; }
+constexpr bool operator<=(monostate const&, monostate const&) noexcept { return true; }
+constexpr bool operator>=(monostate const&, monostate const&) noexcept { return true; }
+constexpr bool operator==(monostate const&, monostate const&) noexcept { return true; }
+constexpr bool operator!=(monostate const&, monostate const&) noexcept { return false; }
+
+#endif
 
 // variant forward declaration
 
