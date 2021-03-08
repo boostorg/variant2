@@ -81,5 +81,14 @@ int main()
         BOOST_TEST_NOT( v1 >= v2 );
     }
 
+    {
+        variant<monostate> v1, v2;
+
+        BOOST_TEST_NOT( v1 < v2 );
+        BOOST_TEST_NOT( v1 > v2 );
+        BOOST_TEST( v1 <= v2 );
+        BOOST_TEST( v1 >= v2 );
+    }
+
     return boost::report_errors();
 }
