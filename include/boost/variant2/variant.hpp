@@ -39,6 +39,8 @@ BOOST_NORETURN void throw_exception( std::exception const & e ); // user defined
 
 #endif
 
+template<class T> struct hash;
+
 namespace variant2
 {
 
@@ -2229,7 +2231,7 @@ inline std::size_t hash_value_impl( std::size_t index, std::size_t value )
     return hash_value_impl_( mp11::mp_bool< (SIZE_MAX > UINT32_MAX) >(), index, value );
 }
 
-template<class V> struct hash_value_L
+template<template<class> class H, class V> struct hash_value_L
 {
     V const & v;
 
@@ -2238,11 +2240,16 @@ template<class V> struct hash_value_L
         auto const & t = unsafe_get<I::value>( v );
 
         std::size_t index = I::value;
-        std::size_t value = std::hash<remove_cv_ref_t<decltype(t)>>()( t );
+        std::size_t value = H<remove_cv_ref_t<decltype(t)>>()( t );
 
         return hash_value_impl( index, value );
     }
 };
+
+template<class... T> std::size_t hash_value_std( variant<T...> const & v )
+{
+    return mp11::mp_with_index<sizeof...(T)>( v.index(), detail::hash_value_L< std::hash, variant<T...> >{ v } );
+}
 
 } // namespace detail
 
@@ -2253,7 +2260,7 @@ inline std::size_t hash_value( monostate const & )
 
 template<class... T> std::size_t hash_value( variant<T...> const & v )
 {
-    return mp11::mp_with_index<sizeof...(T)>( v.index(), detail::hash_value_L< variant<T...> >{ v } );
+    return mp11::mp_with_index<sizeof...(T)>( v.index(), detail::hash_value_L< boost::hash, variant<T...> >{ v } );
 }
 
 namespace detail
@@ -2274,7 +2281,7 @@ template<class V> struct std_hash_impl<V, true>
 {
     std::size_t operator()( V const & v ) const
     {
-        return hash_value( v );
+        return detail::hash_value_std( v );
     }
 };
 
