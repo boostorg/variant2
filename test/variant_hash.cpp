@@ -12,6 +12,7 @@
 #include <boost/core/lightweight_test_trait.hpp>
 #include <boost/container_hash/hash.hpp>
 #include <boost/config/workaround.hpp>
+#include <vector>
 
 using namespace boost::variant2;
 
@@ -47,7 +48,17 @@ template<template<class...> class Hash, class T> void test2()
     BOOST_TEST_NE( h2, h3 );
 }
 
-struct X {};
+struct X
+{
+    int m = 0;
+};
+
+std::size_t hash_value( X const& x )
+{
+    return boost::hash<int>()( x.m );
+}
+
+struct Y {}; // no hash support
 
 int main()
 {
@@ -57,6 +68,8 @@ int main()
     test<boost::hash, monostate, monostate, monostate>();
     test<boost::hash, int, int, float>();
 
+    test<boost::hash, monostate, X, std::vector<X>>();
+
     test2<std::hash, int>();
     test2<std::hash, float>();
 
@@ -65,7 +78,7 @@ int main()
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1910) && ( !defined(_LIBCPP_STD_VER) || _LIBCPP_STD_VER > 11 )
 
-    BOOST_TEST_TRAIT_FALSE(( detail::is_hash_enabled<X> ));
+    BOOST_TEST_TRAIT_FALSE(( detail::is_hash_enabled<Y> ));
 
 #endif
 
