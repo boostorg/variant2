@@ -26,6 +26,7 @@
 #include <initializer_list>
 #include <utility>
 #include <functional> // std::hash
+#include <cstdint>
 
 //
 
@@ -2195,28 +2196,51 @@ void swap( variant<T...> & v, variant<T...> & w )
 namespace detail
 {
 
+inline std::size_t hash_value_impl_( mp11::mp_true, std::size_t index, std::size_t value )
+{
+    boost::ulong_long_type hv = ( boost::ulong_long_type( 0xCBF29CE4 ) << 32 ) + 0x84222325;
+    boost::ulong_long_type const prime = ( boost::ulong_long_type( 0x00000100 ) << 32 ) + 0x000001B3;
+
+    hv ^= index;
+    hv *= prime;
+
+    hv ^= value;
+    hv *= prime;
+
+    return static_cast<std::size_t>( hv );
+}
+
+inline std::size_t hash_value_impl_( mp11::mp_false, std::size_t index, std::size_t value )
+{
+    std::size_t hv = 0x811C9DC5;
+    std::size_t const prime = 0x01000193;
+
+    hv ^= index;
+    hv *= prime;
+
+    hv ^= value;
+    hv *= prime;
+
+    return hv;
+}
+
+inline std::size_t hash_value_impl( std::size_t index, std::size_t value )
+{
+    return hash_value_impl_( mp11::mp_bool< (SIZE_MAX > UINT32_MAX) >(), index, value );
+}
+
 template<class V> struct hash_value_L
 {
     V const & v;
 
     template<class I> std::size_t operator()( I ) const
     {
-        boost::ulong_long_type hv = ( boost::ulong_long_type( 0xCBF29CE4 ) << 32 ) + 0x84222325;
-        boost::ulong_long_type const prime = ( boost::ulong_long_type( 0x00000100 ) << 32 ) + 0x000001B3;
-
-        // index
-
-        hv ^= I::value;
-        hv *= prime;
-
-        // value
-
         auto const & t = unsafe_get<I::value>( v );
 
-        hv ^= std::hash<remove_cv_ref_t<decltype(t)>>()( t );
-        hv *= prime;
+        std::size_t index = I::value;
+        std::size_t value = std::hash<remove_cv_ref_t<decltype(t)>>()( t );
 
-        return static_cast<std::size_t>( hv );
+        return hash_value_impl( index, value );
     }
 };
 
