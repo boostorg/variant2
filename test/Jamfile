@@ -119,3 +119,5 @@ run variant_visit_r.cpp : : :
     <toolset>gcc,<target-os>windows:<variant>release
     <toolset>gcc,<target-os>cygwin:<variant>release
     ;
+
+compile variant_derived_construct.cpp ;
