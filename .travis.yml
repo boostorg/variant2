@@ -288,7 +288,7 @@ matrix:
       env: CMAKE_TEST=1
       script:
         - mkdir __build__ && cd __build__
-        - cmake -DBOOST_ENABLE_CMAKE=1 -DBoost_VERBOSE=1 -DBOOST_INCLUDE_LIBRARIES=variant2 ..
+        - cmake -DBOOST_ENABLE_CMAKE=1 -DBUILD_TESTING=ON -DBoost_VERBOSE=1 -DBOOST_INCLUDE_LIBRARIES=variant2 ..
         - ctest --output-on-failure -R boost_variant2
 
     - os: linux
