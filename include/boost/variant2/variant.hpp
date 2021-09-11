@@ -13,16 +13,14 @@
 # pragma warning( disable: 4521 4522 ) // multiple copy operators
 #endif
 
-#ifndef BOOST_MP11_HPP_INCLUDED
 #include <boost/mp11.hpp>
-#endif
+#include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/cstdint.hpp>
 #include <cstddef>
 #include <type_traits>
 #include <exception>
-#include <cassert>
 #include <initializer_list>
 #include <utility>
 #include <functional> // std::hash
@@ -857,7 +855,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
     {
         size_t const J = I+1;
 
-        assert( ix_ == J );
+        BOOST_ASSERT( ix_ == J );
 
         return st_.get( mp11::mp_size_t<J>() );
     }
@@ -925,7 +923,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
     {
-        assert( index() == I );
+        BOOST_ASSERT( index() == I );
 
         size_t const J = I+1;
 
@@ -1013,7 +1011,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
     {
         size_t const J = I+1;
 
-        assert( ix_ == J );
+        BOOST_ASSERT( ix_ == J );
 
         return st_.get( mp11::mp_size_t<J>() );
     }
@@ -1137,7 +1135,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
     {
-        assert( index() == I );
+        BOOST_ASSERT( index() == I );
 
         size_t const J = I+1;
 
