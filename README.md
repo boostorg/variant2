@@ -14,5 +14,5 @@ Supported compilers:
 * clang++ 3.9 or later with `-std=c++11` or above
 * Visual Studio 2015, 2017, 2019
 
-Tested on [Travis](https://travis-ci.org/boostorg/variant2/) and
+Tested on [Github Actions](https://github.com/boostorg/variant2/actions) and
 [Appveyor](https://ci.appveyor.com/project/pdimov/variant2-fkab9).
