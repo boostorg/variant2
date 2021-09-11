@@ -365,36 +365,43 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 #endif
 }
 
-// detail::unsafe_get (for visit)
-
-namespace detail
-{
+// unsafe_get
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>& unsafe_get(variant<T...>& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
+
+    BOOST_ASSERT( v.index() == I );
+
     return v._get_impl( mp11::mp_size_t<I>() );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>&& unsafe_get(variant<T...>&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
+
+    BOOST_ASSERT( v.index() == I );
+
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const& unsafe_get(variant<T...> const& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
+
+    BOOST_ASSERT( v.index() == I );
+
     return v._get_impl( mp11::mp_size_t<I>() );
 }
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>> const&& unsafe_get(variant<T...> const&& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
+
+    BOOST_ASSERT( v.index() == I );
+
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 }
-
-} // namespace detail
 
 // get (type)
 
@@ -2174,7 +2181,7 @@ template<class R = detail::deduced, class F, class V1, class V2, class... V> con
 {
     return mp11::mp_with_index<detail::variant_base_size<V1>>( v1.index(), [&]( auto I ){
 
-        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( detail::unsafe_get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
+        auto f2 = [&]( auto&&... a ){ return std::forward<F>(f)( unsafe_get<I.value>( std::forward<V1>(v1) ), std::forward<decltype(a)>(a)... ); };
         return visit<R>( f2, std::forward<V2>(v2), std::forward<V>(v)... );
 
     });
