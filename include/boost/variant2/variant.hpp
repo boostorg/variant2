@@ -371,7 +371,11 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
+#if !defined(BOOST_NO_CXX14_CONSTEXPR)
+
     BOOST_ASSERT( v.index() == I );
+
+#endif
 
     return v._get_impl( mp11::mp_size_t<I>() );
 }
@@ -380,7 +384,11 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
+#if !defined(BOOST_NO_CXX14_CONSTEXPR)
+
     BOOST_ASSERT( v.index() == I );
+
+#endif
 
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 }
@@ -389,7 +397,11 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
+#if !defined(BOOST_NO_CXX14_CONSTEXPR)
+
     BOOST_ASSERT( v.index() == I );
+
+#endif
 
     return v._get_impl( mp11::mp_size_t<I>() );
 }
@@ -398,7 +410,11 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
+#if !defined(BOOST_NO_CXX14_CONSTEXPR)
+
     BOOST_ASSERT( v.index() == I );
+
+#endif
 
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 }
