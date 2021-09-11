@@ -368,16 +368,16 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 // unsafe_get
 
 #if !defined(BOOST_NO_CXX14_CONSTEXPR)
-# define BOOST_VARIANT2_CX14_ASSERT(expr) BOOST_ASSERT(expr)
+# define BOOST_VARIANT2_CX14_ASSERT(expr) BOOST_ASSERT(expr);
 #else
-# define BOOST_VARIANT2_CX14_ASSERT(expr) ((void)0)
+# define BOOST_VARIANT2_CX14_ASSERT(expr)
 #endif
 
 template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T...>>& unsafe_get(variant<T...>& v)
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-    BOOST_VARIANT2_CX14_ASSERT( v.index() == I );
+    BOOST_VARIANT2_CX14_ASSERT( v.index() == I )
 
     return v._get_impl( mp11::mp_size_t<I>() );
 }
@@ -386,7 +386,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-    BOOST_VARIANT2_CX14_ASSERT( v.index() == I );
+    BOOST_VARIANT2_CX14_ASSERT( v.index() == I )
 
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 }
@@ -395,7 +395,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-    BOOST_VARIANT2_CX14_ASSERT( v.index() == I );
+    BOOST_VARIANT2_CX14_ASSERT( v.index() == I )
 
     return v._get_impl( mp11::mp_size_t<I>() );
 }
@@ -404,7 +404,7 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 {
     static_assert( I < sizeof...(T), "Index out of bounds" );
 
-    BOOST_VARIANT2_CX14_ASSERT( v.index() == I );
+    BOOST_VARIANT2_CX14_ASSERT( v.index() == I )
 
     return std::move( v._get_impl( mp11::mp_size_t<I>() ) );
 }
@@ -877,7 +877,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
     {
         // size_t const J = I+1;
 
-        BOOST_VARIANT2_CX14_ASSERT( ix_ == I+1 );
+        BOOST_VARIANT2_CX14_ASSERT( ix_ == I+1 )
 
         return st_.get( mp11::mp_size_t<I+1>() );
     }
@@ -947,7 +947,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
 
     template<std::size_t I> constexpr mp11::mp_at_c<variant<T...>, I> const& _get_impl( mp11::mp_size_t<I> ) const noexcept
     {
-        BOOST_VARIANT2_CX14_ASSERT( index() == I );
+        BOOST_VARIANT2_CX14_ASSERT( index() == I )
 
         // size_t const J = I+1;
         // constexpr mp_size_t<J> j{};
@@ -1035,7 +1035,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
     {
         // size_t const J = I+1;
 
-        BOOST_VARIANT2_CX14_ASSERT( ix_ == I+1 );
+        BOOST_VARIANT2_CX14_ASSERT( ix_ == I+1 )
 
         return st_.get( mp11::mp_size_t<I+1>() );
     }
@@ -1161,7 +1161,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
 
     template<std::size_t I> constexpr mp11::mp_at_c<variant<T...>, I> const& _get_impl( mp11::mp_size_t<I> ) const noexcept
     {
-        BOOST_VARIANT2_CX14_ASSERT( index() == I );
+        BOOST_VARIANT2_CX14_ASSERT( index() == I )
 
         // size_t const J = I+1;
         // constexpr mp_size_t<J> j{};
