@@ -1,10 +1,7 @@
 ////
-Copyright 2018, 2019 Peter Dimov
-
+Copyright 2018-2021 Peter Dimov
 Distributed under the Boost Software License, Version 1.0.
-
-See accompanying file LICENSE_1_0.txt or copy at
-http://www.boost.org/LICENSE_1_0.txt
+https://www.boost.org/LICENSE_1_0.txt
 ////
 
 [#reference]
@@ -116,6 +113,21 @@ template<class U, class... T>
 template<class U, class... T>
   constexpr add_pointer_t<const U>
     get_if(const variant<T...>* v) noexcept;
+
+// unsafe_get (extension)
+
+template<size_t I, class... T>
+  constexpr variant_alternative_t<I, variant<T...>>&
+    unsafe_get(variant<T...>& v);
+template<size_t I, class... T>
+  constexpr variant_alternative_t<I, variant<T...>>&&
+    unsafe_get(variant<T...>&& v);
+template<size_t I, class... T>
+  constexpr const variant_alternative_t<I, variant<T...>>&
+    unsafe_get(const variant<T...>& v);
+template<size_t I, class... T>
+  constexpr const variant_alternative_t<I, variant<T...>>&&
+    unsafe_get(const variant<T...>&& v);
 
 // relational operators
 
@@ -775,6 +787,34 @@ Requires: :: The type `U` occurs exactly once in `T...`. Otherwise, the
 Effects:  :: Equivalent to: `return get_if<I>(v);` with `I` being
   the zero-based index of `U` in `T...`.
 
+### unsafe_get (extension)
+
+```
+template<size_t I, class... T>
+  constexpr variant_alternative_t<I, variant<T...>>&
+    unsafe_get(variant<T...>& v);
+```
+```
+template<size_t I, class... T>
+  constexpr variant_alternative_t<I, variant<T...>>&&
+    unsafe_get(variant<T...>&& v);
+```
+```
+template<size_t I, class... T>
+  constexpr const variant_alternative_t<I, variant<T...>>&
+    unsafe_get(const variant<T...>& v);
+```
+```
+template<size_t I, class... T>
+  constexpr const variant_alternative_t<I, variant<T...>>&&
+    unsafe_get(const variant<T...>&& v);
+```
+[none]
+* {blank}
++
+Requires: :: `v.index() == I`.
+Returns: :: a reference to the object stored in the variant.
+
 ### Relational Operators
 
 ```
@@ -878,3 +918,7 @@ public:
     }
 };
 ```
+
+## <boost/variant2.hpp>
+
+This convenience header includes `<boost/variant2/variant.hpp>`.
