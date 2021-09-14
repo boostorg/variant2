@@ -25,6 +25,7 @@
 #include <utility>
 #include <functional> // std::hash
 #include <cstdint>
+#include <iosfwd>
 
 //
 
@@ -2234,6 +2235,30 @@ template<class R = detail::deduced, class V, class... F> constexpr auto visit_by
 
     return mp11::mp_with_index<variant_size<V>::value>( v.index(),
         detail::visit_by_index_L<R, V, F...>{ std::forward<V>(v), std::tuple<F&&...>( std::forward<F>(f)... ) } );
+}
+
+// output streaming
+
+namespace detail
+{
+
+template<class Ch, class Tr, class... T> struct ostream_insert_L
+{
+    std::basic_ostream<Ch, Tr>& os;
+    variant<T...> const& v;
+
+    template<class I> std::basic_ostream<Ch, Tr>& operator()( I ) const
+    {
+        return os << unsafe_get<I::value>( v );
+    }
+};
+
+} // namespace detail
+
+template<class Ch, class Tr, class... T> std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v )
+{
+    return mp11::mp_with_index<sizeof...(T)>( v.index(),
+        detail::ostream_insert_L<Ch, Tr, T...>{ os, v } );
 }
 
 // hashing support
