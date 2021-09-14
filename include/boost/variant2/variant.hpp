@@ -2213,27 +2213,27 @@ void swap( variant<T...> & v, variant<T...> & w )
 namespace detail
 {
 
-template<class V, class... F> struct visit_by_index_L
+template<class R, class V, class... F> using Vret2 = mp11::mp_eval_if_not< std::is_same<R, deduced>, R, front_if_same, mp11::mp_transform<mp11::mp_invoke_q, mp11::mp_list<Qret<F>...>, apply_cv_ref<V>> >;
+
+template<class R, class V, class... F> struct visit_by_index_L
 {
     V&& v;
     std::tuple<F&&...> tp;
 
-    template<class I> void operator()( I ) const
+    template<class I> constexpr detail::Vret2<R, V, F...> operator()( I ) const
     {
-        std::get<I::value>( std::move(tp) )( unsafe_get<I::value>( std::forward<V>(v) ) );
+        return std::get<I::value>( std::move(tp) )( unsafe_get<I::value>( std::forward<V>(v) ) );
     }
 };
 
 } // namespace detail
 
-template<class V, class... F> void visit_by_index( V&& v, F&&... f )
+template<class R = detail::deduced, class V, class... F> constexpr auto visit_by_index( V&& v, F&&... f ) -> detail::Vret2<R, V, F...>
 {
-    constexpr auto N = variant_size<V>::value;
+    static_assert( variant_size<V>::value == sizeof...(F), "Incorrect number of function objects" );
 
-    static_assert( N == sizeof...(F), "Incorrect number of function objects" );
-
-    mp11::mp_with_index<N>( v.index(),
-        detail::visit_by_index_L<V, F...>{ std::forward<V>(v), std::tuple<F&&...>( std::forward<F>(f)... ) } );
+    return mp11::mp_with_index<variant_size<V>::value>( v.index(),
+        detail::visit_by_index_L<R, V, F...>{ std::forward<V>(v), std::tuple<F&&...>( std::forward<F>(f)... ) } );
 }
 
 // hashing support
