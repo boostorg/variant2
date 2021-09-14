@@ -2208,6 +2208,34 @@ void swap( variant<T...> & v, variant<T...> & w )
     v.swap( w );
 }
 
+// visit_by_index
+
+namespace detail
+{
+
+template<class V, class... F> struct visit_by_index_L
+{
+    V&& v;
+    std::tuple<F&&...> tp;
+
+    template<class I> void operator()( I ) const
+    {
+        std::get<I::value>( std::move(tp) )( unsafe_get<I::value>( std::forward<V>(v) ) );
+    }
+};
+
+} // namespace detail
+
+template<class V, class... F> void visit_by_index( V&& v, F&&... f )
+{
+    constexpr auto N = variant_size<V>::value;
+
+    static_assert( N == sizeof...(F), "Incorrect number of function objects" );
+
+    mp11::mp_with_index<N>( v.index(),
+        detail::visit_by_index_L<V, F...>{ std::forward<V>(v), std::tuple<F&&...>( std::forward<F>(f)... ) } );
+}
+
 // hashing support
 
 namespace detail
