@@ -12,6 +12,7 @@ https://www.boost.org/LICENSE_1_0.txt
 
 * Added `<boost/variant2.hpp>`.
 * Added `unsafe_get<I>`.
+* Added `visit_by_index`.
 
 ## Changes in 1.76.0
 

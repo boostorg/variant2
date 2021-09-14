@@ -169,6 +169,10 @@ The main differences between this implementation and `std::variant` are:
   `variant<int, float>` is provided as the member function `subset<U...>`.
   (This operation can throw if the current state of the variant cannot be
   represented.)
+* `unsafe_get`, an unchecked alternative to `get` and `get_if`, is provided
+  as an extension.
+* `visit_by_index`, a visitation function that takes a single variant and a
+  number of function objects, one per alternative, is provided as an extension.
 * The {cpp}20 additions and changes to `std::variant` have not yet been
   implemented.
 

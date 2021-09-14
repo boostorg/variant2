@@ -149,6 +149,11 @@ template<class... T>
 template<class R = /*unspecified*/, class F, class... V>
   constexpr /*see below*/ visit(F&& f, V&&... v);
 
+// visit_by_index (extension)
+
+template<class V, class... F>
+  void visit_by_index(V&& v, F&&.. f);
+
 // monostate
 
 struct monostate {};
@@ -890,6 +895,20 @@ Remarks: :: If `R` is given explicitly, as in `visit<int>`, the return
   type is `R`. Otherwise, it's deduced from `F`. All possible applications
   of `F` to the variant alternatives must have the same return type for
   this deduction to succeed.
+
+### visit_by_index (extension)
+
+```
+template<class V, class... F>
+  void visit_by_index(V&& v, F&&.. f);
+```
+[none]
+* {blank}
++
+Requires: :: `variant_size<V>::value == sizeof...(F)`, or the program is ill-formed.
+Effects: :: `std::forward<Fi>(fi)(get<i>(std::forward<V>(v)))`, where
+  `i` is `v.index()` and `Fi` and `fi` are the `i`-th element of `F...` and `f...`
+  accordingly.
 
 ### swap
 
