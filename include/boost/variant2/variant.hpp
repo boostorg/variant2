@@ -2255,10 +2255,10 @@ template<class Ch, class Tr, class... T> struct ostream_insert_L
 
 } // namespace detail
 
-template<class Ch, class Tr, class... T> std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v )
+template<class Ch, class Tr, class T1, class... T> std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<T1, T...> const& v )
 {
-    return mp11::mp_with_index<sizeof...(T)>( v.index(),
-        detail::ostream_insert_L<Ch, Tr, T...>{ os, v } );
+    return mp11::mp_with_index<1 + sizeof...(T)>( v.index(),
+        detail::ostream_insert_L<Ch, Tr, T1, T...>{ os, v } );
 }
 
 // hashing support
