@@ -1,4 +1,4 @@
-# Copyright 2016-2020 Peter Dimov
+# Copyright 2016-2021 Peter Dimov
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
@@ -29,6 +29,10 @@ environment:
       TOOLSET: msvc-14.2
       ADDRMD: 32,64
       CXXSTD: 14,17,latest
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      TOOLSET: clang-win
+      ADDRMD: 64
+      CXXSTD: 14,17,latest
 
 install:
   - set BOOST_BRANCH=develop
@@ -47,4 +51,4 @@ build: off
 test_script:
   - if not "%CXXSTD%" == "" set CXXSTD=cxxstd=%CXXSTD%
   - if not "%ADDRMD%" == "" set ADDRMD=address-model=%ADDRMD%
-  - b2 -j3 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release
+  - b2 -j3 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release embed-manifest-via=linker
