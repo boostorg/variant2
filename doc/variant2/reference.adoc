@@ -144,6 +144,17 @@ template<class... T>
 template<class... T>
   constexpr bool operator>=(const variant<T...>& v, const variant<T...>& w);
 
+// stream insertion (extension)
+
+template<class Ch, class Tr, class... T>
+  std::basic_ostream<Ch, Tr>&
+    operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v );
+
+// swap
+
+template<class... T>
+  void swap(variant<T...>& v, variant<T...>& w) noexcept( /*see below*/ );
+
 // visit
 
 template<class R = /*unspecified*/, class F, class... V>
@@ -164,11 +175,6 @@ constexpr bool operator<(monostate, monostate) noexcept { return false; }
 constexpr bool operator>(monostate, monostate) noexcept { return false; }
 constexpr bool operator<=(monostate, monostate) noexcept { return true; }
 constexpr bool operator>=(monostate, monostate) noexcept { return true; }
-
-// swap
-
-template<class... T>
-  void swap(variant<T...>& v, variant<T...>& w) noexcept( /*see below*/ );
 
 // bad_variant_access
 
@@ -880,6 +886,32 @@ template<class... T>
 Returns: ::
   `w \<= v`.
 
+### Stream Insertion (extension)
+```
+template<class Ch, class Tr, class... T>
+  std::basic_ostream<Ch, Tr>&
+    operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v );
+```
+[none]
+* {blank}
++
+Requires: ::
+  `sizeof...(T) != 0`.
+Returns: ::
+  `os << get<I>(v)`, where `I` is `v.index()`.
+
+### swap
+
+```
+template<class... T>
+  void swap(variant<T...>& v, variant<T...>& w) noexcept( /*see below*/ );
+```
+[none]
+* {blank}
++
+Effects: ::
+  Equivalent to `v.swap(w)`.
+
 ### visit
 
 ```
@@ -913,18 +945,6 @@ Remarks: :: If `R` is given explicitly, as in `visit_by_index<int>`, the return
   type is `R`. Otherwise, it's deduced from `F...` and `V`. All the applications
   of `Fi` to the corresponding variant alternatives must have the same return type
   for this deduction to succeed.
-
-### swap
-
-```
-template<class... T>
-  void swap(variant<T...>& v, variant<T...>& w) noexcept( /*see below*/ );
-```
-[none]
-* {blank}
-+
-Effects: ::
-  Equivalent to `v.swap(w)`.
 
 ### bad_variant_access
 
