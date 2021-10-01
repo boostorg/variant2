@@ -13,7 +13,10 @@
 # pragma warning( disable: 4521 4522 ) // multiple copy operators
 #endif
 
-#include <boost/mp11.hpp>
+#include <boost/mp11/algorithm.hpp>
+#include <boost/mp11/function.hpp>
+#include <boost/mp11/integral.hpp>
+#include <boost/mp11/utility.hpp>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
