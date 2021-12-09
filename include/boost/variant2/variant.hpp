@@ -2253,9 +2253,19 @@ template<class Ch, class Tr, class... T> struct ostream_insert_L
     }
 };
 
+template<class Os, class T, class E = void> struct is_output_streamable: std::false_type
+{
+};
+
+template<class Os, class T> struct is_output_streamable<Os, T, decltype( std::declval<Os&>() << std::declval<T const&>(), (void)0 )>: std::true_type
+{
+};
+
 } // namespace detail
 
-template<class Ch, class Tr, class T1, class... T> std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<T1, T...> const& v )
+template<class Ch, class Tr, class T1, class... T,
+    class E = typename std::enable_if< mp11::mp_all< detail::is_output_streamable<std::basic_ostream<Ch, Tr>, T>... >::value >::type >
+std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<T1, T...> const& v )
 {
     return mp11::mp_with_index<1 + sizeof...(T)>( v.index(),
         detail::ostream_insert_L<Ch, Tr, T1, T...>{ os, v } );
