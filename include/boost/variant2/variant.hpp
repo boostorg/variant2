@@ -2263,6 +2263,13 @@ template<class Os, class T> struct is_output_streamable<Os, T, decltype( std::de
 
 } // namespace detail
 
+template<class Ch, class Tr>
+std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, monostate const& )
+{
+    os << "monostate";
+    return os;
+}
+
 template<class Ch, class Tr, class T1, class... T,
     class E = typename std::enable_if< mp11::mp_all< detail::is_output_streamable<std::basic_ostream<Ch, Tr>, T>... >::value >::type >
 std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<T1, T...> const& v )

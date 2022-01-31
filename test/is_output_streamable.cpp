@@ -30,9 +30,12 @@ int main()
     BOOST_TEST_TRAIT_FALSE((boost::variant2::detail::is_output_streamable<std::ostream, X>));
     BOOST_TEST_TRAIT_TRUE((boost::variant2::detail::is_output_streamable<std::ostream, Y>));
 
+    BOOST_TEST_TRAIT_TRUE((boost::variant2::detail::is_output_streamable<std::ostream, boost::variant2::monostate>));
+
     BOOST_TEST_TRAIT_TRUE((boost::variant2::detail::is_output_streamable<std::ostream, boost::variant2::variant<int, float, std::string>>));
     BOOST_TEST_TRAIT_FALSE((boost::variant2::detail::is_output_streamable<std::ostream, boost::variant2::variant<int, float, X>>));
     BOOST_TEST_TRAIT_TRUE((boost::variant2::detail::is_output_streamable<std::ostream, boost::variant2::variant<int, float, Y>>));
+    BOOST_TEST_TRAIT_TRUE((boost::variant2::detail::is_output_streamable<std::ostream, boost::variant2::variant<boost::variant2::monostate, int, float>>));
 
     return boost::report_errors();
 }
