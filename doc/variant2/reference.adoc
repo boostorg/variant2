@@ -144,12 +144,6 @@ template<class... T>
 template<class... T>
   constexpr bool operator>=(const variant<T...>& v, const variant<T...>& w);
 
-// stream insertion (extension)
-
-template<class Ch, class Tr, class... T>
-  std::basic_ostream<Ch, Tr>&
-    operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v );
-
 // swap
 
 template<class... T>
@@ -175,6 +169,16 @@ constexpr bool operator<(monostate, monostate) noexcept { return false; }
 constexpr bool operator>(monostate, monostate) noexcept { return false; }
 constexpr bool operator<=(monostate, monostate) noexcept { return true; }
 constexpr bool operator>=(monostate, monostate) noexcept { return true; }
+
+// stream insertion (extension)
+
+template<class Ch, class Tr, class... T>
+  std::basic_ostream<Ch, Tr>&
+    operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v );
+
+template<class Ch, class Tr>
+  std::basic_ostream<Ch, Tr>&
+    operator<<( std::basic_ostream<Ch, Tr>& os, monostate const& v );
 
 // bad_variant_access
 
@@ -886,20 +890,6 @@ template<class... T>
 Returns: ::
   `w \<= v`.
 
-### Stream Insertion (extension)
-```
-template<class Ch, class Tr, class... T>
-  std::basic_ostream<Ch, Tr>&
-    operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v );
-```
-[none]
-* {blank}
-+
-Requires: ::
-  `sizeof...(T) != 0`.
-Returns: ::
-  `os << get<I>(v)`, where `I` is `v.index()`.
-
 ### swap
 
 ```
@@ -945,6 +935,33 @@ Remarks: :: If `R` is given explicitly, as in `visit_by_index<int>`, the return
   type is `R`. Otherwise, it's deduced from `F...` and `V`. All the applications
   of `Fi` to the corresponding variant alternatives must have the same return type
   for this deduction to succeed.
+
+### Stream Insertion (extension)
+```
+template<class Ch, class Tr, class... T>
+  std::basic_ostream<Ch, Tr>&
+    operator<<( std::basic_ostream<Ch, Tr>& os, variant<T...> const& v );
+```
+[none]
+* {blank}
++
+Requires: ::
+  `sizeof...(T) != 0`.
+Returns: ::
+  `os << get<I>(v)`, where `I` is `v.index()`.
+
+```
+template<class Ch, class Tr>
+  std::basic_ostream<Ch, Tr>&
+    operator<<( std::basic_ostream<Ch, Tr>& os, monostate const& v );
+```
+[none]
+* {blank}
++
+Effects: ::
+  `os << "monostate"`.
+Returns: ::
+  `os`.
 
 ### bad_variant_access
 
