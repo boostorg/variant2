@@ -2239,6 +2239,7 @@ template<class R = detail::deduced, class V, class... F> constexpr auto visit_by
 
 // output streaming
 
+#if !defined(BOOST_VARIANT2_NO_OSTREAM)
 namespace detail
 {
 
@@ -2277,6 +2278,7 @@ std::basic_ostream<Ch, Tr>& operator<<( std::basic_ostream<Ch, Tr>& os, variant<
     return mp11::mp_with_index<1 + sizeof...(T)>( v.index(),
         detail::ostream_insert_L<Ch, Tr, T1, T...>{ os, v } );
 }
+#endif
 
 // hashing support
 
