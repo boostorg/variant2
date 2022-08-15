@@ -113,7 +113,7 @@ jobs:
             install: clang-14
           - toolset: clang
             cxxstd: "03,11,14,17,2a"
-            os: macos-10.15
+            os: macos-11
 
     runs-on: ${{matrix.os}}
 
@@ -223,7 +223,7 @@ jobs:
           - os: ubuntu-18.04
           - os: ubuntu-20.04
           - os: ubuntu-22.04
-          - os: macos-10.15
+          - os: macos-11
 
     runs-on: ${{matrix.os}}
 
@@ -270,7 +270,7 @@ jobs:
           - os: ubuntu-18.04
           - os: ubuntu-20.04
           - os: ubuntu-22.04
-          - os: macos-10.15
+          - os: macos-11
 
     runs-on: ${{matrix.os}}
 
@@ -327,7 +327,7 @@ jobs:
           - os: ubuntu-18.04
           - os: ubuntu-20.04
           - os: ubuntu-22.04
-          - os: macos-10.15
+          - os: macos-11
 
     runs-on: ${{matrix.os}}
 
