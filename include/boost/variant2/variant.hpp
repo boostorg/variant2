@@ -2419,12 +2419,6 @@ template<class T>
 void value_from( T&& t, value& jv );
 
 template<class T>
-struct value_to_tag;
-
-template<class T>
-T value_to( value const & v );
-
-template<class T>
 struct try_value_to_tag;
 
 template<class T1, class T2>
