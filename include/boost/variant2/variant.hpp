@@ -2449,15 +2449,51 @@ template<> struct is_null_like< variant2::monostate, void >: std::true_type
 namespace variant2
 {
 
+namespace detail
+{
+
+struct tag_invoke_L1
+{
+    boost::json::value& v;
+
+    template<class T> void operator()( T const& t ) const
+    {
+        boost::json::value_from( t, v );
+    }
+};
+
+} // namespace detail
+
 template<class... T>
     void tag_invoke( boost::json::value_from_tag const&, boost::json::value& v, variant<T...> const & w )
 {
-    visit( [&](auto const& t){
-
-        boost::json::value_from( t, v );
-
-    }, w );
+    visit( detail::tag_invoke_L1{ v }, w );
 }
+
+namespace detail
+{
+
+template<class V> struct tag_invoke_L2
+{
+    boost::json::value const& v;
+    typename boost::json::result_for<V, boost::json::value>::type& r;
+
+    template<class I> void operator()( I i ) const
+    {
+        if( !r )
+        {
+            using Ti = mp11::mp_at_c<V, i>;
+            auto r2 = boost::json::try_value_to<Ti>( v );
+
+            if( r2 )
+            {
+                r.emplace( in_place_index_t<i>{}, *r2 );
+            }
+        }
+    }
+};
+
+} // namespace detail
 
 template<class... T>
     typename boost::json::result_for<variant<T...>, boost::json::value>::type
@@ -2466,20 +2502,7 @@ template<class... T>
     static constexpr boost::source_location loc = BOOST_CURRENT_LOCATION;
     auto r = boost::json::result_from_errno< variant<T...> >( EINVAL, &loc );
 
-    mp11::mp_for_each<mp11::mp_iota_c<sizeof...(T)>>( [&](auto I){
-
-        if( !r )
-        {
-            using Ti = mp11::mp_at_c<variant<T...>, I>;
-            auto r2 = boost::json::try_value_to<Ti>( v );
-
-            if( r2 )
-            {
-                r.emplace( in_place_index<I>, *r2 );
-            }
-        }
-
-    });
+    mp11::mp_for_each<mp11::mp_iota_c<sizeof...(T)>>( detail::tag_invoke_L2< variant<T...> >{ v, r } );
 
     return r;
 }
