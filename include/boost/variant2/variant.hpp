@@ -15,8 +15,9 @@
 
 #include <boost/mp11.hpp>
 #include <boost/assert.hpp>
+#include <boost/assert/source_location.hpp>
 #include <boost/config.hpp>
-#include <boost/detail/workaround.hpp>
+#include <boost/config/workaround.hpp>
 #include <boost/cstdint.hpp>
 #include <cstddef>
 #include <type_traits>
@@ -24,8 +25,9 @@
 #include <initializer_list>
 #include <utility>
 #include <functional> // std::hash
-#include <cstdint>
 #include <iosfwd>
+#include <cstdint>
+#include <cerrno>
 
 //
 
@@ -2401,6 +2403,89 @@ template<> struct hash< ::boost::variant2::monostate >
 };
 
 } // namespace std
+
+// JSON support
+
+namespace boost
+{
+namespace json
+{
+
+class value;
+
+struct value_from_tag;
+
+template<class T>
+void value_from( T&& t, value& jv );
+
+template<class T>
+struct value_to_tag;
+
+template<class T>
+T value_to( value const & v );
+
+template<class T>
+struct try_value_to_tag;
+
+template<class T1, class T2>
+struct result_for;
+
+template<class T>
+typename result_for<T, value>::type
+try_value_to( value const & jv );
+
+template<class T>
+typename result_for<T, value>::type
+result_from_errno( int e, boost::source_location const* loc ) noexcept;
+
+template<class T, class E> struct is_null_like;
+
+template<> struct is_null_like< variant2::monostate, void >: std::true_type
+{
+};
+
+} // namespace json
+
+namespace variant2
+{
+
+template<class... T>
+    void tag_invoke( boost::json::value_from_tag const&, boost::json::value& v, variant<T...> const & w )
+{
+    visit( [&](auto const& t){
+
+        boost::json::value_from( t, v );
+
+    }, w );
+}
+
+template<class... T>
+    typename boost::json::result_for<variant<T...>, boost::json::value>::type
+    tag_invoke( boost::json::try_value_to_tag<variant<T...>> const&, boost::json::value const& v )
+{
+    static constexpr boost::source_location loc = BOOST_CURRENT_LOCATION;
+    auto r = boost::json::result_from_errno< variant<T...> >( EINVAL, &loc );
+
+    mp11::mp_for_each<mp11::mp_iota_c<sizeof...(T)>>( [&](auto I){
+
+        if( !r )
+        {
+            using Ti = mp11::mp_at_c<variant<T...>, I>;
+            auto r2 = boost::json::try_value_to<Ti>( v );
+
+            if( r2 )
+            {
+                r.emplace( in_place_index<I>, *r2 );
+            }
+        }
+
+    });
+
+    return r;
+}
+
+} // namespace variant2
+} // namespace boost
 
 #undef BOOST_VARIANT2_CX14_ASSERT
 
