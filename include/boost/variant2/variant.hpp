@@ -2438,11 +2438,9 @@ template<class T>
 typename result_for<T, value>::type
 result_from_errno( int e, boost::source_location const* loc ) noexcept;
 
-template<class T, class E> struct is_null_like;
+template<class T> struct is_null_like;
 
-template<> struct is_null_like< variant2::monostate, void >: std::true_type
-{
-};
+template<> struct is_null_like<variant2::monostate>: std::true_type {};
 
 } // namespace json
 
