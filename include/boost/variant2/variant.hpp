@@ -2479,7 +2479,7 @@ template<class V> struct tag_invoke_L2
 
             if( r2 )
             {
-                r.emplace( in_place_index_t<i>{}, *r2 );
+                r.emplace( in_place_index_t<i>{}, std::move( *r2 ) );
             }
         }
     }
