@@ -2448,6 +2448,11 @@ struct tag_invoke_L1
 {
     boost::json::value& v;
 
+#if defined(BOOST_MSVC) && BOOST_MSVC / 10 == 191
+    // msvc-14.1 with /permissive- needs this
+    explicit tag_invoke_L1( boost::json::value& v_ ): v( v_ ) {}
+#endif
+
     template<class T> void operator()( T const& t ) const
     {
         boost::json::value_from( t, v );
