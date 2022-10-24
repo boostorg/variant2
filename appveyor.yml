@@ -22,6 +22,11 @@ environment:
       ADDRMD: 32,64
       CXXSTD: 14,17,latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      TOOLSET: msvc-14.1
+      ADDRMD: 32,64
+      CXXSTD: 14,17,latest
+      CXXFLAGS: /permissive-
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: clang-win
       ADDRMD: 64
       CXXSTD: 14,17,latest
@@ -51,4 +56,5 @@ build: off
 test_script:
   - if not "%CXXSTD%" == "" set CXXSTD=cxxstd=%CXXSTD%
   - if not "%ADDRMD%" == "" set ADDRMD=address-model=%ADDRMD%
-  - b2 -j3 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release embed-manifest-via=linker
+  - if not "%CXXFLAGS%" == "" set CXXFLAGS=cxxflags=%CXXFLAGS%
+  - b2 -j3 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% %CXXFLAGS% variant=debug,release embed-manifest-via=linker
