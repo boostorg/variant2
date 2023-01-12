@@ -41,10 +41,6 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       CMAKE: 1
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      CMAKE: 1
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      CMAKE: 1
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       CMAKE_SUBDIR: 1
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       CMAKE_INSTALL: 1
@@ -70,7 +66,7 @@ test_script:
   - if "%CMAKE%%CMAKE_SUBDIR%%CMAKE_INSTALL%" == ""  b2 -j3 libs/variant2/test toolset=%TOOLSET% %CXXSTD% %ADDRMD% %CXXFLAGS% variant=debug,release embed-manifest-via=linker
 
   - if not "%CMAKE%" == ""  mkdir __build__ && cd __build__
-  - if not "%CMAKE%" == ""  cmake -DBUILD_TESTING=ON -DBOOST_INCLUDE_LIBRARIES=variant2 ..
+  - if not "%CMAKE%" == ""  cmake -DBUILD_TESTING=ON -DBOOST_INCLUDE_LIBRARIES=variant2 -DBoost_VERBOSE=ON ..
   - if not "%CMAKE%" == ""  cmake --build . --target tests --config Debug & ctest --output-on-failure --no-tests=error -C Debug
   - if not "%CMAKE%" == ""  cmake --build . --target tests --config Release & ctest --output-on-failure --no-tests=error -C Release
   - if not "%CMAKE%" == ""  cmake --build . --target tests --config MinSizeRel & ctest --output-on-failure --no-tests=error -C MinSizeRel
