@@ -31,10 +31,6 @@ environment:
       ADDRMD: 64
       CXXSTD: 14,17,latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      TOOLSET: msvc-14.2
-      ADDRMD: 32,64
-      CXXSTD: 14,17,latest
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       TOOLSET: clang-win
       ADDRMD: 64
       CXXSTD: 14,17,latest
@@ -67,10 +63,10 @@ test_script:
 
   - if not "%CMAKE%" == ""  mkdir __build__ && cd __build__
   - if not "%CMAKE%" == ""  cmake -DBUILD_TESTING=ON -DBOOST_INCLUDE_LIBRARIES=variant2 -DBoost_VERBOSE=ON ..
-  - if not "%CMAKE%" == ""  cmake --build . --target tests --config Debug & ctest --output-on-failure --no-tests=error -C Debug
-  - if not "%CMAKE%" == ""  cmake --build . --target tests --config Release & ctest --output-on-failure --no-tests=error -C Release
-  - if not "%CMAKE%" == ""  cmake --build . --target tests --config MinSizeRel & ctest --output-on-failure --no-tests=error -C MinSizeRel
-  - if not "%CMAKE%" == ""  cmake --build . --target tests --config RelWithDebInfo & ctest --output-on-failure --no-tests=error -C RelWithDebInfo
+  - if not "%CMAKE%" == ""  cmake --build . --target tests -j 3 --config Debug & ctest --output-on-failure --no-tests=error -j 3 -C Debug
+  - if not "%CMAKE%" == ""  cmake --build . --target tests -j 3 --config Release & ctest --output-on-failure --no-tests=error -j 3 -C Release
+  - if not "%CMAKE%" == ""  cmake --build . --target tests -j 3 --config MinSizeRel & ctest --output-on-failure --no-tests=error -j 3 -C MinSizeRel
+  - if not "%CMAKE%" == ""  cmake --build . --target tests -j 3 --config RelWithDebInfo & ctest --output-on-failure --no-tests=error -j 3 -C RelWithDebInfo
 
   - if not "%CMAKE_SUBDIR%" == ""  cd libs/variant2/test/cmake_subdir_test && mkdir __build__ && cd __build__
   - if not "%CMAKE_SUBDIR%" == ""  cmake ..
