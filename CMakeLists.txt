@@ -19,12 +19,14 @@ target_link_libraries(boost_variant2
     Boost::mp11
 )
 
-file(GLOB_RECURSE boost_variant2_IDEFILES CONFIGURE_DEPENDS include/*.hpp)
-source_group(TREE ${PROJECT_SOURCE_DIR}/include FILES ${boost_variant2_IDEFILES})
-if (CMAKE_GENERATOR MATCHES "Visual Studio")
-    list(APPEND boost_variant2_IDEFILES extra/boost_variant2.natvis)
+if(CMAKE_VERSION VERSION_GREATER 3.18 AND CMAKE_GENERATOR MATCHES "Visual Studio")
+
+  file(GLOB_RECURSE boost_variant2_IDEFILES CONFIGURE_DEPENDS include/*.hpp)
+  source_group(TREE ${PROJECT_SOURCE_DIR}/include FILES ${boost_variant2_IDEFILES} PREFIX "Header Files")
+  list(APPEND boost_variant2_IDEFILES extra/boost_variant2.natvis)
+  target_sources(boost_variant2 PRIVATE ${boost_variant2_IDEFILES})
+
 endif()
-target_sources(boost_variant2 PRIVATE ${boost_variant2_IDEFILES})
 
 target_compile_features(boost_variant2 INTERFACE cxx_std_11)
 
