@@ -196,35 +196,32 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     linux_pipeline(
-        "Linux 20.04 Clang 13",
-        "cppalliance/droneubuntu2004:1",
+        "Linux 22.04 Clang 13",
+        "cppalliance/droneubuntu2204:1",
         { TOOLSET: 'clang', COMPILER: 'clang++-13', CXXSTD: '03,11,14,17,20' },
         "clang-13",
-        ["deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"],
     ),
 
     linux_pipeline(
-        "Linux 20.04 Clang 14 UBSAN",
-        "cppalliance/droneubuntu2004:1",
+        "Linux 22.04 Clang 14 UBSAN",
+        "cppalliance/droneubuntu2204:1",
         { TOOLSET: 'clang', COMPILER: 'clang++-14', CXXSTD: '03,11,14,17,20' } + ubsan,
         "clang-14",
-        ["deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"],
     ),
 
     linux_pipeline(
-        "Linux 20.04 Clang 14 ASAN",
-        "cppalliance/droneubuntu2004:1",
+        "Linux 22.04 Clang 14 ASAN",
+        "cppalliance/droneubuntu2204:1",
         { TOOLSET: 'clang', COMPILER: 'clang++-14', CXXSTD: '03,11,14,17,20' } + asan,
         "clang-14",
-        ["deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main"],
     ),
 
     linux_pipeline(
-        "Linux 20.04 Clang 15",
-        "cppalliance/droneubuntu2004:1",
+        "Linux 22.04 Clang 15",
+        "cppalliance/droneubuntu2204:1",
         { TOOLSET: 'clang', COMPILER: 'clang++-15', CXXSTD: '03,11,14,17,20,2b' },
         "clang-15",
-        ["deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"],
+        ["deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"],
     ),
 
     macos_pipeline(
