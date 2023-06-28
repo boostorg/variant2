@@ -131,3 +131,5 @@ local JSON = <library>/boost//json/<warnings>off "<toolset>msvc-14.0:<build>no" 
 
 run variant_json_value_from.cpp : : : $(JSON) ;
 run variant_json_value_to.cpp : : : $(JSON) ;
+
+compile variant_uses_double_storage.cpp ;
