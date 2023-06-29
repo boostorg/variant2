@@ -8,6 +8,10 @@ https://www.boost.org/LICENSE_1_0.txt
 # Revision History
 :idprefix: changelog_
 
+## Changes in 1.83.0
+
+* Added `uses_double_storage()`.
+
 ## Changes in 1.81.0
 
 * Added support for `boost::json::value_from` and `boost::json::value_to`.
