@@ -61,18 +61,18 @@ int main()
     }
 
     {
-        variant<int, float> const v( 3.14f );
+        variant<int, float> const v( 3.125f );
 
         BOOST_TEST_EQ( visit<int>( F1(), v ), 3 );
-        BOOST_TEST_EQ( visit<float>( F1(), v ), 3.14f );
+        BOOST_TEST_EQ( visit<float>( F1(), v ), 3.125f );
     }
 
     {
         variant<int, float> v1( 1 );
-        variant<int, float> const v2( 3.14f );
+        variant<int, float> const v2( 3.125f );
 
         BOOST_TEST_EQ( visit<int>( F2(), v1, v2 ), 4 );
-        BOOST_TEST_EQ( visit<float>( F2(), v1, v2 ), static_cast<float>( 1 + 3.14f ) ); // see FLT_EVAL_METHOD
+        BOOST_TEST_EQ( visit<float>( F2(), v1, v2 ), 1 + 3.125f );
     }
 
     {
