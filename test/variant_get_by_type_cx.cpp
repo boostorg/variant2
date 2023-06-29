@@ -58,7 +58,7 @@ int main()
     {
         constexpr variant<int, float> v( 3.14f );
 
-        STATIC_ASSERT( get<float>(v) == 3.14f );
+        STATIC_ASSERT( get<float>(v) == (float)3.14f ); // see FLT_EVAL_METHOD
 
         STATIC_ASSERT_IF( get_if<int>(&v) == nullptr );
         STATIC_ASSERT_IF( get_if<float>(&v) == &get<float>(v) );
@@ -83,7 +83,7 @@ int main()
     {
         constexpr variant<int, int, float> v( 3.14f );
 
-        STATIC_ASSERT( get<float>(v) == 3.14f );
+        STATIC_ASSERT( get<float>(v) == (float)3.14f );
 
         STATIC_ASSERT_IF( get_if<float>(&v) == &get<float>(v) );
     }

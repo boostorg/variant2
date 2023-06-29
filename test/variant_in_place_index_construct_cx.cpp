@@ -68,7 +68,7 @@ int main()
         constexpr variant<int, float> v( in_place_index_t<1>{}, 3.14f );
 
         STATIC_ASSERT( v.index() == 1 );
-        STATIC_ASSERT( get<1>(v) == 3.14f );
+        STATIC_ASSERT( get<1>(v) == (float)3.14f ); // see FLT_EVAL_METHOD
     }
 
     {
@@ -89,14 +89,14 @@ int main()
         constexpr variant<int, int, float, float, X, X> v( in_place_index_t<2>{}, 3.14f );
 
         STATIC_ASSERT( v.index() == 2 );
-        STATIC_ASSERT( get<2>(v) == 3.14f );
+        STATIC_ASSERT( get<2>(v) == (float)3.14f );
     }
 
     {
         constexpr variant<int, int, float, float, X, X> v( in_place_index_t<3>{}, 3.14f );
 
         STATIC_ASSERT( v.index() == 3 );
-        STATIC_ASSERT( get<3>(v) == 3.14f );
+        STATIC_ASSERT( get<3>(v) == (float)3.14f );
     }
 
     {
