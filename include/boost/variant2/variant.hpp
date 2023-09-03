@@ -2497,16 +2497,16 @@ template<class V> struct tag_invoke_L2
     boost::json::value const& v;
     typename boost::json::result_for<V, boost::json::value>::type& r;
 
-    template<class I> void operator()( I i ) const
+    template<class I> void operator()( I /*i*/ ) const
     {
         if( !r )
         {
-            using Ti = mp11::mp_at_c<V, i>;
+            using Ti = mp11::mp_at_c<V, I::value>;
             auto r2 = boost::json::try_value_to<Ti>( v );
 
             if( r2 )
             {
-                r.emplace( in_place_index_t<i>{}, std::move( *r2 ) );
+                r.emplace( in_place_index_t<I::value>{}, std::move( *r2 ) );
             }
         }
     }
