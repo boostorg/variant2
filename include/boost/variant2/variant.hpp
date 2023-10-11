@@ -18,13 +18,11 @@
 #include <boost/assert/source_location.hpp>
 #include <boost/config.hpp>
 #include <boost/config/workaround.hpp>
-#include <boost/cstdint.hpp>
 #include <cstddef>
 #include <type_traits>
 #include <exception>
-#include <initializer_list>
 #include <utility>
-#include <functional> // std::hash
+#include <typeindex> // std::hash
 #include <iosfwd>
 #include <cstdint>
 #include <cerrno>
@@ -2319,8 +2317,8 @@ namespace detail
 
 inline std::size_t hash_value_impl_( mp11::mp_true, std::size_t index, std::size_t value )
 {
-    boost::ulong_long_type hv = ( boost::ulong_long_type( 0xCBF29CE4 ) << 32 ) + 0x84222325;
-    boost::ulong_long_type const prime = ( boost::ulong_long_type( 0x00000100 ) << 32 ) + 0x000001B3;
+    unsigned long long hv = 0xCBF29CE484222325ull;
+    unsigned long long const prime = 0x100000001B3ull;
 
     hv ^= index;
     hv *= prime;
