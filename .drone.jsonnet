@@ -379,9 +379,9 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     windows_pipeline(
-        "Windows VS2017 msvc-14.1 Strict",
+        "Windows VS2017 msvc-14.1 permissive-",
         "cppalliance/dronevs2017",
-        { TOOLSET: 'msvc-14.1', CXXSTD: '14,17,latest', CXXFLAGS: '/permissive-' },
+        { TOOLSET: 'msvc-14.1', CXXSTD: '14,17', CXXFLAGS: '/permissive-' },
     ),
 
     windows_pipeline(
@@ -391,14 +391,20 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     windows_pipeline(
-        "Windows VS2019 msvc-14.2 Strict",
+        "Windows VS2019 msvc-14.2 permissive-",
         "cppalliance/dronevs2019",
-        { TOOLSET: 'msvc-14.2', CXXSTD: '14,17,20,latest', CXXFLAGS: '/permissive-' },
+        { TOOLSET: 'msvc-14.2', CXXSTD: '14,17', CXXFLAGS: '/permissive-' },
     ),
 
     windows_pipeline(
         "Windows VS2022 msvc-14.3",
         "cppalliance/dronevs2022:1",
         { TOOLSET: 'msvc-14.3', CXXSTD: '14,17,20,latest' },
+    ),
+
+    windows_pipeline(
+        "Windows VS2022 msvc-14.3 permissive-",
+        "cppalliance/dronevs2022:1",
+        { TOOLSET: 'msvc-14.3', CXXSTD: '14,17', CXXFLAGS: '/permissive-' },
     ),
 ]
