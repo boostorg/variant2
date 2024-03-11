@@ -1,0 +1,22 @@
+# Copyright René Ferdinand Rivera Morell 2023
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+import project ;
+
+project /boost/variant2
+    : common-requirements
+        <source>/boost/assert//boost_assert
+        <source>/boost/config//boost_config
+        <source>/boost/mp11//boost_mp11
+        <include>include
+    ;
+
+explicit
+    [ alias boost_variant2 ]
+    [ alias all : boost_variant2 test ]
+    ;
+
+call-if : boost-library variant2
+    ;
