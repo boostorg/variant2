@@ -16,9 +16,9 @@ project
     <warnings>extra
 
   : requirements
-    <source>/boost/config//boost_config
-    <source>/boost/container_hash//boost_container_hash
-    <source>/boost/core//boost_core
+    <library>/boost/config//boost_config
+    <library>/boost/container_hash//boost_container_hash
+    <library>/boost/core//boost_core
 
     <toolset>msvc:<warnings-as-errors>on
     <toolset>gcc:<warnings-as-errors>on
