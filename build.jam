@@ -5,18 +5,21 @@
 
 require-b2 5.2 ;
 
+constant boost_dependencies :
+    /boost/assert//boost_assert
+    /boost/config//boost_config
+    /boost/mp11//boost_mp11 ;
+
 project /boost/variant2
     : common-requirements
-        <library>/boost/assert//boost_assert
-        <library>/boost/config//boost_config
-        <library>/boost/mp11//boost_mp11
         <include>include
     ;
 
 explicit
-    [ alias boost_variant2 ]
+    [ alias boost_variant2 : : : : <library>$(boost_dependencies) ]
     [ alias all : boost_variant2 test ]
     ;
 
 call-if : boost-library variant2
     ;
+
