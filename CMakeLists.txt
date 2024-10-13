@@ -11,6 +11,10 @@ add_library(boost_variant2 INTERFACE)
 add_library(Boost::variant2 ALIAS boost_variant2)
 
 target_include_directories(boost_variant2 INTERFACE include)
+if(NOT CMAKE_VERSION VERSION_LESS "3.19")
+  file(GLOB_RECURSE headers include/*.hpp)
+  target_sources(boost_variant2 PRIVATE ${headers})
+endif()
 
 target_link_libraries(boost_variant2
   INTERFACE
