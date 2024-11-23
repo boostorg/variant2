@@ -2125,7 +2125,7 @@ template<class R, class F, class V1> struct visit_L1
     F&& f;
     V1&& v1;
 
-    template<class I> auto operator()( I ) const -> Vret<R, F, V1>
+    template<class I> constexpr auto operator()( I ) const -> Vret<R, F, V1>
     {
         return std::forward<F>(f)( unsafe_get<I::value>( std::forward<V1>(v1) ) );
     }
