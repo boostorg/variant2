@@ -141,3 +141,4 @@ compile variant_uses_double_storage.cpp ;
 run variant_derived_construct2.cpp ;
 
 compile variant_visit_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_visit_r_cx.cpp : [ requires cxx14_constexpr ] ;
