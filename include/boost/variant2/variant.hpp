@@ -880,7 +880,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
     {
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         BOOST_ASSERT( ix_ == J );
 
@@ -889,7 +889,7 @@ template<class... T> struct variant_base_impl<true, true, T...>
 
     template<std::size_t I> constexpr mp11::mp_at_c<variant<T...>, I> const& _get_impl( mp11::mp_size_t<I> ) const noexcept
     {
-        // size_t const J = I+1;
+        // std::size_t const J = I+1;
 
         BOOST_VARIANT2_CX14_ASSERT( ix_ == I+1 )
 
@@ -958,7 +958,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
     {
         BOOST_ASSERT( index() == I );
 
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         constexpr mp11::mp_size_t<J> j{};
         return st_[ ix_ & 1 ].get( j );
@@ -968,7 +968,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
     {
         BOOST_VARIANT2_CX14_ASSERT( index() == I )
 
-        // size_t const J = I+1;
+        // std::size_t const J = I+1;
         // constexpr mp_size_t<J> j{};
 
         return st_[ ix_ & 1 ].get( mp11::mp_size_t<I+1>() );
@@ -976,7 +976,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
 
     template<std::size_t I, class... A> BOOST_CXX14_CONSTEXPR void emplace( A&&... a )
     {
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         unsigned i2 = 1 - ( ix_ & 1 );
 
@@ -1048,7 +1048,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
     template<std::size_t I> BOOST_CXX14_CONSTEXPR mp11::mp_at_c<variant<T...>, I>& _get_impl( mp11::mp_size_t<I> ) noexcept
     {
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         BOOST_ASSERT( ix_ == J );
 
@@ -1057,7 +1057,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
     template<std::size_t I> constexpr mp11::mp_at_c<variant<T...>, I> const& _get_impl( mp11::mp_size_t<I> ) const noexcept
     {
-        // size_t const J = I+1;
+        // std::size_t const J = I+1;
 
         BOOST_VARIANT2_CX14_ASSERT( ix_ == I+1 )
 
@@ -1066,7 +1066,7 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
     template<std::size_t I, class... A> void emplace( A&&... a )
     {
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         using U = mp11::mp_at_c<variant<T...>, I>;
 
@@ -1182,7 +1182,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
     {
         BOOST_ASSERT( index() == I );
 
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         constexpr mp11::mp_size_t<J> j{};
         return storage( ix_ & 1 ).get( j );
@@ -1192,7 +1192,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
     {
         BOOST_VARIANT2_CX14_ASSERT( index() == I )
 
-        // size_t const J = I+1;
+        // std::size_t const J = I+1;
         // constexpr mp_size_t<J> j{};
 
         return storage( ix_ & 1 ).get( mp11::mp_size_t<I+1>() );
@@ -1200,7 +1200,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
 
     template<std::size_t I, class... A> void emplace( A&&... a )
     {
-        size_t const J = I+1;
+        std::size_t const J = I+1;
 
         unsigned i2 = 1 - ( ix_ & 1 );
 
