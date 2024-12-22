@@ -47,17 +47,19 @@ template<template<class...> class F, std::size_t N> void test_()
 {
     using V = mp_rename< mp_transform<F, mp_iota_c<N>>, boost::variant2::variant >;
 
+    using last_type = F<mp_size_t<N-1>>;
+
     {
-        V v( mp_back<V>{} );
-        BOOST_TEST_EQ( v.index(), mp_size<V>() - 1 );
+        V v( last_type{} );
+        BOOST_TEST_EQ( v.index(), N-1 );
     }
 
     {
         V v;
         BOOST_TEST_EQ( v.index(), 0 );
 
-        v.template emplace< mp_back<V> >();
-        BOOST_TEST_EQ( v.index(), mp_size<V>() - 1 );
+        v.template emplace<last_type>();
+        BOOST_TEST_EQ( v.index(), N-1 );
     }
 }
 
