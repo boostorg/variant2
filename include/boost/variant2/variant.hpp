@@ -856,7 +856,15 @@ template<std::size_t N> using get_smallest_unsigned_type = mp11::mp_cond<
 
 >;
 
+#if BOOST_WORKAROUND( BOOST_CLANG_VERSION, < 30800 )
+
+template<bool Double, class... T> using get_index_type = unsigned short;
+
+#else
+
 template<bool Double, class... T> using get_index_type = get_smallest_unsigned_type< (Double + 1) * sizeof...(T) >;
+
+#endif
 
 // variant_base
 
