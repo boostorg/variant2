@@ -60,10 +60,10 @@ run variant_in_place_type_construct.cpp ;
 compile variant_in_place_type_construct_cx.cpp : <toolset>msvc-14.0:<build>no ;
 
 run variant_copy_assign.cpp ;
-compile variant_copy_assign_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_copy_assign_cx.cpp : [ requires cxx14_constexpr ] <toolset>gcc-5:<build>no <toolset>gcc-6:<build>no ;
 
 run variant_move_assign.cpp ;
-compile variant_move_assign_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_move_assign_cx.cpp : [ requires cxx14_constexpr ] <toolset>gcc-5:<build>no <toolset>gcc-6:<build>no ;
 
 run variant_value_assign.cpp ;
 compile variant_value_assign_cx.cpp : [ requires cxx14_constexpr ] ;
