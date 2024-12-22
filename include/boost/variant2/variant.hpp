@@ -848,7 +848,15 @@ template<class U, class... T> using resolve_overload_index = mp11::mp_find<mp11:
 
 // index_type
 
-template<bool Double, class... T> using get_index_type = unsigned;
+template<std::size_t N> using get_smallest_unsigned_type = mp11::mp_cond<
+
+    mp11::mp_bool< N <= (std::numeric_limits<unsigned char>::max)() >, unsigned char,
+    mp11::mp_bool< N <= (std::numeric_limits<unsigned short>::max)() >, unsigned short,
+    mp11::mp_true, unsigned
+
+>;
+
+template<bool Double, class... T> using get_index_type = get_smallest_unsigned_type< (Double + 1) * sizeof...(T) >;
 
 // variant_base
 
@@ -1000,7 +1008,7 @@ template<class... T> struct variant_base_impl<true, false, T...>
         st_[ i2 ].emplace( mp11::mp_size_t<J>(), std::forward<A>(a)... );
 
         static_assert( J * 2 + 1 <= (std::numeric_limits<index_type>::max)(), "" );
-        ix_ = J * 2 + i2;
+        ix_ = static_cast<index_type>( J * 2 + i2 );
     }
 
     static constexpr bool uses_double_storage() noexcept
@@ -1193,7 +1201,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
 
     void _destroy() noexcept
     {
-        mp11::mp_with_index<1 + sizeof...(T)>( ix_ / 2, _destroy_L1{ this, ix_ & 1 } );
+        mp11::mp_with_index<1 + sizeof...(T)>( ix_ / 2, _destroy_L1{ this, static_cast<unsigned>( ix_ & 1 ) } );
     }
 
     ~variant_base_impl() noexcept
@@ -1236,7 +1244,7 @@ template<class... T> struct variant_base_impl<false, false, T...>
         _destroy();
 
         static_assert( J * 2 + 1 <= (std::numeric_limits<index_type>::max)(), "" );
-        ix_ = J * 2 + i2;
+        ix_ = static_cast<index_type>( J * 2 + i2 );
     }
 
     static constexpr bool uses_double_storage() noexcept
