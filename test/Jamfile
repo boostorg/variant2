@@ -148,5 +148,5 @@ run variant_index_type.cpp : : :
   <variant>release
   <toolset>msvc,<address-model>32:<build>no
   <toolset>msvc-14.0:<build>no # fails on GHA (only) with "out of heap space"
-  <toolset>clang:<cxxflags>-ftemplate-depth=1024
+  <toolset>clang,<target-os>linux:<cxxflags>-ftemplate-depth=1024 # for Clang 3.x
 ;
