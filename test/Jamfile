@@ -144,9 +144,16 @@ compile variant_visit_cx.cpp : [ requires cxx14_constexpr ] ;
 compile variant_visit_cx_2.cpp : [ requires cxx14_constexpr ] ;
 compile variant_visit_r_cx.cpp : [ requires cxx14_constexpr ] ;
 
-run variant_index_type.cpp : : :
+local index-type-reqs =
+
   <variant>release
   <toolset>msvc,<address-model>32:<build>no
-  <toolset>msvc-14.0:<build>no # fails on GHA (only) with "out of heap space"
   <toolset>clang,<target-os>linux:<cxxflags>-ftemplate-depth=1024 # for Clang 3.x
 ;
+
+local list-sizes = 126 127 128 129 254 255 256 257 ;
+
+for local list-size in $(list-sizes)
+{
+    run variant_index_type.cpp : : : $(index-type-reqs) <define>LIST_SIZE=$(list-size) : variant_index_type_$(list-size) ;
+}

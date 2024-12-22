@@ -43,9 +43,11 @@ template<std::size_t I> struct W
 
 template<class N> using Wf = W< N::value >;
 
-template<template<class...> class F, std::size_t N> void test_()
+template<class L, template<class...> class F> void test()
 {
-    using V = mp_rename< mp_transform<F, mp_iota_c<N>>, boost::variant2::variant >;
+    using V = mp_rename< mp_transform<F, L>, boost::variant2::variant >;
+
+    constexpr std::size_t N = mp_size<L>::value;
 
     using last_type = F<mp_size_t<N-1>>;
 
@@ -63,32 +65,22 @@ template<template<class...> class F, std::size_t N> void test_()
     }
 }
 
-template<template<class...> class F> void test()
-{
-    test_<F, 126>();
-    test_<F, 127>();
-    test_<F, 128>();
-    test_<F, 129>();
-
-    test_<F, 254>();
-    test_<F, 255>();
-    test_<F, 256>();
-    test_<F, 257>();
-}
-
 int main()
 {
+    constexpr std::size_t N = LIST_SIZE;
+    using L = mp_iota_c<N>;
+
     static_assert( !boost::variant2::variant< X<0>, X<1> >::uses_double_storage(), "" );
-    test<Xf>();
+    test<L, Xf>();
 
     static_assert( boost::variant2::variant< Y<0>, Y<1> >::uses_double_storage(), "" );
-    test<Yf>();
+    test<L, Yf>();
 
     static_assert( !boost::variant2::variant< Z<0>, Z<1> >::uses_double_storage(), "" );
-    test<Zf>();
+    test<L, Zf>();
 
     static_assert( boost::variant2::variant< W<0>, W<1> >::uses_double_storage(), "" );
-    test<Wf>();
+    test<L, Wf>();
 
     return boost::report_errors();
 }
