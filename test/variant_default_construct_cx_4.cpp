@@ -11,6 +11,11 @@
 BOOST_PRAGMA_MESSAGE("Skipping constexpr destructor test because __cpp_constexpr_dynamic_alloc < 201907L")
 int main() {}
 
+#elif defined(BOOST_CLANG) && BOOST_CLANG_VERSION < 180000
+
+BOOST_PRAGMA_MESSAGE("Skipping constexpr destructor test because BOOST_CLANG_VERSION < 180000")
+int main() {}
+
 #else
 
 using namespace boost::variant2;
