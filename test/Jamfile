@@ -162,3 +162,7 @@ compile variant_default_construct_cx_2.cpp ;
 compile variant_default_construct_cx_3.cpp ;
 compile variant_default_construct_cx_4.cpp ;
 compile variant_default_construct_cx_5.cpp ;
+
+compile variant_value_construct_cx_2.cpp ;
+compile variant_value_construct_cx_3.cpp ;
+compile variant_value_construct_cx_4.cpp ;
