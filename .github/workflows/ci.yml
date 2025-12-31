@@ -11,6 +11,10 @@ on:
 env:
   UBSAN_OPTIONS: print_stacktrace=1
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   posix:
     strategy:
