@@ -172,3 +172,10 @@ compile variant_default_construct_cx_5.cpp ;
 compile variant_value_construct_cx_2.cpp ;
 compile variant_value_construct_cx_3.cpp ;
 compile variant_value_construct_cx_4.cpp ;
+
+# GCC 12+ false positive -Wmaybe-uninitialized with non-trivially-copyable types
+run variant_gcc_false_positive.cpp : : :
+    <library>/boost/system//boost_system
+    <toolset>gcc:<cxxflags>-O3
+    <toolset>clang:<cxxflags>-O3
+    ;
