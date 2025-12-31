@@ -37,6 +37,25 @@
 # define BOOST_VARIANT2_CXX20_CONSTEXPR
 #endif
 
+// GCC 12+ false positive -Wmaybe-uninitialized workaround
+// https://github.com/boostorg/variant2/issues/33
+#ifndef BOOST_VARIANT2_GCC12_WORKAROUND
+# if defined(BOOST_GCC) && __GNUC__ >= 12
+#  define BOOST_VARIANT2_GCC12_WORKAROUND 1
+# endif
+#endif
+
+#if BOOST_VARIANT2_GCC12_WORKAROUND
+# define BOOST_VARIANT2_DISABLE_GCC12_WARNINGS \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+# define BOOST_VARIANT2_RESTORE_GCC12_WARNINGS \
+    _Pragma("GCC diagnostic pop")
+#else
+# define BOOST_VARIANT2_DISABLE_GCC12_WARNINGS
+# define BOOST_VARIANT2_RESTORE_GCC12_WARNINGS
+#endif
+
 //
 
 namespace boost
@@ -1420,12 +1439,16 @@ private:
 
 public:
 
+    BOOST_VARIANT2_DISABLE_GCC12_WARNINGS
+
     BOOST_CXX14_CONSTEXPR variant_cc_base_impl( variant_cc_base_impl const& r )
         noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
         : variant_base()
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L1{ this, r } );
     }
+
+    BOOST_VARIANT2_RESTORE_GCC12_WARNINGS
 
     // move constructor
 
@@ -1500,12 +1523,16 @@ private:
 
 public:
 
+    BOOST_VARIANT2_DISABLE_GCC12_WARNINGS
+
     BOOST_CXX14_CONSTEXPR variant_ca_base_impl& operator=( variant_ca_base_impl const & r )
         noexcept( mp11::mp_all<std::is_nothrow_copy_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L3{ this, r } );
         return *this;
     }
+
+    BOOST_VARIANT2_RESTORE_GCC12_WARNINGS
 
     // move assignment
 
@@ -1574,11 +1601,15 @@ private:
 
 public:
 
+    BOOST_VARIANT2_DISABLE_GCC12_WARNINGS
+
     BOOST_CXX14_CONSTEXPR variant_mc_base_impl( variant_mc_base_impl && r )
         noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L2{ this, r } );
     }
+
+    BOOST_VARIANT2_RESTORE_GCC12_WARNINGS
 
     // assignment
 
@@ -1653,12 +1684,16 @@ private:
 
 public:
 
+    BOOST_VARIANT2_DISABLE_GCC12_WARNINGS
+
     BOOST_CXX14_CONSTEXPR variant_ma_base_impl& operator=( variant_ma_base_impl && r )
         noexcept( mp11::mp_all<std::is_nothrow_move_constructible<T>...>::value )
     {
         mp11::mp_with_index<sizeof...(T)>( r.index(), L4{ this, r } );
         return *this;
     }
+
+    BOOST_VARIANT2_RESTORE_GCC12_WARNINGS
 };
 
 } // namespace detail
