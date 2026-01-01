@@ -93,7 +93,7 @@ struct monostate
 {
 };
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, < 1950)
+#if !BOOST_WORKAROUND(BOOST_MSVC, < 1960)
 
 constexpr bool operator<(monostate, monostate) noexcept { return false; }
 constexpr bool operator>(monostate, monostate) noexcept { return false; }
@@ -1689,7 +1689,7 @@ public:
         class Ud = typename std::decay<U>::type,
         class E1 = typename std::enable_if< !std::is_same<Ud, variant>::value && !std::is_base_of<variant, Ud>::value && !detail::is_in_place_index<Ud>::value && !detail::is_in_place_type<Ud>::value >::type,
 
-#if BOOST_WORKAROUND(BOOST_MSVC, < 1950)
+#if BOOST_WORKAROUND(BOOST_MSVC, < 1960)
 
         class V = mp11::mp_apply_q< mp11::mp_bind_front<detail::resolve_overload_type, U&&>, variant >,
 
