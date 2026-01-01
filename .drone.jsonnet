@@ -214,6 +214,13 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     linux_pipeline(
+        "Linux 25.04 GCC 15 32/64",
+        "cppalliance/droneubuntu2504:1",
+        { TOOLSET: 'gcc', COMPILER: 'g++-13', CXXSTD: '11,14,17,20,23,2c', ADDRMD: '32,64' },
+        "g++-15-multilib",
+    ),
+
+    linux_pipeline(
         "Linux 16.04 Clang 3.5",
         "cppalliance/droneubuntu1604:1",
         { TOOLSET: 'clang', COMPILER: 'clang++-3.5', CXXSTD: '11' },
@@ -368,10 +375,24 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
     ),
 
     linux_pipeline(
-        "Linux 24.10 Clang 19",
-        "cppalliance/droneubuntu2410:1",
-        { TOOLSET: 'clang', COMPILER: 'clang++-19', CXXSTD: '11,14,17,20,2b' } + asan,
+        "Linux 24.04 Clang 19",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-19', CXXSTD: '11,14,17,20,2b' },
         "clang-19",
+    ),
+
+    linux_pipeline(
+        "Linux 24.04 Clang 20",
+        "cppalliance/droneubuntu2404:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-20', CXXSTD: '11,14,17,20,23,2c' },
+        "clang-20",
+    ),
+
+    linux_pipeline(
+        "Linux 25.10 Clang 21",
+        "cppalliance/droneubuntu2510:1",
+        { TOOLSET: 'clang', COMPILER: 'clang++-21', CXXSTD: '11,14,17,20,23,2c' },
+        "clang-21",
     ),
 
     macos_pipeline(
@@ -436,5 +457,17 @@ local windows_pipeline(name, image, environment, arch = "amd64") =
         "Windows VS2022 msvc-14.3 permissive-",
         "cppalliance/dronevs2022:1",
         { TOOLSET: 'msvc-14.3', CXXSTD: '14,17', CXXFLAGS: '/permissive-' },
+    ),
+
+    windows_pipeline(
+        "Windows VS2026 msvc-14.5",
+        "cppalliance/dronevs2026:1",
+        { TOOLSET: 'msvc-14.5', CXXSTD: '14,17,20,latest' },
+    ),
+
+    windows_pipeline(
+        "Windows VS2026 msvc-14.5 permissive-",
+        "cppalliance/dronevs2026:1",
+        { TOOLSET: 'msvc-14.5', CXXSTD: '14,17', CXXFLAGS: '/permissive-' },
     ),
 ]
