@@ -1,4 +1,3 @@
-
 // Copyright 2025 Peter Dimov
 // Copyright 2025 Vinnie Falco
 //
@@ -8,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 
 // GCC 12+ -Wmaybe-uninitialized false positive tests
-// https://github.com/boostorg/variant2/issues/33
+// https://github.com/boostorg/variant2/issues/55
 //
 // GCC 12+'s improved dataflow analysis sees code paths for all alternatives
 // in mp_with_index and warns that members may be uninitialized, even though
@@ -17,11 +16,12 @@
 
 #include <boost/system/result.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <boost/config.hpp>
 #include <exception>
 #include <string>
 
 // Check for C++17 std::optional support
-#if __cplusplus >= 201703L
+#if BOOST_CXX_VERSION >= 201703L
 # include <optional>
 # define BOOST_VARIANT2_TEST_HAS_OPTIONAL 1
 #endif
