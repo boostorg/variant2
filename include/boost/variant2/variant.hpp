@@ -558,9 +558,19 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_false, T1, T.
     T1 first_;
     variant_storage<T...> rest_;
 
+#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+// false positive, see https://github.com/boostorg/variant2/issues/55
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
     template<class... A> constexpr variant_storage_impl( mp11::mp_size_t<0>, A&&... a ): first_( std::forward<A>(a)... )
     {
     }
+
+#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+# pragma GCC diagnostic pop
+#endif
 
     template<std::size_t I, class... A> constexpr variant_storage_impl( mp11::mp_size_t<I>, A&&... a ): rest_( mp11::mp_size_t<I-1>(), std::forward<A>(a)... )
     {
@@ -704,6 +714,7 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_true, T1, T..
 # pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
 #endif
+
         *this = variant_storage_impl( mp11::mp_size_t<I>(), std::forward<A>(a)... );
 
 #if defined(BOOST_GCC) && (__GNUC__ >= 7)
@@ -1071,7 +1082,18 @@ template<class... T> struct variant_base_impl<false, true, T...>
         template<class I> BOOST_CXX14_CONSTEXPR void operator()( I ) const noexcept
         {
             using U = mp11::mp_at<mp11::mp_list<none, T...>, I>;
+
+#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+// false positive, see https://github.com/boostorg/variant2/issues/55
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
             this_->st_.get( I() ).~U();
+
+#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+# pragma GCC diagnostic pop
+#endif
         }
     };
 
@@ -1119,7 +1141,17 @@ template<class... T> struct variant_base_impl<false, true, T...>
 
         static_assert( std::is_nothrow_move_constructible<U>::value, "Logic error: U must be nothrow move constructible" );
 
+#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+// false positive, see https://github.com/boostorg/variant2/issues/55
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
         U tmp( std::forward<A>(a)... );
+
+#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+# pragma GCC diagnostic pop
+#endif
 
         _destroy();
 
