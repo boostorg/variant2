@@ -175,4 +175,9 @@ compile variant_value_construct_cx_4.cpp ;
 
 # GCC 12+ false positive -Wmaybe-uninitialized with non-trivially-copyable types
 run variant_issue_55.cpp
-  : : : <library>/boost/system//boost_system ;
+  : : :
+    <library>/boost/system//boost_system
+
+    # clang-cl 32 bit fails with an assertion in mp_with_index, likely due to a codegen bug
+    "<toolset>clang-win,<address-model>32:<build>no"
+  ;
