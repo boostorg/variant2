@@ -186,6 +186,9 @@ void testGccUninitialized()
 
 int main()
 {
+    boost::core::lwt_init();
+
     testGccUninitialized();
+
     return boost::report_errors();
 }
