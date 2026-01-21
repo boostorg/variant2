@@ -1,12 +1,9 @@
 #ifndef BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 #define BOOST_VARIANT2_VARIANT_HPP_INCLUDED
 
-// Copyright 2017-2019 Peter Dimov.
-//
+// Copyright 2017-2026 Peter Dimov.
 // Distributed under the Boost Software License, Version 1.0.
-//
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
+// https://www.boost.org/LICENSE_1_0.txt
 
 #if defined(_MSC_VER) && _MSC_VER < 1910
 # pragma warning( push )
@@ -451,61 +448,106 @@ template<std::size_t I, class... T> constexpr variant_alternative_t<I, variant<T
 
 // get (type)
 
+namespace detail
+{
+
+template<class U, class V> struct get_if_impl_L1
+{
+    V& v_;
+
+    template<class I> constexpr U* fn( I, mp11::mp_true ) const noexcept
+    {
+        return &v_._get_impl( I() );
+    }
+
+    template<class I> constexpr U* fn( I, mp11::mp_false ) const noexcept
+    {
+        return nullptr;
+    }
+
+    template<class I> constexpr U* operator()( I ) const noexcept
+    {
+        return this->fn( I(), std::is_same<U, mp11::mp_at<V, I>>() );
+    }
+};
+
+template<class U, class... T> constexpr U* get_if_impl( variant<T...>& v ) noexcept
+{
+    return mp11::mp_with_index<sizeof...(T)>( v.index(), get_if_impl_L1< U, variant<T...> >{ v } );
+}
+
+template<class U, class V> struct get_if_impl_L2
+{
+    V const& v_;
+
+    template<class I> constexpr U const* fn( I, mp11::mp_true ) const noexcept
+    {
+        return &v_._get_impl( I() );
+    }
+
+    template<class I> constexpr U const* fn( I, mp11::mp_false ) const noexcept
+    {
+        return nullptr;
+    }
+
+    template<class I> constexpr U const* operator()( I ) const noexcept
+    {
+        return this->fn( I(), std::is_same<U, mp11::mp_at<V, I>>() );
+    }
+};
+
+template<class U, class... T> constexpr U const* get_if_impl( variant<T...> const& v ) noexcept
+{
+    return mp11::mp_with_index<sizeof...(T)>( v.index(), get_if_impl_L2< U, variant<T...> >{ v } );
+}
+
+} // namespace detail
+
 template<class U, class... T> constexpr U& get(variant<T...>& v)
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-
-    using I = mp11::mp_find<variant<T...>, U>;
-
-    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), v._get_impl( I() );
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
+    return ( !holds_alternative<U>( v )? detail::throw_bad_variant_access(): (void)0 ), *detail::get_if_impl<U>( v );
 }
 
 template<class U, class... T> constexpr U&& get(variant<T...>&& v)
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-
-    using I = mp11::mp_find<variant<T...>, U>;
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
-    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), std::move( v._get_impl( I() ) );
+    return ( !holds_alternative<U>( v )? detail::throw_bad_variant_access(): (void)0 ), std::move( *detail::get_if_impl<U>( v ) );
 
 #else
 
-    if( v.index() != I::value ) detail::throw_bad_variant_access();
-    return std::move( v._get_impl( I() ) );
+    if( !holds_alternative<U>( v ) ) detail::throw_bad_variant_access();
+    return std::move( *detail::get_if_impl<U>( v ) );
 
 #endif
 }
 
 template<class U, class... T> constexpr U const& get(variant<T...> const& v)
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-
-    using I = mp11::mp_find<variant<T...>, U>;
-
-    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), v._get_impl( I() );
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
+    return ( !holds_alternative<U>( v )? detail::throw_bad_variant_access(): (void)0 ), *detail::get_if_impl<U>( v );
 }
 
 template<class U, class... T> constexpr U const&& get(variant<T...> const&& v)
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-
-    using I = mp11::mp_find<variant<T...>, U>;
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
 
 #if !BOOST_WORKAROUND(BOOST_MSVC, < 1930)
 
-    return ( v.index() != I::value? detail::throw_bad_variant_access(): (void)0 ), std::move( v._get_impl( I() ) );
+    return ( !holds_alternative<U>( v )? detail::throw_bad_variant_access(): (void)0 ), std::move( *detail::get_if_impl<U>( v ) );
 
 #else
 
-    if( v.index() != I::value ) detail::throw_bad_variant_access();
-    return std::move( v._get_impl( I() ) );
+    if( !holds_alternative<U>( v ) ) detail::throw_bad_variant_access();
+    return std::move( *detail::get_if_impl<U>( v ) );
 
 #endif
 }
 
-// get_if
+// get_if (index)
 
 template<std::size_t I, class... T> constexpr typename std::add_pointer<variant_alternative_t<I, variant<T...>>>::type get_if(variant<T...>* v) noexcept
 {
@@ -519,22 +561,18 @@ template<std::size_t I, class... T> constexpr typename std::add_pointer<const va
     return v && v->index() == I? &v->_get_impl( mp11::mp_size_t<I>() ): 0;
 }
 
+// get_if (type)
+
 template<class U, class... T> constexpr typename std::add_pointer<U>::type get_if(variant<T...>* v) noexcept
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-
-    using I = mp11::mp_find<variant<T...>, U>;
-
-    return v && v->index() == I::value? &v->_get_impl( I() ): 0;
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
+    return v && holds_alternative<U>( *v )? detail::get_if_impl<U>( *v ): 0;
 }
 
-template<class U, class... T> constexpr typename std::add_pointer<U const>::type get_if(variant<T...> const * v) noexcept
+template<class U, class... T> constexpr typename std::add_pointer<U const>::type get_if(variant<T...> const* v) noexcept
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-
-    using I = mp11::mp_find<variant<T...>, U>;
-
-    return v && v->index() == I::value? &v->_get_impl( I() ): 0;
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
+    return v && holds_alternative<U>( *v )? detail::get_if_impl<U>( *v ): 0;
 }
 
 //

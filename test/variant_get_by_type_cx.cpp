@@ -3,12 +3,13 @@
 // https://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/variant2/variant.hpp>
+#include <boost/mp11.hpp>
 #include <boost/config.hpp>
 #include <boost/config/pragma_message.hpp>
 
-#if defined(BOOST_MSVC) && BOOST_MSVC < 1910
+#if !defined(BOOST_MP11_HAS_CXX14_CONSTEXPR)
 
-BOOST_PRAGMA_MESSAGE( "Test skipped because BOOST_MSVC < 1910" )
+BOOST_PRAGMA_MESSAGE("Test skipped because BOOST_MP11_HAS_CXX14_CONSTEXPR is not defined")
 int main() {}
 
 #else
@@ -74,6 +75,7 @@ int main()
         STATIC_ASSERT( get<int>(v) == 0 );
 
         STATIC_ASSERT_IF( get_if<int>(&v) == &get<int>(v) );
+        STATIC_ASSERT_IF( get_if<float>(&v) == nullptr );
     }
 
     {
@@ -82,6 +84,7 @@ int main()
         STATIC_ASSERT( get<int>(v) == 1 );
 
         STATIC_ASSERT_IF( get_if<int>(&v) == &get<int>(v) );
+        STATIC_ASSERT_IF( get_if<float>(&v) == nullptr );
     }
 
     {
@@ -89,6 +92,7 @@ int main()
 
         STATIC_ASSERT( get<float>(v) == (float)3.14f );
 
+        STATIC_ASSERT_IF( get_if<int>(&v) == nullptr );
         STATIC_ASSERT_IF( get_if<float>(&v) == &get<float>(v) );
     }
 }

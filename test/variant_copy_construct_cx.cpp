@@ -38,22 +38,22 @@ enum E
 
 #define STATIC_ASSERT(...) static_assert(__VA_ARGS__, #__VA_ARGS__)
 
-template<class T, class V> constexpr T test( V const v )
+template<std::size_t I, class V> constexpr variant_alternative_t<I, V> test( V const v )
 {
-    return get<T>( v );
+    return get<I>( v );
 }
 
 int main()
 {
     {
         constexpr variant<int> v( 1 );
-        constexpr auto w = test<int>( v );
+        constexpr auto w = test<0>( v );
         STATIC_ASSERT( w == 1 );
     }
 
     {
         constexpr variant<X> v( 1 );
-        constexpr auto w = test<X>( v );
+        constexpr auto w = test<0>( v );
         STATIC_ASSERT( w == 1 );
     }
 
@@ -62,7 +62,7 @@ int main()
 
     {
         constexpr variant<Y> v( 1 );
-        constexpr auto w = test<Y>( v );
+        constexpr auto w = test<0>( v );
         STATIC_ASSERT( w == 1 );
     }
 
@@ -70,31 +70,31 @@ int main()
 
     {
         constexpr variant<int, float> v( 1 );
-        constexpr auto w = test<int>( v );
+        constexpr auto w = test<0>( v );
         STATIC_ASSERT( w == 1 );
     }
 
     {
         constexpr variant<int, float> v( 3.0f );
-        constexpr auto w = test<float>( v );
+        constexpr auto w = test<1>( v );
         STATIC_ASSERT( w == 3.0f );
     }
 
     {
         constexpr variant<int, int, float> v( 3.0f );
-        constexpr auto w = test<float>( v );
+        constexpr auto w = test<2>( v );
         STATIC_ASSERT( w == 3.0f );
     }
 
     {
         constexpr variant<E, E, X> v( 1 );
-        constexpr auto w = test<X>( v );
+        constexpr auto w = test<2>( v );
         STATIC_ASSERT( w == 1 );
     }
 
     {
         constexpr variant<int, int, float, float, X> v( X(1) );
-        constexpr auto w = test<X>( v );
+        constexpr auto w = test<4>( v );
         STATIC_ASSERT( w == 1 );
     }
 
@@ -103,13 +103,13 @@ int main()
 
     {
         constexpr variant<E, E, Y> v( 1 );
-        constexpr auto w = test<Y>( v );
+        constexpr auto w = test<2>( v );
         STATIC_ASSERT( w == 1 );
     }
 
     {
         constexpr variant<int, int, float, float, Y> v( Y(1) );
-        constexpr auto w = test<Y>( v );
+        constexpr auto w = test<4>( v );
         STATIC_ASSERT( w == 1 );
     }
 

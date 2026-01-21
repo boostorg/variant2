@@ -111,7 +111,12 @@ run variant_special.cpp ;
 
 run variant_visit_derived.cpp ;
 
-run variant_many_types.cpp ;
+# These two tests require /bigobj under GCC/Windows and CMake/VS2022 (for some reason)
+
+run variant_many_types.cpp : : :
+    <toolset>gcc,<target-os>windows:<variant>release
+    <toolset>gcc,<target-os>cygwin:<variant>release
+    ;
 
 run variant_visit_r.cpp : : :
     <toolset>gcc,<target-os>windows:<variant>release
