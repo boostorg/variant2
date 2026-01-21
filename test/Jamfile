@@ -1,14 +1,8 @@
-#  Boost.Variant2 Library Test Jamfile
-#
-#  Copyright 2015-2019 Peter Dimov
-#
+#  Copyright 2015-2026 Peter Dimov
 #  Distributed under the Boost Software License, Version 1.0.
-#  See accompanying file LICENSE_1_0.txt or copy at
-#  http://www.boost.org/LICENSE_1_0.txt
+#  https://www.boost.org/LICENSE_1_0.txt
 
 import testing ;
-import-search /boost/config/checks ;
-import config : requires ;
 
 project
   : default-build
@@ -48,7 +42,7 @@ run variant_copy_construct.cpp ;
 compile variant_copy_construct_cx.cpp ;
 
 run variant_move_construct.cpp ;
-compile variant_move_construct_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_move_construct_cx.cpp ;
 
 run variant_value_construct.cpp ;
 compile variant_value_construct_cx.cpp ;
@@ -60,27 +54,27 @@ run variant_in_place_type_construct.cpp ;
 compile variant_in_place_type_construct_cx.cpp ;
 
 run variant_copy_assign.cpp ;
-compile variant_copy_assign_cx.cpp : [ requires cxx14_constexpr ] <toolset>gcc-5:<build>no <toolset>gcc-6:<build>no ;
+compile variant_copy_assign_cx.cpp ;
 
 run variant_move_assign.cpp ;
-compile variant_move_assign_cx.cpp : [ requires cxx14_constexpr ] <toolset>gcc-5:<build>no <toolset>gcc-6:<build>no ;
+compile variant_move_assign_cx.cpp ;
 
 run variant_value_assign.cpp ;
-compile variant_value_assign_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_value_assign_cx.cpp ;
 
 run variant_emplace_index.cpp ;
-compile variant_emplace_index_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_emplace_index_cx.cpp ;
 
 run variant_emplace_type.cpp ;
-compile variant_emplace_type_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_emplace_type_cx.cpp ;
 
 run variant_swap.cpp ;
 
 run variant_eq_ne.cpp ;
-compile variant_eq_ne_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_eq_ne_cx.cpp ;
 
 run variant_lt_gt.cpp ;
-compile variant_lt_gt_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_lt_gt_cx.cpp ;
 
 run variant_destroy.cpp ;
 run variant_visit.cpp ;
@@ -103,10 +97,10 @@ local NX =
     ;
 
 run variant_get_by_index.cpp throw_exception.cpp : : : $(NX) : variant_get_by_index_nx ;
-compile variant_get_by_index_cx.cpp : $(NX) <toolset>msvc-14.0:<build>no : variant_get_by_index_cx_nx ;
+compile variant_get_by_index_cx.cpp : $(NX) : variant_get_by_index_cx_nx ;
 
 run variant_get_by_type.cpp throw_exception.cpp : : : $(NX) : variant_get_by_type_nx ;
-compile variant_get_by_type_cx.cpp : $(NX) <toolset>msvc-14.0:<build>no : variant_get_by_type_cx_nx ;
+compile variant_get_by_type_cx.cpp : $(NX) : variant_get_by_type_cx_nx ;
 
 run variant_subset.cpp throw_exception.cpp : : : $(NX) : variant_subset_nx ;
 
@@ -146,9 +140,9 @@ compile variant_uses_double_storage.cpp ;
 
 run variant_derived_construct2.cpp ;
 
-compile variant_visit_cx.cpp : [ requires cxx14_constexpr ] ;
-compile variant_visit_cx_2.cpp : [ requires cxx14_constexpr ] ;
-compile variant_visit_r_cx.cpp : [ requires cxx14_constexpr ] ;
+compile variant_visit_cx.cpp ;
+compile variant_visit_cx_2.cpp ;
+compile variant_visit_r_cx.cpp ;
 
 local index-type-reqs =
 
