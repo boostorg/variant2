@@ -324,11 +324,40 @@ constexpr std::size_t variant_npos = ~static_cast<std::size_t>( 0 );
 
 // holds_alternative
 
+#if !defined(BOOST_MP11_HAS_CXX14_CONSTEXPR)
+
 template<class U, class... T> constexpr bool holds_alternative( variant<T...> const& v ) noexcept
 {
-    static_assert( mp11::mp_count<variant<T...>, U>::value == 1, "The type must occur exactly once in the list of variant alternatives" );
-    return v.index() == mp11::mp_find<variant<T...>, U>::value;
+    static_assert( mp11::mp_contains<variant<T...>, U>::value, "The type must be present in the list of variant alternatives" );
+
+    using A = bool[];
+    return A{ std::is_same<U, T>::value... }[ v.index() ];
 }
+
+#else
+
+namespace detail
+{
+
+template<class U, class V> struct holds_alternative_L
+{
+    template<class I> constexpr bool operator()( I ) const noexcept
+    {
+        return std::is_same< U, mp11::mp_at<V, I> >::value;
+    }
+};
+
+} // namespace detail
+
+template<class U, class... T> constexpr bool holds_alternative( variant<T...> const& v ) noexcept
+{
+    using V = variant<T...>;
+    static_assert( mp11::mp_contains<V, U>::value, "The type must be present in the list of variant alternatives" );
+
+    return mp11::mp_with_index<sizeof...(T)>( v.index(), detail::holds_alternative_L<U, V>() );
+}
+
+#endif
 
 // get (index)
 

@@ -39,11 +39,19 @@ int main()
     {
         constexpr variant<int, float, float> v;
         STATIC_ASSERT( holds_alternative<int>( v ) );
+        STATIC_ASSERT( !holds_alternative<float>( v ) );
     }
 
     {
         constexpr variant<int, int, float> v( 3.14f );
+        STATIC_ASSERT( !holds_alternative<int>( v ) );
         STATIC_ASSERT( holds_alternative<float>( v ) );
+    }
+
+    {
+        constexpr variant<int, int, float> v;
+        STATIC_ASSERT( holds_alternative<int>( v ) );
+        STATIC_ASSERT( !holds_alternative<float>( v ) );
     }
 }
 
