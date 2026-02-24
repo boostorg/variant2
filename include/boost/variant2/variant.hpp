@@ -627,6 +627,8 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_false, T1, T.
 
 #if defined(BOOST_GCC) && (__GNUC__ >= 7)
 // false positive, see https://github.com/boostorg/variant2/issues/55
+// ... and https://github.com/boostorg/variant2/pull/57
+// ... and https://github.com/boostorg/variant2/pull/58
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
@@ -754,6 +756,8 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_true, T1, T..
 
 #if defined(BOOST_GCC) && (__GNUC__ >= 7)
 // false positive, see https://github.com/boostorg/variant2/issues/55
+// ... and https://github.com/boostorg/variant2/pull/57
+// ... and https://github.com/boostorg/variant2/pull/58
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
