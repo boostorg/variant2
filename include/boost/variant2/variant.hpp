@@ -752,9 +752,17 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_true, T1, T..
     T1 first_;
     variant_storage<T...> rest_;
 
+#if defined(BOOST_GCC) && (__GNUC__ >= 14)
+# pragma GCC diagnostic push
+// False positive in at least GCC 14 with -O3 (via result<T>)
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     template<class... A> constexpr variant_storage_impl( mp11::mp_size_t<0>, A&&... a ): first_( std::forward<A>(a)... )
     {
     }
+#if defined(BOOST_GCC) && (__GNUC__ >= 14)
+# pragma GCC diagnostic pop
+#endif
 
     template<std::size_t I, class... A> constexpr variant_storage_impl( mp11::mp_size_t<I>, A&&... a ): rest_( mp11::mp_size_t<I-1>(), std::forward<A>(a)... )
     {
