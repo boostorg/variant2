@@ -625,7 +625,7 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_false, T1, T.
     T1 first_;
     variant_storage<T...> rest_;
 
-#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+#if defined(BOOST_GCC) && (__GNUC__ >= 7)
 // false positive, see https://github.com/boostorg/variant2/issues/55
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -635,7 +635,7 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_false, T1, T.
     {
     }
 
-#if defined(BOOST_GCC) && (__GNUC__ >= 12)
+#if defined(BOOST_GCC) && (__GNUC__ >= 7)
 # pragma GCC diagnostic pop
 #endif
 
@@ -752,9 +752,19 @@ template<class T1, class... T> union variant_storage_impl<mp11::mp_true, T1, T..
     T1 first_;
     variant_storage<T...> rest_;
 
+#if defined(BOOST_GCC) && (__GNUC__ >= 7)
+// false positive, see https://github.com/boostorg/variant2/issues/55
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
     template<class... A> constexpr variant_storage_impl( mp11::mp_size_t<0>, A&&... a ): first_( std::forward<A>(a)... )
     {
     }
+
+#if defined(BOOST_GCC) && (__GNUC__ >= 7)
+# pragma GCC diagnostic pop
+#endif
 
     template<std::size_t I, class... A> constexpr variant_storage_impl( mp11::mp_size_t<I>, A&&... a ): rest_( mp11::mp_size_t<I-1>(), std::forward<A>(a)... )
     {
