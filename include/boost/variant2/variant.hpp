@@ -2103,6 +2103,21 @@ public:
 namespace detail
 {
 
+namespace relops_constraints
+{
+
+struct not_comparable {};
+template<class U> not_comparable operator==( U const &, U const & );
+template<class U> not_comparable operator!=( U const &, U const & );
+template<class U> not_comparable operator< ( U const &, U const & );
+template<class U> not_comparable operator<=( U const &, U const & );
+
+template<class T> struct has_eq: std::is_convertible<decltype( std::declval<const T&>() == std::declval<const T&>() ), bool>
+{
+};
+
+} // namespace relops_constraints
+
 template<class... T> struct eq_L
 {
     variant<T...> const & v;
@@ -2116,13 +2131,23 @@ template<class... T> struct eq_L
 
 } // namespace detail
 
-template<class... T> constexpr bool operator==( variant<T...> const & v, variant<T...> const & w )
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_eq<T>...>::value>::type>
+constexpr bool operator==( variant<T...> const & v, variant<T...> const & w )
 {
     return v.index() == w.index() && mp11::mp_with_index<sizeof...(T)>( v.index(), detail::eq_L<T...>{ v, w } );
 }
 
 namespace detail
 {
+
+namespace relops_constraints
+{
+
+template<class T> struct has_neq: std::is_convertible<decltype( std::declval<const T&>() != std::declval<const T&>() ), bool>
+{
+};
+
+} // namespace relops_constraints
 
 template<class... T> struct ne_L
 {
@@ -2137,13 +2162,23 @@ template<class... T> struct ne_L
 
 } // namespace detail
 
-template<class... T> constexpr bool operator!=( variant<T...> const & v, variant<T...> const & w )
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_neq<T>...>::value>::type>
+constexpr bool operator!=( variant<T...> const & v, variant<T...> const & w )
 {
     return v.index() != w.index() || mp11::mp_with_index<sizeof...(T)>( v.index(), detail::ne_L<T...>{ v, w } );
 }
 
 namespace detail
 {
+
+namespace relops_constraints
+{
+
+template<class T> struct has_lt: std::is_convertible<decltype( std::declval<const T&>() < std::declval<const T&>() ), bool>
+{
+};
+
+} // namespace relops_constraints
 
 template<class... T> struct lt_L
 {
@@ -2158,18 +2193,29 @@ template<class... T> struct lt_L
 
 } // namespace detail
 
-template<class... T> constexpr bool operator<( variant<T...> const & v, variant<T...> const & w )
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_lt<T>...>::value>::type>
+constexpr bool operator<( variant<T...> const & v, variant<T...> const & w )
 {
     return v.index() < w.index() || ( v.index() == w.index() && mp11::mp_with_index<sizeof...(T)>( v.index(), detail::lt_L<T...>{ v, w } ) );
 }
 
-template<class... T> constexpr bool operator>(  variant<T...> const & v, variant<T...> const & w )
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_lt<T>...>::value>::type>
+constexpr bool operator>(  variant<T...> const & v, variant<T...> const & w )
 {
     return w < v;
 }
 
 namespace detail
 {
+
+namespace relops_constraints
+{
+
+template<class T> struct has_le: std::is_convertible<decltype( std::declval<const T&>() <= std::declval<const T&>() ), bool>
+{
+};
+
+} // namespace relops_constraints
 
 template<class... T> struct le_L
 {
@@ -2184,12 +2230,14 @@ template<class... T> struct le_L
 
 } // namespace detail
 
-template<class... T> constexpr bool operator<=( variant<T...> const & v, variant<T...> const & w )
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_le<T>...>::value>::type>
+constexpr bool operator<=( variant<T...> const & v, variant<T...> const & w )
 {
     return v.index() < w.index() || ( v.index() == w.index() && mp11::mp_with_index<sizeof...(T)>( v.index(), detail::le_L<T...>{ v, w } ) );
 }
 
-template<class... T> constexpr bool operator>=( variant<T...> const & v, variant<T...> const & w )
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_le<T>...>::value>::type>
+constexpr bool operator>=( variant<T...> const & v, variant<T...> const & w )
 {
     return w <= v;
 }
