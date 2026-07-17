@@ -127,7 +127,7 @@ int main()
         using v_t = const variant<int, no_ne>&;
 
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() == std::declval<v_t>() ), bool     >));
-        BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() != std::declval<v_t>() ), not_found>));
+        BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( operator!=( std::declval<v_t>(), std::declval<v_t>() ) ), not_found>));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() <  std::declval<v_t>() ), bool     >));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() <= std::declval<v_t>() ), bool     >));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() >  std::declval<v_t>() ), bool     >));
@@ -138,7 +138,7 @@ int main()
         using v_t = const variant<int, bad_ne>&;
 
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() == std::declval<v_t>() ), bool     >));
-        BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() != std::declval<v_t>() ), not_found>));
+        BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( operator!= ( std::declval<v_t>(), std::declval<v_t>() ) ), not_found>));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() <  std::declval<v_t>() ), bool     >));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() <= std::declval<v_t>() ), bool     >));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() >  std::declval<v_t>() ), bool     >));
