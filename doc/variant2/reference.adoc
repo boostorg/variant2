@@ -845,6 +845,9 @@ template<class... T>
 [none]
 * {blank}
 +
+Constraints: :: `std::declval<const Ti&>() == std::declval<const Ti&>()` is a valid expression 
+  convertible to `bool` for all `Ti` in `T...`.
++
 Returns: :: `v.index() == w.index() && get<I>(v) == get<I>(w)`, where `I`
   is `v.index()`.
 
@@ -855,6 +858,9 @@ template<class... T>
 [none]
 * {blank}
 +
+Constraints: :: `std::declval<const Ti&>() != std::declval<const Ti&>()` is a valid expression 
+  convertible to `bool` for all `Ti` in `T...`.
++
 Returns: :: `!(v == w)`.
 
 ```
@@ -863,6 +869,9 @@ template<class... T>
 ```
 [none]
 * {blank}
++
+Constraints: :: `std::declval<const Ti&>() < std::declval<const Ti&>()` is a valid expression 
+  convertible to `bool` for all `Ti` in `T...`.
 +
 Returns: :: `v.index() < w.index() || (v.index() == w.index() && get<I>(v) < get<I>(w))`,
   where `I` is `v.index()`.
@@ -874,6 +883,9 @@ template<class... T>
 [none]
 * {blank}
 +
+Constraints: :: `std::declval<const Ti&>() < std::declval<const Ti&>()` is a valid expression 
+  convertible to `bool` for all `Ti` in `T...`.
++
 Returns: :: `w < v`.
 
 ```
@@ -882,6 +894,9 @@ template<class... T>
 ```
 [none]
 * {blank}
++
+Constraints: :: `std::declval<const Ti&>() \<= std::declval<const Ti&>()` is a valid expression 
+  convertible to `bool` for all `Ti` in `T...`.
 +
 Returns: :: `v.index() < w.index() || (v.index() == w.index() && get<I>(v) \<= get<I>(w))`,
   where `I` is `v.index()`.
@@ -892,6 +907,9 @@ template<class... T>
 ```
 [none]
 * {blank}
++
+Constraints: :: `std::declval<const Ti&>() \<= std::declval<const Ti&>()` is a valid expression 
+  convertible to `bool` for all `Ti` in `T...`.
 +
 Returns: ::
   `w \<= v`.
