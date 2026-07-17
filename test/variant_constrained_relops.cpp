@@ -9,6 +9,7 @@
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
+#include <functional>
 #include <type_traits>
 
 #if !defined(BOOST_NO_SFINAE_EXPR) && \
@@ -99,6 +100,15 @@ struct bad_le
     void operator<=( const bad_le& ) const;
 };
 
+struct non_comparable {};
+
+template<typename T>
+struct wrapper
+{ 
+    T t; 
+    bool operator<(const wrapper& x) const { return t < x.t; }; 
+};
+
 int main()
 {
     {
@@ -187,6 +197,16 @@ int main()
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() <= std::declval<v_t>() ), not_found>));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() >  std::declval<v_t>() ), bool     >));
         BOOST_TEST_TRAIT_TRUE((std::is_same<decltype( std::declval<v_t>() >= std::declval<v_t>() ), not_found>));
+    }
+
+    {
+        //https://github.com/boostorg/variant2/issues/60
+
+        using v_t = variant<non_comparable>;
+        using reference_wrapper = std::reference_wrapper<v_t>;
+
+        wrapper<reference_wrapper*> x{nullptr}, y{nullptr};
+        (void)(x < y);
     }
 
     return boost::report_errors();
