@@ -2112,20 +2112,18 @@ namespace relops_constraints
 template<class...> struct make_void { typedef void type; };
 
 #define BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( name, op ) \
-template<class T, class = void> struct name##_impl: std::false_type {}; \
+template<class T, class = void> struct name: std::false_type {}; \
 \
-template<class T> struct name##_impl<T, typename make_void< \
+template<class T> struct name<T, typename make_void< \
     decltype( std::declval<const T&>() op std::declval<const T&>() )>::type>: \
     std::is_convertible<decltype( std::declval<const T&>() op std::declval<const T&>() ), bool> \
 { \
-}; \
-\
-template<class T> struct name: name##_impl<T> {};
+};
 
 #else
 
-// non-expression-SFINAE fallback does not work with deleted relops, 
-// compilation fails instead, which is good enough
+// non-expression-SFINAE fallback does not work with deleted relops: 
+// variant's relop instantiation fails instead, which is good enough
 
 struct not_comparable {};
 template<class U> not_comparable operator==( U const &, U const & );
