@@ -2106,15 +2106,41 @@ namespace detail
 namespace relops_constraints
 {
 
+#if !defined(BOOST_NO_SFINAE_EXPR) && \
+    !BOOST_WORKAROUND(BOOST_MSVC, < 1900) && !BOOST_WORKAROUND(BOOST_GCC, < 40900)
+
+template<class...> struct make_void { typedef void type; };
+
+#define BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( name, op ) \
+template<class T, class = void> struct name##_impl: std::false_type {}; \
+\
+template<class T> struct name##_impl<T, typename make_void< \
+    decltype( std::declval<const T&>() op std::declval<const T&>() )>::type>: \
+    std::is_convertible<decltype( std::declval<const T&>() op std::declval<const T&>() ), bool> \
+{ \
+}; \
+\
+template<class T> struct name: name##_impl<T> {};
+
+#else
+
+// non-expression-SFINAE fallback does not work with deleted relops, 
+// compilation fails instead, which is good enough
+
 struct not_comparable {};
 template<class U> not_comparable operator==( U const &, U const & );
 template<class U> not_comparable operator!=( U const &, U const & );
 template<class U> not_comparable operator< ( U const &, U const & );
 template<class U> not_comparable operator<=( U const &, U const & );
 
-template<class T> struct has_eq: std::is_convertible<decltype( std::declval<const T&>() == std::declval<const T&>() ), bool>
-{
+#define BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( name, op ) \
+template<class T> struct name: std::is_convertible<decltype( std::declval<const T&>() op std::declval<const T&>() ), bool> \
+{ \
 };
+
+#endif
+
+BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( has_eq, == )
 
 } // namespace relops_constraints
 
@@ -2143,9 +2169,7 @@ namespace detail
 namespace relops_constraints
 {
 
-template<class T> struct has_neq: std::is_convertible<decltype( std::declval<const T&>() != std::declval<const T&>() ), bool>
-{
-};
+BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( has_ne, != )
 
 } // namespace relops_constraints
 
@@ -2162,7 +2186,7 @@ template<class... T> struct ne_L
 
 } // namespace detail
 
-template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_neq<T>...>::value>::type>
+template<class... T,  class E = typename std::enable_if<mp11::mp_all<detail::relops_constraints::has_ne<T>...>::value>::type>
 constexpr bool operator!=( variant<T...> const & v, variant<T...> const & w )
 {
     return v.index() != w.index() || mp11::mp_with_index<sizeof...(T)>( v.index(), detail::ne_L<T...>{ v, w } );
@@ -2174,9 +2198,7 @@ namespace detail
 namespace relops_constraints
 {
 
-template<class T> struct has_lt: std::is_convertible<decltype( std::declval<const T&>() < std::declval<const T&>() ), bool>
-{
-};
+BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( has_lt, < )
 
 } // namespace relops_constraints
 
@@ -2211,9 +2233,8 @@ namespace detail
 namespace relops_constraints
 {
 
-template<class T> struct has_le: std::is_convertible<decltype( std::declval<const T&>() <= std::declval<const T&>() ), bool>
-{
-};
+BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT( has_le, <= )
+#undef BOOST_VARIANT2_DEFINE_RELOP_CONSTRAINT
 
 } // namespace relops_constraints
 
