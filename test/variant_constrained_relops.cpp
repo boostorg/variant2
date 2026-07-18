@@ -20,13 +20,13 @@
 using namespace boost::variant2;
 
 struct not_found {};
-struct any { any( ... ); };
-not_found operator==( any const &, any const & );
-not_found operator!=( any const &, any const & );
-not_found operator< ( any const &, any const & );
-not_found operator<=( any const &, any const & );
-not_found operator> ( any const &, any const & );
-not_found operator>=( any const &, any const & );
+struct variant_sink { template<class... T> variant_sink( variant<T...> const & ); };
+not_found operator==( variant_sink const &, variant_sink const & );
+not_found operator!=( variant_sink const &, variant_sink const & );
+not_found operator< ( variant_sink const &, variant_sink const & );
+not_found operator<=( variant_sink const &, variant_sink const & );
+not_found operator> ( variant_sink const &, variant_sink const & );
+not_found operator>=( variant_sink const &, variant_sink const & );
 
 struct no_eq
 {
