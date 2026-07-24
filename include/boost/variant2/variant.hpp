@@ -2164,9 +2164,13 @@ template<class... T> struct lt_L
     }
 };
 
+template<class T> using has_lt_impl = std::is_convertible<decltype( std::declval<T const&>() < std::declval<T const&>() ), bool>;
+template<class T> using has_lt = mp11::mp_valid_and_true<has_lt_impl, T>;
+
 } // namespace detail
 
-template<class... T> constexpr bool operator<( variant<T...> const & v, variant<T...> const & w )
+template< class... T, class En = mp11::mp_if<mp11::mp_all<detail::has_lt<T>...>, void> >
+constexpr bool operator<( variant<T...> const & v, variant<T...> const & w )
 {
     return v.index() < w.index() || ( v.index() == w.index() && mp11::mp_with_index<sizeof...(T)>( v.index(), detail::lt_L<T...>{ v, w } ) );
 }
