@@ -6,7 +6,6 @@
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
 #include <boost/mp11.hpp>
-#include <type_traits>
 
 using boost::variant2::detail::has_le;
 
@@ -26,15 +25,22 @@ struct X3
     void operator<=( X3 const& ) const;
 };
 
+struct X4
+{
+    bool operator<=( X4 const& ) const;
+};
+
 int main()
 {
     BOOST_TEST_TRAIT_FALSE(( has_le< X1 > ));
     BOOST_TEST_TRAIT_FALSE(( has_le< X2 > ));
     BOOST_TEST_TRAIT_FALSE(( has_le< X3 > ));
+    BOOST_TEST_TRAIT_TRUE(( has_le< X4 > ));
 
     BOOST_TEST_TRAIT_FALSE(( has_le< variant<X1> > ));
     BOOST_TEST_TRAIT_FALSE(( has_le< variant<X2> > ));
     BOOST_TEST_TRAIT_FALSE(( has_le< variant<X3> > ));
+    BOOST_TEST_TRAIT_TRUE(( has_le< variant<X4> > ));
 
     return boost::report_errors();
 }
