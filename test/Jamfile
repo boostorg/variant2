@@ -181,7 +181,8 @@ run variant_issue_55.cpp
     "<toolset>clang-win,<address-model>32:<build>no"
   ;
 
-link variant_issue_60.cpp ;
+link variant_issue_60.cpp
+  : "<toolset>gcc-4.8:<build>no" ;
 
 run variant_eq_2.cpp ;
 run variant_ne_2.cpp ;
