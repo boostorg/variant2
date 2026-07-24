@@ -186,3 +186,4 @@ link variant_issue_60.cpp ;
 run variant_eq_2.cpp ;
 run variant_ne_2.cpp ;
 run variant_lt_2.cpp ;
+run variant_le_2.cpp ;
