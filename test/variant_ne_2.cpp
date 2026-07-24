@@ -2,6 +2,16 @@
 // Distributed under the Boost Software License, Version 1.0.
 // https://www.boost.org/LICENSE_1_0.txt
 
+#include <boost/config.hpp>
+#include <boost/config/pragma_message.hpp>
+
+#if defined(BOOST_MSVC) && BOOST_MSVC < 1920
+
+BOOST_PRAGMA_MESSAGE( "Test skipped, because BOOST_MSVC < 1920" )
+int main() {}
+
+#else
+
 #include <boost/variant2/variant.hpp>
 #include <boost/core/lightweight_test.hpp>
 #include <boost/core/lightweight_test_trait.hpp>
@@ -44,3 +54,5 @@ int main()
 
     return boost::report_errors();
 }
+
+#endif
