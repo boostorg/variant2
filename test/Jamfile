@@ -184,3 +184,4 @@ run variant_issue_55.cpp
 link variant_issue_60.cpp ;
 
 run variant_eq_2.cpp ;
+run variant_ne_2.cpp ;
