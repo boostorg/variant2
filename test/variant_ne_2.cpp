@@ -8,8 +8,7 @@
 #include <boost/mp11.hpp>
 #include <type_traits>
 
-template<class T> using has_ne_impl = decltype( std::declval<T const&>() != std::declval<T const&>() );
-template<class T> using has_ne = boost::mp11::mp_valid<has_ne_impl, T>;
+using boost::variant2::detail::has_ne;
 
 using namespace boost::variant2;
 
@@ -29,6 +28,10 @@ struct X3
 
 int main()
 {
+    BOOST_TEST_TRAIT_FALSE(( has_ne< X1 > ));
+    BOOST_TEST_TRAIT_FALSE(( has_ne< X2 > ));
+    BOOST_TEST_TRAIT_FALSE(( has_ne< X3 > ));
+
     BOOST_TEST_TRAIT_FALSE(( has_ne< variant<X1> > ));
     BOOST_TEST_TRAIT_FALSE(( has_ne< variant<X2> > ));
     BOOST_TEST_TRAIT_FALSE(( has_ne< variant<X3> > ));

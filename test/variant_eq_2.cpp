@@ -8,8 +8,7 @@
 #include <boost/mp11.hpp>
 #include <type_traits>
 
-template<class T> using has_eq_impl = decltype( std::declval<T const&>() == std::declval<T const&>() );
-template<class T> using has_eq = boost::mp11::mp_valid<has_eq_impl, T>;
+using boost::variant2::detail::has_eq;
 
 using namespace boost::variant2;
 
@@ -29,6 +28,10 @@ struct X3
 
 int main()
 {
+    BOOST_TEST_TRAIT_FALSE(( has_eq< X1 > ));
+    BOOST_TEST_TRAIT_FALSE(( has_eq< X2 > ));
+    BOOST_TEST_TRAIT_FALSE(( has_eq< X3 > ));
+
     BOOST_TEST_TRAIT_FALSE(( has_eq< variant<X1> > ));
     BOOST_TEST_TRAIT_FALSE(( has_eq< variant<X2> > ));
     BOOST_TEST_TRAIT_FALSE(( has_eq< variant<X3> > ));
